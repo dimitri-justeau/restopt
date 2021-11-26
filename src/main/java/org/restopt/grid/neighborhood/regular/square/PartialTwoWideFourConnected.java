@@ -39,7 +39,7 @@ public class PartialTwoWideFourConnected<T extends PartialRegularSquareGrid> imp
     public int[] getNeighbors(T grid, int i) {
         PartialFourConnected four = Neighborhoods.PARTIAL_FOUR_CONNECTED;
         int[] fourneigh = four.getNeighbors(grid, i);
-        ISet neighbors = SetFactory.makeBipartiteSet(0);
+        ISet neighbors = SetFactory.makeBitSet(0);
         for (int neigh : fourneigh) {
             neighbors.add(neigh);
             for (int nneigh : four.getNeighbors(grid, neigh)) {
