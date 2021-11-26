@@ -29,7 +29,7 @@ To execute restopt, you need three rasters that must have the same extents and r
 - `-restorable`: a quantitative raster corresponding to the amount of restorable area in each cell. The values must be
   integer between 0 and `cellArea`, a parameter which corresponds to the total area of a raster cell.
 
-- `accessible`: a raster corresponding to the accessible cells (those that can be considered for restoration). These
+- `-accessible`: a raster corresponding to the accessible cells (those that can be considered for restoration). These
   cells are identified by the value of the parameter `accessibleValue`. If every cell are accessible, use the binary
   habitat raster with `accessibleValue = 1`.
 
