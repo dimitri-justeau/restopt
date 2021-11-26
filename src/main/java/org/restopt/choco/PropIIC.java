@@ -23,12 +23,6 @@
 
 package org.restopt.choco;
 
-import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.restopt.BaseProblem;
-import org.restopt.grid.neighborhood.INeighborhood;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
-import org.restopt.grid.regular.square.RegularSquareGrid;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
 import org.chocosolver.solver.exception.ContradictionException;
@@ -36,8 +30,10 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
-
-import java.util.Arrays;
+import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.restopt.grid.neighborhood.INeighborhood;
+import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
+import org.restopt.grid.regular.square.RegularSquareGrid;
 
 /**
  * Propagator maintaining a variable equals to the Integral Index of Connectivity (IIC).

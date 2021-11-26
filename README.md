@@ -10,6 +10,8 @@ For a detailed description of the problem solved by `restopt`, please refer to t
 
 `restopt` is currently distributed as .jar command-line interface. To execute this jar, the Java Runtime Environment (JRE) is needed (version 8 minimum), download and installation instructions for the JRE are available here: https://www.oracle.com/java/technologies/javase-downloads.html, or here: https://openjdk.java.net/install/.
 
+Last release: https://github.com/dimitri-justeau/restopt/releases/tag/1.0-beta
+
 An R interface is under development: stay tuned !
 
 To execute restopt, you need three rasters that must have the same extents and resolutions:

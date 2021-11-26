@@ -28,9 +28,6 @@ import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * The 2-wide four-connected neighborhood in a regular square org.flsgen.grid.
  */

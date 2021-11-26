@@ -23,9 +23,9 @@
 
 package org.restopt.choco;
 
+import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.restopt.grid.Grid;
 import org.restopt.grid.neighborhood.INeighborhood;
-import org.chocosolver.util.objects.graphs.UndirectedGraph;
 
 import java.util.Arrays;
 import java.util.HashSet;

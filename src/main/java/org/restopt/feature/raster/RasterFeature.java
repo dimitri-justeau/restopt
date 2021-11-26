@@ -23,8 +23,8 @@
 
 package org.restopt.feature.raster;
 
-import org.restopt.raster.RasterReader;
 import org.restopt.feature.Feature;
+import org.restopt.raster.RasterReader;
 
 import java.io.File;
 import java.io.IOException;

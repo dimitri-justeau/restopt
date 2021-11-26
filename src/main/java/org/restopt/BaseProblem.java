@@ -7,7 +7,6 @@ import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
-import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
@@ -16,7 +15,10 @@ import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.choco.*;
+import org.restopt.choco.FragmentationIndices;
+import org.restopt.choco.PropEffectiveMeshSize;
+import org.restopt.choco.PropIIC;
+import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
@@ -24,7 +26,6 @@ import org.restopt.grid.regular.square.RegularSquareGrid;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.InputMismatchException;
-import java.util.Map;
 import java.util.stream.IntStream;
 
 public class BaseProblem {

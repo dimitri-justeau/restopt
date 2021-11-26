@@ -1,10 +1,10 @@
 package org.restopt;
 
-import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.gce.geotiff.GeoTiffWriter;
+import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 
 import java.awt.*;
 import java.awt.image.*;

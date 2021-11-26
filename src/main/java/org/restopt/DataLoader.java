@@ -1,8 +1,8 @@
 package org.restopt;
 
-import org.restopt.raster.RasterReader;
 import org.restopt.feature.QuantitativeFeature;
 import org.restopt.feature.raster.QuantitativeRasterFeature;
+import org.restopt.raster.RasterReader;
 
 import java.io.IOException;
 
