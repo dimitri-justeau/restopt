@@ -45,7 +45,7 @@ public class FourConnected<T extends RegularSquareGrid> implements INeighborhood
     public int getTopNeighbor(T grid, int i) {
         int nbCols = grid.getNbCols();
         if (i >= nbCols) {
-            return  i - nbCols;
+            return i - nbCols;
         }
         return -1;
     }
@@ -54,7 +54,7 @@ public class FourConnected<T extends RegularSquareGrid> implements INeighborhood
         int nbCols = grid.getNbCols();
         int nbRows = grid.getNbRows();
         if (i < nbCols * (nbRows - 1)) {
-            return  i + nbCols;
+            return i + nbCols;
         }
         return -1;
     }
@@ -62,7 +62,7 @@ public class FourConnected<T extends RegularSquareGrid> implements INeighborhood
     public int getLeftNeighbor(T grid, int i) {
         int nbCols = grid.getNbCols();
         if (i % nbCols != 0) {
-            return  i - 1;
+            return i - 1;
         }
         return -1;
     }

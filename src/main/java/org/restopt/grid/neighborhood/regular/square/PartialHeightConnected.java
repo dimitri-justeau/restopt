@@ -45,7 +45,7 @@ public class PartialHeightConnected<T extends PartialRegularSquareGrid> implemen
         int leftBottom = (idx < nbCols * (nbRows - 1)) && (idx % nbCols != 0) ? grid.getPartialIndex(idx + nbCols - 1) : -1;
         int rightBottom = (idx < nbCols * (nbRows - 1)) && ((idx + 1) % nbCols != 0) ? grid.getPartialIndex(idx + nbCols + 1) : -1;
         return IntStream.of(left, right, top, bottom, leftTop, rightTop, leftBottom, rightBottom)
-                .filter(x -> x >=0).toArray();
+                .filter(x -> x >= 0).toArray();
     }
 
 }

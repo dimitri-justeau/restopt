@@ -15,7 +15,7 @@ public class DataLoader {
     private QuantitativeFeature restorable;
     private QuantitativeFeature accessible;
 
-    private  int[] habitatData;
+    private int[] habitatData;
     private int[] restorableData;
     private int[] accessibleData;
 
@@ -23,7 +23,8 @@ public class DataLoader {
     private int height;
 
     private String habitatRasterPath;
-    private String accessibleRasterPath;;
+    private String accessibleRasterPath;
+    ;
     private String restorableRasterPath;
 
     public DataLoader(String habitatRasterPath, String accessibleRasterPath, String restorableRasterPath) throws IOException {

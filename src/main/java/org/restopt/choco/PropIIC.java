@@ -37,7 +37,7 @@ import org.restopt.grid.regular.square.RegularSquareGrid;
 
 /**
  * Propagator maintaining a variable equals to the Integral Index of Connectivity (IIC).
- *
+ * <p>
  * Ref: https://link.springer.com/article/10.1007/s10980-006-0013-z
  *
  * @author Dimitri Justeau-Allaire
@@ -55,13 +55,12 @@ public class PropIIC extends Propagator<Variable> {
     private ConnectivityFinderSpatialGraph ccLB, ccUB;
 
     /**
-     *
-     * @param g The graph variable associated to the region for which the propagator will maintain IIC.
-     * @param iic The integer variable equals to IIC, maintained by this propagator.
+     * @param g             The graph variable associated to the region for which the propagator will maintain IIC.
+     * @param iic           The integer variable equals to IIC, maintained by this propagator.
      * @param landscapeArea The total landscape area.
      */
     public PropIIC(UndirectedGraphVar g, IntVar iic, PartialRegularGroupedGrid grid, int landscapeArea, INeighborhood distanceThreshold, int precison, boolean maximize) {
-        super(new Variable[] {g, iic}, PropagatorPriority.QUADRATIC, false);
+        super(new Variable[]{g, iic}, PropagatorPriority.QUADRATIC, false);
         this.g = g;
         this.grid = grid;
         this.iic = iic;
@@ -80,7 +79,7 @@ public class PropIIC extends Propagator<Variable> {
         if (!maximize || g.isInstantiated()) {
             int iic_LB = (int) Math.round(getIICLB() * Math.pow(10, precision));
             iic.updateLowerBound(iic_LB, this);
-        }        
+        }
         // UB
         int iic_UB = (int) Math.round(getIICUB() * Math.pow(10, precision));
         iic.updateUpperBound(iic_UB, this);
@@ -120,7 +119,7 @@ public class PropIIC extends Propagator<Variable> {
             int[] dists = bfs(i, adj);
             for (int j = 0; j < adj.length; j++) {
                 if (dists[j] >= 0) {
-                    iic +=  (connectivityFinder.getAttributeCC()[i] * connectivityFinder.getAttributeCC()[j]) / (1 + dists[j]);
+                    iic += (connectivityFinder.getAttributeCC()[i] * connectivityFinder.getAttributeCC()[j]) / (1 + dists[j]);
                 }
             }
         }
@@ -166,7 +165,7 @@ public class PropIIC extends Propagator<Variable> {
         int rear = 0;
         int[] dist = new int[n];
         for (int i = 0; i < n; i++) {
-            dist[i] = - 1;
+            dist[i] = -1;
         }
         int current;
         visited[source] = true;

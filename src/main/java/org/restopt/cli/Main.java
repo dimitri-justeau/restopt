@@ -8,10 +8,10 @@ import picocli.CommandLine;
 import java.io.IOException;
 
 @CommandLine.Command(
-        name="restopt",
-        description="Find connected and compact areas maximizing the effective mesh size (MESH) or the integral index of connectivity (IIC).",
+        name = "restopt",
+        description = "Find connected and compact areas maximizing the effective mesh size (MESH) or the integral index of connectivity (IIC).",
         mixinStandardHelpOptions = true,
-        version="1.0"
+        version = "1.0"
 )
 public class Main {
 

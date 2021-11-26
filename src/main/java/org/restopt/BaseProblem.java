@@ -194,12 +194,12 @@ public class BaseProblem {
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial MESH value", "optimal MESH value", "solving time (ms)"},
                 {
-                    String.valueOf(solution.getIntVal(minRestore)),
-                    String.valueOf(solution.getIntVal(maxRestorable)),
-                    String.valueOf(solution.getSetVal(restoreSet).length),
-                    String.valueOf(1.0 * Math.round(MESH_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
-                    String.valueOf((1.0 * solution.getIntVal(MESH)) / Math.pow(10, precision)),
-                    String.valueOf((System.currentTimeMillis() - t))
+                        String.valueOf(solution.getIntVal(minRestore)),
+                        String.valueOf(solution.getIntVal(maxRestorable)),
+                        String.valueOf(solution.getSetVal(restoreSet).length),
+                        String.valueOf(1.0 * Math.round(MESH_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
+                        String.valueOf((1.0 * solution.getIntVal(MESH)) / Math.pow(10, precision)),
+                        String.valueOf((System.currentTimeMillis() - t))
                 }
         };
         System.out.println("\n--- Best solution ---\n");
@@ -251,7 +251,7 @@ public class BaseProblem {
             TimeCounter timeCounter = new TimeCounter(model, (long) (timeLimit * 1e9));
             solution = solver.findOptimalSolution(IIC, true, timeCounter);
         } else {
-             solution = solver.findOptimalSolution(IIC, true);
+            solution = solver.findOptimalSolution(IIC, true);
         }
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial IIC value", "optimal IIC value", "solving time (ms)"},

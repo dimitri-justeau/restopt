@@ -44,7 +44,7 @@ public class HeightConnected<T extends RegularSquareGrid> implements INeighborho
         int leftBottom = (i < nbCols * (nbRows - 1)) && (i % nbCols != 0) ? i + nbCols - 1 : -1;
         int rightBottom = (i < nbCols * (nbRows - 1)) && ((i + 1) % nbCols != 0) ? i + nbCols + 1 : -1;
         return IntStream.of(left, right, top, bottom, leftTop, rightTop, leftBottom, rightBottom)
-                .filter(x -> x >=0).toArray();
+                .filter(x -> x >= 0).toArray();
     }
 
 }

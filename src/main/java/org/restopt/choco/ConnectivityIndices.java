@@ -65,11 +65,11 @@ public class ConnectivityIndices {
             int[] dists = bfs(i, neigh);
             for (int j = 0; j < neigh.length; j++) {
                 if (dists[j] >= 0) {
-                    iic_UB +=  (sizeCC[i] * sizeCC[j]) / (1 + dists[j]);
+                    iic_UB += (sizeCC[i] * sizeCC[j]) / (1 + dists[j]);
                 }
             }
         }
-        return iic_UB  / (grid.getNbCells() * grid.getNbCells());
+        return iic_UB / (grid.getNbCells() * grid.getNbCells());
     }
 
     private static int[] bfs(int source, int[][] adj) {
@@ -80,7 +80,7 @@ public class ConnectivityIndices {
         int rear = 0;
         int[] dist = new int[n];
         for (int i = 0; i < n; i++) {
-            dist[i] = - 1;
+            dist[i] = -1;
         }
         int current;
         visited[source] = true;

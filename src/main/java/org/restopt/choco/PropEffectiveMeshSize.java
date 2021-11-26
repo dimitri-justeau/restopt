@@ -35,7 +35,7 @@ import java.util.stream.IntStream;
 
 /**
  * Propagator maintaining a variable equals to the Effective Mesh Size (MESH), using the classical CUT procedure.
- *
+ * <p>
  * Ref: https://link.springer.com/article/10.1023/A:1008129329289
  *
  * @author Dimitri Justeau-Allaire
@@ -51,9 +51,8 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     private int[] cellsArea;
 
     /**
-     *
-     * @param g The graph variable associated to the region for which the propagator will maintain MESH.
-     * @param mesh The integer variable equals to MESH, maintained by this propagator.
+     * @param g             The graph variable associated to the region for which the propagator will maintain MESH.
+     * @param mesh          The integer variable equals to MESH, maintained by this propagator.
      * @param landscapeArea The total landscape area.
      */
     public PropEffectiveMeshSize(UndirectedGraphVar g, IntVar mesh, int landscapeArea, int precison, boolean maximize) {
@@ -61,7 +60,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     }
 
     public PropEffectiveMeshSize(UndirectedGraphVar g, IntVar mesh, int[] cellsArea, int landscapeArea, int precison, boolean maximize) {
-        super(new Variable[] {g, mesh}, PropagatorPriority.VERY_SLOW, false);
+        super(new Variable[]{g, mesh}, PropagatorPriority.VERY_SLOW, false);
         this.g = g;
         this.mesh = mesh;
         this.landscapeArea = landscapeArea;

@@ -67,12 +67,12 @@ public class SolutionExporter {
 
         DataBuffer buff = grid.getRenderedImage().getData().getDataBuffer();
         SampleModel sm = new BandedSampleModel(DataBuffer.TYPE_INT, width, height, 1);
-        WritableRaster rast = Raster.createWritableRaster(sm, buff, new Point(0,0));
+        WritableRaster rast = Raster.createWritableRaster(sm, buff, new Point(0, 0));
         rast.setPixels(0, 0, width, height, completeData);
 
         GridCoverageFactory f = new GridCoverageFactory();
         GridCoverage2D destCov = f.create("rast", rast, grid.getEnvelope());
 
-        writer.write(destCov,null);
+        writer.write(destCov, null);
     }
 }
