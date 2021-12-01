@@ -162,10 +162,10 @@ public class Main {
         baseProblem.postCompactnessConstraint(main.maxDiam);
         baseProblem.postRestorableConstraint(main.minRestore, main.maxRestore, main.cellArea, main.minProportion);
         if (main.objective == Objective.MESH) {
-            baseProblem.maximizeMESH(main.precision, main.outputPath, main.timeLimit, false);
+            baseProblem.maximizeMESH(main.precision, main.outputPath, main.timeLimit);
         } else {
             if (main.objective == Objective.IIC) {
-                baseProblem.maximizeIIC(main.precision, main.outputPath, main.timeLimit, false);
+                baseProblem.maximizeIIC(main.precision, main.outputPath, main.timeLimit);
             }
         }
     }

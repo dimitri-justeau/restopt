@@ -149,7 +149,7 @@ public class BaseProblem {
         model.post(cons);
     }
 
-    public void maximizeMESH(int precision, String outputPath, int timeLimit, boolean lns) throws IOException, ContradictionException {
+    public boolean maximizeMESH(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
         MESH = model.intVar(
                 "MESH",
                 0, (int) ((grid.getNbCells() + nonHabNonAcc) * Math.pow(10, precision))
@@ -173,16 +173,7 @@ public class BaseProblem {
         System.out.println("\nMESH initial = " + MESH_initial + "\n");
         Solver solver = model.getSolver();
         solver.showShortStatistics();
-
         solver.setSearch(Search.setVarSearch(restoreSet));
-
-        if (lns) {
-            if (timeLimit == 0) {
-                throw new InputMismatchException("LNS cannot be used without a time limit, as it breaks completeness " +
-                        "and is not guaranteed to terminate without a limit.");
-            }
-//            solver.setLNS(INeighborFactory.random(reserveModel.getSites()));
-        }
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -190,6 +181,10 @@ public class BaseProblem {
             solution = solver.findOptimalSolution(MESH, true, timeCounter);
         } else {
             solution = solver.findOptimalSolution(MESH, true);
+        }
+        if (solution == null) {
+            System.out.println("There is no solution satisfying the constraints");
+            return false;
         }
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial MESH value", "optimal MESH value", "solving time (ms)"},
@@ -212,9 +207,10 @@ public class BaseProblem {
         System.out.println("\nRaster exported at " + outputPath + ".tif");
         System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
+        return true;
     }
 
-    public void maximizeIIC(int precision, String outputPath, int timeLimit, boolean lns) throws IOException, ContradictionException {
+    public boolean maximizeIIC(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
         IIC = model.intVar(
                 "IIC",
                 0, (int) (Math.pow(10, precision))
@@ -234,17 +230,8 @@ public class BaseProblem {
         model.post(consIIC);
         double IIC_initial = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
         System.out.println("\nIIC initial = " + IIC_initial + "\n");
-
         Solver solver = model.getSolver();
         solver.showShortStatistics();
-//        solver.setSearch(Search.minDomUBSearch(reserveModel.getSites()));
-        if (lns) {
-            if (timeLimit == 0) {
-                throw new InputMismatchException("LNS cannot be used without a time limit, as it breaks completeness " +
-                        "and is not guaranteed to terminate without a limit.");
-            }
-//            solver.setLNS(INeighborFactory.random(reserveModel.getSites()));
-        }
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -252,6 +239,10 @@ public class BaseProblem {
             solution = solver.findOptimalSolution(IIC, true, timeCounter);
         } else {
             solution = solver.findOptimalSolution(IIC, true);
+        }
+        if (solution == null) {
+            System.out.println("There is no solution satisfying the constraints");
+            return false;
         }
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial IIC value", "optimal IIC value", "solving time (ms)"},
@@ -274,6 +265,7 @@ public class BaseProblem {
         System.out.println("\nRaster exported at " + outputPath + ".tif");
         System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
+        return true;
     }
 
     public void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) {
@@ -311,7 +303,7 @@ public class BaseProblem {
                 this,
                 sites,
                 data.getHabitatRasterPath(),
-                exportPath + ".cvs",
+                exportPath + ".csv",
                 exportPath + ".tif"
         );
         exporter.exportCharacteristics(characteristics);

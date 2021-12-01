@@ -20,7 +20,7 @@ public class TestSolve {
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
         Path temp = Files.createTempFile("test_mesh", "");
-        baseProblem.maximizeMESH(3, temp.toString(), 0, false);
+        baseProblem.maximizeMESH(3, temp.toString(), 0);
         Files.delete(temp);
     }
 
@@ -35,7 +35,7 @@ public class TestSolve {
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
         Path temp = Files.createTempFile("test_mesh2", "");
-        baseProblem.maximizeMESH(3, temp.toString(), 0, false);
+        baseProblem.maximizeMESH(3, temp.toString(), 0);
         Files.delete(temp);
     }
 
@@ -50,7 +50,7 @@ public class TestSolve {
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
         Path temp = Files.createTempFile("test_iic", "");
-        baseProblem.maximizeIIC(3, temp.toString(), 0, false);
+        baseProblem.maximizeIIC(3, temp.toString(), 0);
         Files.delete(temp);
     }
 
@@ -65,7 +65,7 @@ public class TestSolve {
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
         Path temp = Files.createTempFile("test_iic2", "");
-        baseProblem.maximizeIIC(3, temp.toString(), 0, false);
+        baseProblem.maximizeIIC(3, temp.toString(), 0);
         Files.delete(temp);
     }
 }
