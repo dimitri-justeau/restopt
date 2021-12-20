@@ -2,7 +2,7 @@
 
 [![Java CI with Maven](https://github.com/dimitri-justeau/restopt/actions/workflows/maven.yml/badge.svg)](https://github.com/dimitri-justeau/restopt/actions/workflows/maven.yml) [![codecov](https://codecov.io/gh/dimitri-justeau/restopt/branch/master/graph/badge.svg?token=O0TFEUGPGF)](https://codecov.io/gh/dimitri-justeau/restopt) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/84acbf275a6a4abeb65b712993004652)](https://www.codacy.com/gh/dimitri-justeau/restopt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dimitri-justeau/restopt&amp;utm_campaign=Badge_Grade) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-`restopt` is an ecological restoration planning (SCP) software which is specifically designed to identify connected,
+`restopt` is an ecological restoration planning software which is specifically designed to identify connected,
 accessible, and compact areas for ecological restoration, with an emphasis on reducing habitat fragmentation and
 increasing habitat connectivity.
 
@@ -29,7 +29,7 @@ To execute restopt, you need three rasters that must have the same extents and r
 - `-restorable`: a quantitative raster corresponding to the amount of restorable area in each cell. The values must be
   integer between 0 and `cellArea`, a parameter which corresponds to the total area of a raster cell.
 
-- `accessible`: a raster corresponding to the accessible cells (those that can be considered for restoration). These
+- `-accessible`: a raster corresponding to the accessible cells (those that can be considered for restoration). These
   cells are identified by the value of the parameter `accessibleValue`. If every cell are accessible, use the binary
   habitat raster with `accessibleValue = 1`.
 
