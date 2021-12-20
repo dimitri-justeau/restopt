@@ -10,8 +10,6 @@ import java.util.Map;
 
 public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
 
-    private UndirectedGraph groupGraph;
-    private ConnectivityFinderSpatialGraph connectivityFinder;
     private int[] sizeCells;
     private int nbGroups;
     private ISet[] groups;
@@ -21,9 +19,8 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
 
     public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, UndirectedGraph groupGraph) {
         super(nbRows, nbCols, toDiscard);
-        this.groupGraph = groupGraph;
         this.nbGroupedCells = groupGraph.getNodes().size();
-        this.connectivityFinder = new ConnectivityFinderSpatialGraph(groupGraph);
+        ConnectivityFinderSpatialGraph connectivityFinder = new ConnectivityFinderSpatialGraph(groupGraph);
         connectivityFinder.findAllCC();
         this.nbGroups = connectivityFinder.getNBCC();
         this.sizeCells = new int[super.getNbCells() - nbGroupedCells + nbGroups];

@@ -26,10 +26,10 @@ package org.restopt.choco;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
 
 /**
- * Utility class to compute fragmentation indices on static objects.
+ * Utility class to compute landscape indices on static objects.
  * e.g. to get the initial value of a landscape before solving.
  */
-public class FragmentationIndices {
+public class LandscapeIndicesUtils {
 
     public static double effectiveMeshSize(UndirectedGraph g, int landscapeArea) {
         ConnectivityFinderSpatialGraph connFinder = new ConnectivityFinderSpatialGraph(g);

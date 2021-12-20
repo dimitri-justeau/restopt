@@ -52,7 +52,8 @@ public class PropIIC extends Propagator<Variable> {
     protected INeighborhood threshold;
     public int[][] threshNeigh;
     private boolean maximize;
-    private ConnectivityFinderSpatialGraph ccLB, ccUB;
+    private ConnectivityFinderSpatialGraph ccLB;
+    private ConnectivityFinderSpatialGraph ccUB;
 
     /**
      * @param g             The graph variable associated to the region for which the propagator will maintain IIC.
@@ -137,11 +138,9 @@ public class PropIIC extends Propagator<Variable> {
                     threshNeigh[node] = threshold.getNeighbors(grid, node);
                 }
                 for (int j : threshNeigh[node]) {
-                    if (nodeCC[j] != i && nodes.contains(j)) {
-                        if (!conn[nodeCC[j]]) {
-                            conn[nodeCC[j]] = true;
-                            nAdj += 1;
-                        }
+                    if (nodeCC[j] != i && nodes.contains(j) && !conn[nodeCC[j]]) {
+                        conn[nodeCC[j]] = true;
+                        nAdj += 1;
                     }
                 }
             }

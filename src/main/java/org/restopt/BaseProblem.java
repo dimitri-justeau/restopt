@@ -15,7 +15,7 @@ import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.choco.FragmentationIndices;
+import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.choco.PropEffectiveMeshSize;
 import org.restopt.choco.PropIIC;
 import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
@@ -25,7 +25,6 @@ import org.restopt.grid.regular.square.RegularSquareGrid;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.stream.IntStream;
 
 public class BaseProblem {
@@ -36,15 +35,16 @@ public class BaseProblem {
     public int accessibleVal;
 
     Model model;
-    UndirectedGraphVar habitatGraph, restoreGraph;
+    UndirectedGraphVar habitatGraph;
+    UndirectedGraphVar restoreGraph;
     public UndirectedGraph habGraph;
     SetVar restoreSet;
 
     public int nonHabNonAcc;
-    public int nCC;
     public int[] accessibleNonHabitatPixels;
 
-    public IntVar minRestore, maxRestorable;
+    public IntVar minRestore;
+    public IntVar maxRestorable;
     public IntVar MESH;
     public IntVar IIC;
 
@@ -166,7 +166,7 @@ public class BaseProblem {
                 )
         );
         model.post(meshCons);
-        double MESH_initial = FragmentationIndices.effectiveMeshSize(
+        double MESH_initial = LandscapeIndicesUtils.effectiveMeshSize(
                 habGraph,
                 (grid.getNbUngroupedCells() + nonHabNonAcc)
         );

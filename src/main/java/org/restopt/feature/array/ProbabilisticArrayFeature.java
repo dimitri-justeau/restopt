@@ -43,10 +43,10 @@ public class ProbabilisticArrayFeature extends ArrayFeature implements Probabili
     }
 
     @Override
-    public double[] getProbabilisticData() throws Exception {
+    public double[] getProbabilisticData() throws InvalidDataException {
         for (double d : getData()) {
             if (d > 1) {
-                throw new Exception("There are values strictly greater than 1 in the array describing the " +
+                throw new InvalidDataException("There are values strictly greater than 1 in the array describing the " +
                         "feature. They cannot be interpreted as probabilistic data");
             }
         }

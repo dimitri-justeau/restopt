@@ -16,7 +16,9 @@ import java.io.IOException;
 
 public class SolutionExporter {
 
-    public String csvDest, rastDest, template;
+    public String csvDest;
+    public String rastDest;
+    public String template;
     public int[] solution;
     public int[] completeData;
     public BaseProblem baseProblem;

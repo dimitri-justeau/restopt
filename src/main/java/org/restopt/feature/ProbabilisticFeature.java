@@ -33,14 +33,20 @@ public interface ProbabilisticFeature extends Feature {
     /**
      * @return The data associated with the feature as probabilistic data.
      */
-    default double[] getProbabilisticData() throws Exception, IOException {
+    default double[] getProbabilisticData() throws InvalidDataException, IOException {
         double[] data = getData();
         for (double d : data) {
             if (d > 1) {
-                throw new Exception("There are values strictly greater than 1 describing the feature." +
+                throw new InvalidDataException("There are values strictly greater than 1 describing the feature." +
                         " They cannot be interpreted as probabilistic data");
             }
         }
         return getData();
+    }
+
+    class InvalidDataException extends Exception {
+        public InvalidDataException(String s) {
+            super(s);
+        }
     }
 }

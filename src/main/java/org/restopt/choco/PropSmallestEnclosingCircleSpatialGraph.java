@@ -43,7 +43,9 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
 
     private UndirectedGraphVar g;
     private double[][] coordinates;
-    private RealVar radius, centerX, centerY;
+    private RealVar radius;
+    private RealVar centerX;
+    private RealVar centerY;
     private ISet pointsSet;
 
     public PropSmallestEnclosingCircleSpatialGraph(UndirectedGraphVar g, double[][] coordinates, RealVar radius, RealVar centerX, RealVar centerY) {

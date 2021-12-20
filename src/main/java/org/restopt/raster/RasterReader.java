@@ -40,14 +40,15 @@ public class RasterReader {
     private String filePath;
 
     /**
-     * Metadata of the org.restopt.raster
+     * Metadata of the raster
      */
-    private int width, height;
+    private int width;
+    private int height;
 
     /**
      * Constructor.
      *
-     * @param rasterFilePath The path to the org.restopt.raster file.
+     * @param rasterFilePath The path to the raster file.
      */
     public RasterReader(String rasterFilePath) throws IOException {
         this.filePath = rasterFilePath;

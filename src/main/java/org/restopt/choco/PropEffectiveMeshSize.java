@@ -46,9 +46,9 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     protected IntVar mesh;
     protected int landscapeArea;
     protected int precision;
-    public ConnectivityFinderSpatialGraph connectivityFinderGUB, connectivityFinderGLB;
+    public ConnectivityFinderSpatialGraph connectivityFinderGUB;
+    public ConnectivityFinderSpatialGraph connectivityFinderGLB;
     private boolean maximize;
-    private int[] cellsArea;
 
     /**
      * @param g             The graph variable associated to the region for which the propagator will maintain MESH.
@@ -67,7 +67,6 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         this.precision = precison;
         this.connectivityFinderGUB = new ConnectivityFinderSpatialGraph(g.getUB(), cellsArea);
         this.connectivityFinderGLB = new ConnectivityFinderSpatialGraph(g.getLB(), cellsArea);
-        this.cellsArea = cellsArea;
         this.maximize = maximize;
     }
 
@@ -106,11 +105,9 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
                         }
                     }
                 }
-                if (filtered) {
-                    if (!maximize || g.isInstantiated()) {
-                        int mesh_LB_round = getLB();
-                        mesh.updateLowerBound(mesh_LB_round, this);
-                    }
+                if (filtered && (!maximize || g.isInstantiated())) {
+                    int mesh_LB_round = getLB();
+                    mesh.updateLowerBound(mesh_LB_round, this);
                 }
             }
         }

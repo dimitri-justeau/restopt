@@ -47,9 +47,17 @@ public class ConnectivityFinderSpatialGraph {
 
     private int n;
     private UndirectedGraph g;
-    private int[] CCFirstNode, CCNextNode, nodeCC, p, fifo, sizeCC, attributeCC;
+    private int[] CCFirstNode;
+    private int[] CCNextNode;
+    private int[] nodeCC;
+    private int[] p;
+    private int[] fifo;
+    private int[] sizeCC;
+    private int[] attributeCC;
     private int[] attributeCell;
-    private int nbCC, sizeMinCC, sizeMaxCC;
+    private int nbCC;
+    private int sizeMinCC;
+    private int sizeMaxCC;
 
     /**
      * Create an object that can compute Connected Components (CC) of a graph g

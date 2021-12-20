@@ -1,6 +1,5 @@
 package org.restopt;
 
-import org.restopt.feature.QuantitativeFeature;
 import org.restopt.feature.raster.QuantitativeRasterFeature;
 import org.restopt.raster.RasterReader;
 
@@ -10,10 +9,6 @@ import java.io.IOException;
  * Class for loading and accessing problem's data.
  */
 public class DataLoader {
-
-    private QuantitativeFeature habitat;
-    private QuantitativeFeature restorable;
-    private QuantitativeFeature accessible;
 
     private int[] habitatData;
     private int[] restorableData;
@@ -42,9 +37,9 @@ public class DataLoader {
             throw new IOException("All input rasters must have the same dimension");
         }
         // Load data
-        habitat = new QuantitativeRasterFeature(habitatRasterPath);
-        restorable = new QuantitativeRasterFeature(restorableRasterPath);
-        accessible = new QuantitativeRasterFeature(accessibleRasterPath);
+        QuantitativeRasterFeature habitat = new QuantitativeRasterFeature(habitatRasterPath);
+        QuantitativeRasterFeature restorable = new QuantitativeRasterFeature(restorableRasterPath);
+        QuantitativeRasterFeature accessible = new QuantitativeRasterFeature(accessibleRasterPath);
         habitatData = habitat.getQuantitativeData();
         restorableData = restorable.getQuantitativeData();
         accessibleData = accessible.getQuantitativeData();
