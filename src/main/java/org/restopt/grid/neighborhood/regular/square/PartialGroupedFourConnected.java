@@ -32,6 +32,8 @@ import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
+import java.util.Set;
+
 /**
  * The four-connected neighborhood in a partial regular square org.flsgen.grid.
  */
@@ -58,9 +60,9 @@ public class PartialGroupedFourConnected<T extends PartialRegularGroupedGrid> im
     }
 
     @Override
-    public UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType setType) {
+    public UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType nodeSetType, SetType edgeSetType) {
         int nbCells = grid.getNbCells();
-        UndirectedGraph partialGraph = GraphFactory.makeStoredUndirectedGraph(model, nbCells, setType, setType);
+        UndirectedGraph partialGraph = GraphFactory.makeStoredUndirectedGraph(model, nbCells, nodeSetType, edgeSetType);
         for (int i : cells) {
             partialGraph.addNode(i);
         }
@@ -75,6 +77,11 @@ public class PartialGroupedFourConnected<T extends PartialRegularGroupedGrid> im
             }
         }
         return partialGraph;
+    }
+
+    @Override
+    public UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType setType) {
+        return getPartialGraph(grid, model, cells, setType, setType);
     }
 
 }

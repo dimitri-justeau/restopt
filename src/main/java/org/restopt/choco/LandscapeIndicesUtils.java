@@ -37,7 +37,7 @@ public class LandscapeIndicesUtils {
         double mesh = 0;
         for (int i = 0; i < connFinder.getNBCC(); i++) {
             int s = connFinder.getSizeCC()[i];
-            mesh += s * s;
+            mesh += 1.0 * s * s;
         }
         mesh /= 1.0 * landscapeArea;
         return mesh;

@@ -17,9 +17,11 @@ public class DataLoader {
     private int width;
     private int height;
 
+    public double noDataHabitat;
+
     private String habitatRasterPath;
     private String accessibleRasterPath;
-    ;
+
     private String restorableRasterPath;
 
     public DataLoader(String habitatRasterPath, String accessibleRasterPath, String restorableRasterPath) throws IOException {
@@ -32,6 +34,7 @@ public class DataLoader {
         RasterReader rasterAccessible = new RasterReader(accessibleRasterPath);
         height = rasterHabitat.getHeight();
         width = rasterHabitat.getWidth();
+        noDataHabitat = rasterHabitat.getNoDataValue();
         if (height != rasterRestorable.getHeight() || height != rasterAccessible.getHeight()
                 || width != rasterRestorable.getWidth() || width != rasterAccessible.getWidth()) {
             throw new IOException("All input rasters must have the same dimension");

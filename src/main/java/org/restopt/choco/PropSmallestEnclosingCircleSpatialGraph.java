@@ -31,15 +31,16 @@ import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.objects.setDataStructures.ISetIterator;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.tools.ArrayUtils;
+
+import java.util.Arrays;
 
 /**
  *
  */
 public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable> {
-
-    public final static double EPSILON = 1e-5;
 
     private UndirectedGraphVar g;
     private double[][] coordinates;
@@ -85,8 +86,12 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
     public void propagate(int evtmask) throws ContradictionException {
         ISet ker = getKernelPoints();
         ISet env = getEnvelopePoints();
+        // Empty region is only allowed in radius lower bound is 0
         if (env.size() == 0) {
-            fails();
+            if (radius.getLB() > 0) {
+                fails();
+            }
+            return;
         }
         if (ker.size() == env.size()) {
             double[] minidisk = minidisk(ker);
@@ -130,8 +135,10 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         ISet ker = getKernelPoints();
         ISet env = getEnvelopePoints();
         if (env.size() == 0) {
-            // We assume that by definition, the empty region of points does not satisfy the constraint.
-            return ESat.FALSE;
+            if (radius.getLB() > 0) {
+                return ESat.FALSE;
+            }
+            return ESat.UNDEFINED;
         }
         if (ker.size() == env.size()) {
             double[] minidisk = minidisk(ker);
@@ -187,13 +194,16 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         }
         if (nbPoints == 1) {
             double[] center = coordinates[points.iterator().next()];
-            return new double[]{center[0], center[1], EPSILON};
+            return new double[]{center[0], center[1], 0};
         }
         if (nbPoints == 2) {
-            double[] p1 = coordinates[points.iterator().next()];
-            double[] p2 = coordinates[points.iterator().next()];
+            ISetIterator iter = points.iterator();
+            int i = iter.next();
+            int j = iter.next();
+            double[] p1 = coordinates[i];
+            double[] p2 = coordinates[j];
             double[] center = midpoint(p1, p2);
-            return new double[]{center[0], center[1], (distance(p1, p2) / 2) + EPSILON};
+            return new double[]{center[0], center[1], (distance(p1, p2) / 2)};
         }
         // Shuffle the points
         int[] pointsArray = points.toArray();
@@ -204,7 +214,7 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         double[] p1 = coordinates[pointsArray[0]];
         double[] p2 = coordinates[pointsArray[1]];
         double[] center = midpoint(p1, p2);
-        double r = (distance(p1, p2) / 2) + EPSILON;
+        double r = (distance(p1, p2) / 2);
         // Check other points
         for (int i = 2; i < pointsArray.length; i++) {
             double[] pi = coordinates[pointsArray[i]];
@@ -223,7 +233,7 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         double[] p1 = coordinates[shuffled[0]];
         double[] pi = coordinates[shuffled[i]];
         double[] center = midpoint(p1, pi);
-        double r = (distance(p1, pi) / 2) + EPSILON;
+        double r = (distance(p1, pi) / 2);
         // Check whether previous points are included in this new circle
         for (int j = 1; j < i; j++) {
             double[] pj = coordinates[shuffled[j]];
@@ -241,7 +251,7 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         double[] pi = coordinates[shuffled[i]];
         double[] pj = coordinates[shuffled[j]];
         double[] center = midpoint(pi, pj);
-        double r = (distance(pi, pj) / 2) + EPSILON;
+        double r = (distance(pi, pj) / 2);
         // Check whether previous points are included in this new circle
         for (int k = 0; k < j; k++) {
             double[] pk = coordinates[shuffled[k]];
@@ -288,7 +298,7 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         double cy = ((Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (c[0] - b[0])
                 + (Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (a[0] - c[0])
                 + (Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (b[0] - a[0])) / d;
-        double cr = distance(new double[]{cx, cy}, a) + EPSILON;
+        double cr = distance(new double[]{cx, cy}, a);
         return new double[]{cx, cy, cr};
     }
 

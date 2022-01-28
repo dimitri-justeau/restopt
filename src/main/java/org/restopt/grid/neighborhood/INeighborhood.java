@@ -59,6 +59,23 @@ public interface INeighborhood<T extends Grid> {
         return g;
     }
 
+    default UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType nodeSetType, SetType edgeSetType) {
+        int nbCells = grid.getNbCells();
+        UndirectedGraph partialGraph = GraphFactory.makeStoredUndirectedGraph(model, nbCells, nodeSetType, edgeSetType);
+        for (int i : cells) {
+            partialGraph.addNode(i);
+        }
+        for (int i : cells) {
+            int[] neighbors = getNeighbors(grid, i);
+            for (int ii : neighbors) {
+                if (partialGraph.getNodes().contains(ii)) {
+                    partialGraph.addEdge(i, ii);
+                }
+            }
+        }
+        return partialGraph;
+    }
+
     /**
      * @param grid    A org.flsgen.grid.
      * @param model   The GraphModel to be associated with the graph.
@@ -67,8 +84,12 @@ public interface INeighborhood<T extends Grid> {
      * @return The partial graph associated to a subset of cells of the org.flsgen.grid.
      */
     default UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType setType) {
+        return getPartialGraph(grid, model, cells, setType, setType);
+    }
+
+    default UndirectedGraph getPartialGraph(T grid, int[] cells, SetType nodeSetType, SetType edgeSetType) {
         int nbCells = grid.getNbCells();
-        UndirectedGraph partialGraph = GraphFactory.makeStoredUndirectedGraph(model, nbCells, setType, setType);
+        UndirectedGraph partialGraph = GraphFactory.makeUndirectedGraph(nbCells, nodeSetType, edgeSetType);
         for (int i : cells) {
             partialGraph.addNode(i);
         }
@@ -84,20 +105,7 @@ public interface INeighborhood<T extends Grid> {
     }
 
     default UndirectedGraph getPartialGraph(T grid, int[] cells, SetType setType) {
-        int nbCells = grid.getNbCells();
-        UndirectedGraph partialGraph = GraphFactory.makeUndirectedGraph(nbCells, setType, setType);
-        for (int i : cells) {
-            partialGraph.addNode(i);
-        }
-        for (int i : cells) {
-            int[] neighbors = getNeighbors(grid, i);
-            for (int ii : neighbors) {
-                if (partialGraph.getNodes().contains(ii)) {
-                    partialGraph.addEdge(i, ii);
-                }
-            }
-        }
-        return partialGraph;
+        return getPartialGraph(grid, cells, setType, setType);
     }
 
     default UndirectedGraph getPartialGraphUB(T grid, Model model, int[] cells, SetType setType) {

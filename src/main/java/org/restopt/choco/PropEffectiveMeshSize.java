@@ -118,7 +118,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         connectivityFinderGLB.findAllCC();
         for (int i = 0; i < connectivityFinderGLB.getNBCC(); i++) {
             int s = connectivityFinderGLB.getAttributeCC()[i];
-            mesh_LB += s * s;
+            mesh_LB += 1.0 * s * s;
         }
         mesh_LB /= 1.0 * landscapeArea;
         int mesh_LB_round = (int) Math.round(mesh_LB * Math.pow(10, precision));
@@ -130,7 +130,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         connectivityFinderGUB.findAllCC();
         for (int i = 0; i < connectivityFinderGUB.getNBCC(); i++) {
             int s = connectivityFinderGUB.getAttributeCC()[i];
-            mesh_UB += s * s;
+            mesh_UB += 1.0 * s * s;
         }
         mesh_UB /= 1.0 * landscapeArea;
         int mesh_UB_round = (int) Math.round(mesh_UB * Math.pow(10, precision));

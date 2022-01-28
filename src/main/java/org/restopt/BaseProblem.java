@@ -48,6 +48,10 @@ public class BaseProblem {
     public IntVar MESH;
     public IntVar IIC;
 
+    PropSmallestEnclosingCircleSpatialGraph propCompact;
+
+    public BaseProblem() {}
+
     public BaseProblem(DataLoader data, int accessibleVal) {
 
         this.data = data;
@@ -61,7 +65,7 @@ public class BaseProblem {
         System.out.println("Width = " + data.getWidth());
 
         int[] outPixels = IntStream.range(0, data.getHabitatData().length)
-                .filter(i -> data.getHabitatData()[i] <= -1)
+                .filter(i -> data.getHabitatData()[i] <= -1 || data.getHabitatData()[i] == data.noDataHabitat)
                 .toArray();
 
         int[] nonHabitatNonAccessiblePixels = IntStream.range(0, data.getHabitatData().length)
@@ -72,7 +76,7 @@ public class BaseProblem {
                 .filter(i -> data.getHabitatData()[i] == 1)
                 .toArray();
 
-        habGraph = Neighborhoods.FOUR_CONNECTED.getPartialGraph(new RegularSquareGrid(data.getHeight(), data.getWidth()), habitatPixelsComp, SetType.BIPARTITESET);
+        habGraph = Neighborhoods.FOUR_CONNECTED.getPartialGraph(new RegularSquareGrid(data.getHeight(), data.getWidth()), habitatPixelsComp, SetType.RANGESET, SetType.RANGESET);
 
         nonHabNonAcc = nonHabitatNonAccessiblePixels.length;
 
@@ -82,10 +86,7 @@ public class BaseProblem {
                 .filter(i -> data.getHabitatData()[i] == 0)
                 .toArray();
 
-        int[] habitatPixels = IntStream.range(0, data.getHabitatData().length)
-                .filter(i -> data.getHabitatData()[i] == 1)
-                .map(i -> grid.getGroupIndexFromCompleteIndex(i))
-                .toArray();
+        int[] habitatPixels = IntStream.range(0, grid.getNbGroups()).toArray();
 
         accessibleNonHabitatPixels = IntStream.range(0, data.getAccessibleData().length)
                 .filter(i -> data.getAccessibleData()[i] == accessibleVal && data.getHabitatData()[i] == 0)
@@ -93,7 +94,7 @@ public class BaseProblem {
                 .toArray();
 
         System.out.println("Current landscape state loaded");
-        System.out.println("    Habitat cells = " + habitatPixels.length + " ");
+        System.out.println("    Habitat cells = " + habitatPixelsComp.length + " ");
         System.out.println("    Non habitat cells = " + nonHabitatPixels.length + " ");
         System.out.println("    Accessible non habitat cells = " + accessibleNonHabitatPixels.length + " ");
         System.out.println("    Out cells = " + outPixels.length);
@@ -104,8 +105,8 @@ public class BaseProblem {
 
         model = new Model();
 
-        UndirectedGraph hab_LB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET);
-        UndirectedGraph hab_UB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, accessibleNonHabitatPixels), SetType.BIPARTITESET);
+        UndirectedGraph hab_LB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET, SetType.BIPARTITESET);
+        UndirectedGraph hab_UB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, accessibleNonHabitatPixels), SetType.BIPARTITESET, SetType.BIPARTITESET);
 
         habitatGraph = model.nodeInducedGraphVar(
                 "habitatGraph",
@@ -123,44 +124,47 @@ public class BaseProblem {
     public void postCompactnessConstraint(double maxDiameter) {
 
         double[][] coords = new double[grid.getNbCells()][];
+        double[][] compCoords = grid.getCartesianCoordinates();
         for (int i = 0; i < accessibleNonHabitatPixels.length; i++) {
-            coords[accessibleNonHabitatPixels[i]] = grid.getCartesianCoordinates()[grid.getUngroupedPartialIndex(accessibleNonHabitatPixels[i])];
+            coords[accessibleNonHabitatPixels[i]] = compCoords[grid.getUngroupedPartialIndex(accessibleNonHabitatPixels[i])];
         }
 
-        Constraint cons = new Constraint("maxDiam", new PropSmallestEnclosingCircleSpatialGraph(
+        propCompact = new PropSmallestEnclosingCircleSpatialGraph(
                 restoreGraph,
                 coords,
                 model.realVar("radius", 0, 0.5 * maxDiameter, 1e-5),
-                model.realVar(
+                model.realVar("centerX",
                         Arrays.stream(grid.getCartesianCoordinates())
                                 .mapToDouble(c -> c[0]).min().getAsDouble(),
                         Arrays.stream(grid.getCartesianCoordinates())
                                 .mapToDouble(c -> c[0]).max().getAsDouble(),
                         1e-5
                 ),
-                model.realVar(
+                model.realVar("centerY",
                         Arrays.stream(grid.getCartesianCoordinates())
                                 .mapToDouble(c -> c[0]).min().getAsDouble(),
                         Arrays.stream(grid.getCartesianCoordinates())
                                 .mapToDouble(c -> c[0]).max().getAsDouble(),
                         1e-5
                 )
-        ));
+        );
+        Constraint cons = new Constraint("maxDiam", propCompact);
         model.post(cons);
     }
 
     public boolean maximizeMESH(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
         MESH = model.intVar(
                 "MESH",
-                0, (int) ((grid.getNbCells() + nonHabNonAcc) * Math.pow(10, precision))
+                0, (int) ((data.getHeight() * data.getWidth() - grid.getDiscardSet().size()) * Math.pow(10, precision))
         );
+        int landscapeArea = grid.getNbUngroupedCells() + nonHabNonAcc;
         Constraint meshCons = new Constraint(
                 "MESH_constraint",
                 new PropEffectiveMeshSize(
                         habitatGraph,
                         MESH,
                         grid.getSizeCells(),
-                        (grid.getNbUngroupedCells() + nonHabNonAcc),
+                        landscapeArea,
                         precision,
                         true
                 )
@@ -189,8 +193,8 @@ public class BaseProblem {
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial MESH value", "optimal MESH value", "solving time (ms)"},
                 {
-                        String.valueOf(solution.getIntVal(minRestore)),
-                        String.valueOf(solution.getIntVal(maxRestorable)),
+                        String.valueOf(getMinRestoreValue(solution)),
+                        String.valueOf(getMaxRestorableValue(solution)),
                         String.valueOf(solution.getSetVal(restoreSet).length),
                         String.valueOf(1.0 * Math.round(MESH_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
                         String.valueOf((1.0 * solution.getIntVal(MESH)) / Math.pow(10, precision)),
@@ -211,6 +215,7 @@ public class BaseProblem {
     }
 
     public boolean maximizeIIC(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
+        int landscapeArea = grid.getNbUngroupedCells() + nonHabNonAcc;
         IIC = model.intVar(
                 "IIC",
                 0, (int) (Math.pow(10, precision))
@@ -221,7 +226,7 @@ public class BaseProblem {
                         habitatGraph,
                         IIC,
                         grid,
-                        (grid.getNbUngroupedCells() + nonHabNonAcc),
+                        landscapeArea,
                         Neighborhoods.PARTIAL_GROUPED_TWO_WIDE_FOUR_CONNECTED,
                         precision,
                         true
@@ -231,6 +236,7 @@ public class BaseProblem {
         double IIC_initial = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
         System.out.println("\nIIC initial = " + IIC_initial + "\n");
         Solver solver = model.getSolver();
+        solver.setSearch(Search.setVarSearch(restoreSet));
         solver.showShortStatistics();
         long t = System.currentTimeMillis();
         Solution solution;
@@ -247,8 +253,8 @@ public class BaseProblem {
         String[][] solCharacteristics = new String[][]{
                 {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial IIC value", "optimal IIC value", "solving time (ms)"},
                 {
-                        String.valueOf(solution.getIntVal(minRestore)),
-                        String.valueOf(solution.getIntVal(maxRestorable)),
+                        String.valueOf(getMinRestoreValue(solution)),
+                        String.valueOf(getMaxRestorableValue(solution)),
                         String.valueOf(solution.getSetVal(restoreSet).length),
                         String.valueOf(1.0 * Math.round(IIC_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
                         String.valueOf((1.0 * solution.getIntVal(IIC)) / Math.pow(10, precision)),
@@ -266,6 +272,22 @@ public class BaseProblem {
         System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
         return true;
+    }
+
+    private int getMinRestoreValue(Solution solution) {
+        if (minRestore != null) {
+            return solution.getIntVal(minRestore);
+        } else {
+            return -1;
+        }
+    }
+
+    private int getMaxRestorableValue(Solution solution) {
+        if (maxRestorable != null) {
+            return solution.getIntVal(maxRestorable);
+        } else {
+            return -1;
+        }
     }
 
     public void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) {

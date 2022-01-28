@@ -24,6 +24,7 @@
 package org.restopt.raster;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.gce.geotiff.GeoTiffReader;
 
 import java.io.File;
@@ -44,6 +45,7 @@ public class RasterReader {
      */
     private int width;
     private int height;
+    private double noData;
 
     /**
      * Constructor.
@@ -56,7 +58,7 @@ public class RasterReader {
     }
 
     /**
-     * Loads the metadata of the org.restopt.raster.
+     * Loads the metadata of the raster.
      */
     private void loadMetaData() throws IOException {
         File file = new File(filePath);
@@ -64,25 +66,35 @@ public class RasterReader {
         GridCoverage2D grid = reader.read(null);
         width = grid.getRenderedImage().getWidth();
         height = grid.getRenderedImage().getHeight();
+        if (CoverageUtilities.getNoDataProperty(grid) != null) {
+            noData = CoverageUtilities.getNoDataProperty(grid).getAsSingleValue();
+        }
         reader.dispose();
     }
 
     /**
-     * @return The width (in pixels) of the org.restopt.raster.
+     * @return The width (in pixels) of the raster.
      */
     public int getWidth() {
         return width;
     }
 
     /**
-     * @return The height (in pixels) of the org.restopt.raster.
+     * @return The height (in pixels) of the raster.
      */
     public int getHeight() {
         return height;
     }
 
     /**
-     * @return The values of the org.restopt.raster as a double matrix ([height][width]).
+     * @return The NODATA value of the raster.
+     */
+    public double getNoDataValue() {
+        return noData;
+    }
+
+    /**
+     * @return The values of the raster as a double matrix ([height][width]).
      * @throws IOException
      */
     public double[][] readAsDoubleMatrix() throws IOException {
@@ -102,7 +114,7 @@ public class RasterReader {
     }
 
     /**
-     * @return The values of the org.restopt.raster as a flattened double matrix.
+     * @return The values of the raster as a flattened double matrix.
      * @throws IOException
      */
     public double[] readAsDoubleArray() throws IOException {
@@ -117,7 +129,7 @@ public class RasterReader {
     }
 
     /**
-     * @return The values of the org.restopt.raster as an int matrix ([height][width]).
+     * @return The values of the raster as an int matrix ([height][width]).
      * @throws IOException
      */
     public int[][] readAsIntMatrix() throws IOException {
@@ -137,7 +149,7 @@ public class RasterReader {
     }
 
     /**
-     * @return The values of the org.restopt.raster as a flattened int array.
+     * @return The values of the raster as a flattened int array.
      * @throws IOException
      */
     public int[] readAsIntArray() throws IOException {

@@ -27,7 +27,7 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
         this.groups = new ISet[nbGroups];
         for (int cc = 0; cc < nbGroups; cc++) {
             sizeCells[cc] = connectivityFinder.getSizeCC()[cc];
-            groups[cc] = SetFactory.makeBitSet(0);
+            groups[cc] = SetFactory.makeRangeSet();
             int i = connectivityFinder.getCCFirstNode()[cc];
             while (i != -1) {
                 groups[cc].add(getPartialIndex(i));
