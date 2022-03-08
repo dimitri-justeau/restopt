@@ -380,7 +380,8 @@ public class BaseProblem {
                 sites,
                 data.getHabitatRasterPath(),
                 exportPath + ".csv",
-                exportPath + ".tif"
+                exportPath + ".tif",
+                data.noDataHabitat
         );
         exporter.exportCharacteristics(characteristics);
         exporter.generateRaster();

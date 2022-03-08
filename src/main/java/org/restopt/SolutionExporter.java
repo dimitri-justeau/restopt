@@ -23,7 +23,8 @@ public class SolutionExporter {
     public int[] completeData;
     public BaseProblem baseProblem;
 
-    public SolutionExporter(BaseProblem baseProblem, int[] solution, String template, String csvDest, String rastDest) {
+    public SolutionExporter(BaseProblem baseProblem, int[] solution, String template, String csvDest, String rastDest,
+                            double noDataValue) {
         this.baseProblem = baseProblem;
         this.solution = solution;
         this.template = template;
@@ -33,7 +34,7 @@ public class SolutionExporter {
         completeData = new int[grid.getNbRows() * grid.getNbCols()];
         for (int i = 0; i < completeData.length; i++) {
             if (grid.getDiscardSet().contains(i)) {
-                completeData[i] = -1;
+                completeData[i] = (int) noDataValue;
             } else {
                 completeData[i] = solution[grid.getPartialIndex(i)];
             }
