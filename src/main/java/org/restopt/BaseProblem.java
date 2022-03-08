@@ -7,6 +7,7 @@ import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.search.strategy.selectors.variables.Random;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
@@ -15,10 +16,7 @@ import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.choco.LandscapeIndicesUtils;
-import org.restopt.choco.PropEffectiveMeshSize;
-import org.restopt.choco.PropIIC;
-import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
+import org.restopt.choco.*;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
@@ -115,6 +113,8 @@ public class BaseProblem {
         );
         restoreGraph = model.nodeInducedSubgraphView(habitatGraph, SetFactory.makeConstantSet(IntStream.range(0, grid.getNbGroups()).toArray()), true);
         restoreSet = model.graphNodeSetView(restoreGraph);
+
+        setDefaultSearch();
     }
 
     public void postNbComponentsConstraint(int minNbCC, int maxNbCC) {
@@ -177,7 +177,6 @@ public class BaseProblem {
         System.out.println("\nMESH initial = " + MESH_initial + "\n");
         Solver solver = model.getSolver();
         solver.showShortStatistics();
-        solver.setSearch(Search.setVarSearch(restoreSet));
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -236,7 +235,6 @@ public class BaseProblem {
         double IIC_initial = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
         System.out.println("\nIIC initial = " + IIC_initial + "\n");
         Solver solver = model.getSolver();
-        solver.setSearch(Search.setVarSearch(restoreSet));
         solver.showShortStatistics();
         long t = System.currentTimeMillis();
         Solution solution;
@@ -274,11 +272,63 @@ public class BaseProblem {
         return true;
     }
 
+    public void setDefaultSearch() {
+        model.getSolver().setSearch(Search.setVarSearch(restoreSet));
+    }
+
+    public void setRandomSearch() {
+        model.getSolver().setSearch(Search.setVarSearch(
+                new Random<SetVar>(model.getSeed()),
+                new SetDomainRandom(model.getSeed()),
+                true, restoreSet)
+        );
+    }
+
+
+    /**
+     * Returns the first solution found satisfying the constraints, without optimization objective.
+     * @return True if a solution was found
+     */
+    public boolean findSolution(String outputPath, int timeLimit) throws IOException {
+        Solver solver = model.getSolver();
+        solver.showShortStatistics();
+        long t = System.currentTimeMillis();
+        Solution solution;
+        if (timeLimit > 0) {
+            TimeCounter timeCounter = new TimeCounter(model, (long) (timeLimit * 1e9));
+            solution = solver.findSolution(timeCounter);
+        } else {
+            solution = solver.findSolution();
+        }
+        if (solution == null) {
+            System.out.println("There is no solution satisfying the constraints");
+            return false;
+        }
+        String[][] solCharacteristics = new String[][]{
+                {"Minimum area to restore", "Maximum restorable area", "no. planning units", "solving time (ms)"},
+                {
+                        String.valueOf(getMinRestoreValue(solution)),
+                        String.valueOf(getMaxRestorableValue(solution)),
+                        String.valueOf(solution.getSetVal(restoreSet).length),
+                        String.valueOf((System.currentTimeMillis() - t))
+                }
+        };
+        System.out.println("\n--- First solution ---\n");
+        System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
+        System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
+        System.out.println("No. planning units : " + solCharacteristics[1][2]);
+        System.out.println("Solving time (ms) : " + solCharacteristics[1][3]);
+        System.out.println("\nRaster exported at " + outputPath + ".tif");
+        System.out.println("Solution characteristics exported at " + outputPath + ".csv");
+        exportSolution(outputPath, solution, solCharacteristics);
+        return true;
+    }
+
     private int getMinRestoreValue(Solution solution) {
         if (minRestore != null) {
             return solution.getIntVal(minRestore);
         } else {
-            return -1;
+            return 0;
         }
     }
 
@@ -286,7 +336,11 @@ public class BaseProblem {
         if (maxRestorable != null) {
             return solution.getIntVal(maxRestorable);
         } else {
-            return -1;
+            int maxRestore = 0;
+            for (int i : solution.getSetVal(restoreSet)) {
+                maxRestore += data.getRestorableData()[grid.getUngroupedCompleteIndex(i)];
+            }
+            return maxRestore;
         }
     }
 
