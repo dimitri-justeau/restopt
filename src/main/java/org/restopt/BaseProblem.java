@@ -284,6 +284,9 @@ public class BaseProblem {
         );
     }
 
+    public String getSearchState() {
+        return model.getSolver().getSearchState().toString();
+    }
 
     /**
      * Returns the first solution found satisfying the constraints, without optimization objective.
