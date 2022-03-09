@@ -34,7 +34,11 @@ public class SolutionExporter {
         completeData = new int[grid.getNbRows() * grid.getNbCols()];
         for (int i = 0; i < completeData.length; i++) {
             if (grid.getDiscardSet().contains(i)) {
-                completeData[i] = (int) noDataValue;
+                if (baseProblem.data.getHabitatData()[i] == 0) {
+                    completeData[i] = -1;
+                } else {
+                    completeData[i] = (int) noDataValue;
+                }
             } else {
                 completeData[i] = solution[grid.getPartialIndex(i)];
             }
