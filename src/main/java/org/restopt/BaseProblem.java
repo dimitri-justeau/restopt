@@ -197,13 +197,22 @@ public class BaseProblem {
             return false;
         }
         String[][] solCharacteristics = new String[][]{
-                {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial MESH value", "optimal MESH value", "solving time (ms)"},
+                {
+                    "Minimum area to restore",
+                    "Maximum restorable area",
+                    "no. planning units",
+                    "MESH_initial",
+                    "MESH_best",
+                    "optimality_proven",
+                    "solving time (ms)"
+                },
                 {
                         String.valueOf(getMinRestoreValue(solution)),
                         String.valueOf(getMaxRestorableValue(solution)),
                         String.valueOf(solution.getSetVal(restoreSet).length),
                         String.valueOf(1.0 * Math.round(MESH_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
                         String.valueOf((1.0 * solution.getIntVal(MESH)) / Math.pow(10, precision)),
+                        String.valueOf(getSearchState() == "TERMINATED"),
                         String.valueOf((System.currentTimeMillis() - t))
                 }
         };
@@ -266,13 +275,21 @@ public class BaseProblem {
             return false;
         }
         String[][] solCharacteristics = new String[][]{
-                {"Minimum area to restore", "Maximum restorable area", "no. planning units", "initial IIC value", "optimal IIC value", "solving time (ms)"},
+                {
+                    "Minimum area to restore",
+                    "Maximum restorable area",
+                    "no. planning units",
+                    "IIC_initial",
+                    "IIC_best",
+                    "optimality_proven",
+                    "solving time (ms)"},
                 {
                         String.valueOf(getMinRestoreValue(solution)),
                         String.valueOf(getMaxRestorableValue(solution)),
                         String.valueOf(solution.getSetVal(restoreSet).length),
                         String.valueOf(1.0 * Math.round(IIC_initial * Math.pow(10, precision)) / Math.pow(10, precision)),
                         String.valueOf((1.0 * solution.getIntVal(IIC)) / Math.pow(10, precision)),
+                        String.valueOf(getSearchState() == "TERMINATED"),
                         String.valueOf((System.currentTimeMillis() - t))
                 }
         };
