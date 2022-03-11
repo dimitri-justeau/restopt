@@ -11,7 +11,7 @@ import java.io.IOException;
 public class DataLoader {
 
     private int[] habitatData;
-    private int[] restorableData;
+    private double[] restorableData;
     private int[] accessibleData;
 
     private int width;
@@ -44,7 +44,7 @@ public class DataLoader {
         QuantitativeRasterFeature restorable = new QuantitativeRasterFeature(restorableRasterPath);
         QuantitativeRasterFeature accessible = new QuantitativeRasterFeature(accessibleRasterPath);
         habitatData = habitat.getQuantitativeData();
-        restorableData = restorable.getQuantitativeData();
+        restorableData = restorable.getQuantitativeDataAsDouble();
         accessibleData = accessible.getQuantitativeData();
     }
 
@@ -52,7 +52,7 @@ public class DataLoader {
         return habitatData;
     }
 
-    public int[] getRestorableData() {
+    public double[] getRestorableData() {
         return restorableData;
     }
 

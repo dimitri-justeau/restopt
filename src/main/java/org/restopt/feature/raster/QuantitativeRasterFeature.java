@@ -44,4 +44,9 @@ public class QuantitativeRasterFeature extends RasterFeature implements Quantita
     public int[] getQuantitativeData() throws IOException {
         return rasterReader.readAsIntArray();
     }
+
+    @Override
+    public double[] getQuantitativeDataAsDouble() throws IOException {
+        return rasterReader.readAsDoubleArray();
+    }
 }

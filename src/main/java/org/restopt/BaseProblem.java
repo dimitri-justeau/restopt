@@ -4,7 +4,6 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
-import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.search.strategy.selectors.variables.Random;
@@ -152,7 +151,11 @@ public class BaseProblem {
         model.post(cons);
     }
 
-    public boolean maximizeMESH(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
+    public boolean maximizeMESH(int precision, String outputPath, int timeLimit) throws IOException {
+        return maximizeMESH(precision, outputPath, timeLimit, true);
+    }
+
+    public boolean maximizeMESH(int precision, String outputPath, int timeLimit, boolean verbose) throws IOException {
         MESH = model.intVar(
                 "MESH",
                 0, (int) ((data.getHeight() * data.getWidth() - grid.getDiscardSet().size()) * Math.pow(10, precision))
@@ -174,9 +177,11 @@ public class BaseProblem {
                 habGraph,
                 (grid.getNbUngroupedCells() + nonHabNonAcc)
         );
-        System.out.println("\nMESH initial = " + MESH_initial + "\n");
         Solver solver = model.getSolver();
-        solver.showShortStatistics();
+        if (verbose) {
+            System.out.println("\nMESH initial = " + MESH_initial + "\n");
+            solver.showShortStatistics();
+        }
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -186,7 +191,9 @@ public class BaseProblem {
             solution = solver.findOptimalSolution(MESH, true);
         }
         if (solution == null) {
-            System.out.println("There is no solution satisfying the constraints");
+            if (verbose) {
+                System.out.println("There is no solution satisfying the constraints");
+            }
             return false;
         }
         String[][] solCharacteristics = new String[][]{
@@ -200,20 +207,26 @@ public class BaseProblem {
                         String.valueOf((System.currentTimeMillis() - t))
                 }
         };
-        System.out.println("\n--- Best solution ---\n");
-        System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
-        System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
-        System.out.println("No. planning units : " + solCharacteristics[1][2]);
-        System.out.println("Initial MESH value : " + solCharacteristics[1][3]);
-        System.out.println("Optimal MESH value : " + solCharacteristics[1][4]);
-        System.out.println("Solving time (ms) : " + solCharacteristics[1][5]);
-        System.out.println("\nRaster exported at " + outputPath + ".tif");
-        System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
+        if (verbose) {
+            System.out.println("\n--- Best solution ---\n");
+            System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
+            System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
+            System.out.println("No. planning units : " + solCharacteristics[1][2]);
+            System.out.println("Initial MESH value : " + solCharacteristics[1][3]);
+            System.out.println("Optimal MESH value : " + solCharacteristics[1][4]);
+            System.out.println("Solving time (ms) : " + solCharacteristics[1][5]);
+            System.out.println("\nRaster exported at " + outputPath + ".tif");
+            System.out.println("Solution characteristics exported at " + outputPath + ".csv");
+        }
         return true;
     }
 
-    public boolean maximizeIIC(int precision, String outputPath, int timeLimit) throws IOException, ContradictionException {
+    public boolean maximizeIIC(int precision, String outputPath, int timeLimit) throws IOException {
+        return maximizeIIC(precision, outputPath, timeLimit, true);
+    }
+
+    public boolean maximizeIIC(int precision, String outputPath, int timeLimit, boolean verbose) throws IOException {
         int landscapeArea = grid.getNbUngroupedCells() + nonHabNonAcc;
         IIC = model.intVar(
                 "IIC",
@@ -233,9 +246,11 @@ public class BaseProblem {
         );
         model.post(consIIC);
         double IIC_initial = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
-        System.out.println("\nIIC initial = " + IIC_initial + "\n");
         Solver solver = model.getSolver();
-        solver.showShortStatistics();
+        if (verbose) {
+            System.out.println("\nIIC initial = " + IIC_initial + "\n");
+            solver.showShortStatistics();
+        }
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -245,7 +260,9 @@ public class BaseProblem {
             solution = solver.findOptimalSolution(IIC, true);
         }
         if (solution == null) {
-            System.out.println("There is no solution satisfying the constraints");
+            if (verbose) {
+                System.out.println("There is no solution satisfying the constraints");
+            }
             return false;
         }
         String[][] solCharacteristics = new String[][]{
@@ -259,16 +276,18 @@ public class BaseProblem {
                         String.valueOf((System.currentTimeMillis() - t))
                 }
         };
-        System.out.println("\n--- Best solution ---\n");
-        System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
-        System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
-        System.out.println("No. planning units : " + solCharacteristics[1][2]);
-        System.out.println("Initial IIC value : " + solCharacteristics[1][3]);
-        System.out.println("Optimal IIC value : " + solCharacteristics[1][4]);
-        System.out.println("Solving time (ms) : " + solCharacteristics[1][5]);
-        System.out.println("\nRaster exported at " + outputPath + ".tif");
-        System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
+        if (verbose) {
+            System.out.println("\n--- Best solution ---\n");
+            System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
+            System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
+            System.out.println("No. planning units : " + solCharacteristics[1][2]);
+            System.out.println("Initial IIC value : " + solCharacteristics[1][3]);
+            System.out.println("Optimal IIC value : " + solCharacteristics[1][4]);
+            System.out.println("Solving time (ms) : " + solCharacteristics[1][5]);
+            System.out.println("\nRaster exported at " + outputPath + ".tif");
+            System.out.println("Solution characteristics exported at " + outputPath + ".csv");
+        }
         return true;
     }
 
@@ -288,13 +307,19 @@ public class BaseProblem {
         return model.getSolver().getSearchState().toString();
     }
 
+    public boolean findSolution(String outputPath, int timeLimit) throws IOException {
+        return findSolution(outputPath, timeLimit, true);
+    }
+
     /**
      * Returns the first solution found satisfying the constraints, without optimization objective.
      * @return True if a solution was found
      */
-    public boolean findSolution(String outputPath, int timeLimit) throws IOException {
+    public boolean findSolution(String outputPath, int timeLimit, boolean verbose) throws IOException {
         Solver solver = model.getSolver();
-        solver.showShortStatistics();
+        if (verbose) {
+            solver.showShortStatistics();
+        }
         long t = System.currentTimeMillis();
         Solution solution;
         if (timeLimit > 0) {
@@ -304,7 +329,9 @@ public class BaseProblem {
             solution = solver.findSolution();
         }
         if (solution == null) {
-            System.out.println("There is no solution satisfying the constraints");
+            if (verbose) {
+                System.out.println("There is no solution satisfying the constraints");
+            }
             return false;
         }
         String[][] solCharacteristics = new String[][]{
@@ -316,14 +343,16 @@ public class BaseProblem {
                         String.valueOf((System.currentTimeMillis() - t))
                 }
         };
-        System.out.println("\n--- First solution ---\n");
-        System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
-        System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
-        System.out.println("No. planning units : " + solCharacteristics[1][2]);
-        System.out.println("Solving time (ms) : " + solCharacteristics[1][3]);
-        System.out.println("\nRaster exported at " + outputPath + ".tif");
-        System.out.println("Solution characteristics exported at " + outputPath + ".csv");
         exportSolution(outputPath, solution, solCharacteristics);
+        if (verbose) {
+            System.out.println("\n--- First solution ---\n");
+            System.out.println("Minimum area to restore : " + solCharacteristics[1][0]);
+            System.out.println("Maximum restorable area : " + solCharacteristics[1][1]);
+            System.out.println("No. planning units : " + solCharacteristics[1][2]);
+            System.out.println("Solving time (ms) : " + solCharacteristics[1][3]);
+            System.out.println("\nRaster exported at " + outputPath + ".tif");
+            System.out.println("Solution characteristics exported at " + outputPath + ".csv");
+        }
         return true;
     }
 
@@ -341,7 +370,7 @@ public class BaseProblem {
         } else {
             int maxRestore = 0;
             for (int i : solution.getSetVal(restoreSet)) {
-                maxRestore += data.getRestorableData()[grid.getUngroupedCompleteIndex(i)];
+                maxRestore += Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(i)]);
             }
             return maxRestore;
         }
@@ -355,9 +384,11 @@ public class BaseProblem {
         int[] maxRestorableArea = new int[grid.getNbCells()];
         int threshold = (int) Math.ceil(cellArea - cellArea * minProportion);
         for (int i = 0; i < accessibleNonHabitatPixels.length; i++) {
-            maxRestorableArea[accessibleNonHabitatPixels[i]] = data.getRestorableData()[grid.getUngroupedCompleteIndex(accessibleNonHabitatPixels[i])];
-            int restorable = data.getRestorableData()[grid.getUngroupedCompleteIndex(accessibleNonHabitatPixels[i])];
-            minArea[accessibleNonHabitatPixels[i]] = restorable <= threshold ? 0 : restorable - threshold;
+            int cell = accessibleNonHabitatPixels[i];
+            int value = (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(cell)]);
+            maxRestorableArea[cell] = value;
+            int restorable = (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(cell)]);
+            minArea[cell] = restorable <= threshold ? 0 : restorable - threshold;
         }
         minRestore = model.intVar(minAreaToRestore, maxAreaToRestore);
         maxRestorable = model.intVar(0, maxAreaToRestore * cellArea);
@@ -377,7 +408,7 @@ public class BaseProblem {
                 sites[i] = 0;
             }
         }
-        System.out.println(set);
+
         SolutionExporter exporter = new SolutionExporter(
                 this,
                 sites,

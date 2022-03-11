@@ -25,6 +25,9 @@ package org.restopt.feature.array;
 
 import org.restopt.feature.QuantitativeFeature;
 
+import java.io.IOException;
+import java.util.stream.IntStream;
+
 /**
  * Quantitative feature loaded from an int[].
  */
@@ -37,5 +40,10 @@ public class QuantitativeArrayFeature extends BinaryArrayFeature implements Quan
     @Override
     public int[] getQuantitativeData() {
         return data;
+    }
+
+    @Override
+    public double[] getQuantitativeDataAsDouble() throws IOException {
+        return IntStream.of(data).mapToDouble(i -> (double) i).toArray();
     }
 }

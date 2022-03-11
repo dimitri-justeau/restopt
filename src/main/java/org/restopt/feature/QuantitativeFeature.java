@@ -36,6 +36,11 @@ public interface QuantitativeFeature extends BinaryFeature {
      */
     int[] getQuantitativeData() throws IOException;
 
+    /**
+     * @return The data associated with the feature as quantitative data as double.
+     */
+    double[] getQuantitativeDataAsDouble() throws IOException;
+
     @Override
     default int[] getBinaryData() throws IOException {
         return IntStream.of(getQuantitativeData())
