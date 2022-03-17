@@ -46,6 +46,7 @@ public class TestSolve {
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
         BaseProblem baseProblem = new BaseProblem(dataLoader, 1);
+//        baseProblem.getModel().getSolver().showContradiction();
         baseProblem.postNbComponentsConstraint(1, 1);
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
