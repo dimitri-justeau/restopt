@@ -1,10 +1,10 @@
-package org.restopt.objective;
+package org.restopt.objectives;
 
 import org.restopt.BaseProblem;
 
 import java.io.IOException;
 
-public interface IObjectiveFactory {
+public interface IRestoptObjectiveFactory {
 
     BaseProblem self();
 

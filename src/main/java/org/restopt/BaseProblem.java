@@ -2,7 +2,6 @@ package org.restopt;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
-import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.search.strategy.selectors.variables.Random;
 import org.chocosolver.solver.variables.IntVar;
@@ -13,16 +12,16 @@ import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.choco.*;
+import org.restopt.constraints.IRestoptConstraintFactory;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
-import org.restopt.objective.IObjectiveFactory;
+import org.restopt.objectives.IRestoptObjectiveFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-public class BaseProblem implements IObjectiveFactory {
+public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
 
     public DataLoader data;
 
@@ -30,16 +29,18 @@ public class BaseProblem implements IObjectiveFactory {
 
     public int accessibleVal;
 
-    Model model;
-    UndirectedGraphVar habitatGraphVar;
-    UndirectedGraphVar restoreGraph;
+    private Model model;
+    private UndirectedGraphVar habitatGraphVar;
+
+    private UndirectedGraphVar restoreGraph;
 
     public UndirectedGraph habGraph;
 
-    SetVar restoreSet;
+    private SetVar restoreSet;
 
     public int nonHabNonAcc;
-    public int[] accessibleNonHabitatPixels;
+
+    private int[] accessibleNonHabitatPixels;
 
     public IntVar minRestore;
     public IntVar maxRestorable;
@@ -121,7 +122,7 @@ public class BaseProblem implements IObjectiveFactory {
         return model;
     }
 
-    public SetVar getRestoreSet() {
+    public SetVar getRestoreSetVar() {
         return restoreSet;
     }
 
@@ -145,39 +146,12 @@ public class BaseProblem implements IObjectiveFactory {
         return nonHabNonAcc;
     }
 
-    public void postNbComponentsConstraint(int minNbCC, int maxNbCC) {
-        model.nbConnectedComponents(restoreGraph, model.intVar(minNbCC, maxNbCC)).post();
+    public UndirectedGraphVar getRestoreGraphVar() {
+        return restoreGraph;
     }
 
-    public void postCompactnessConstraint(double maxDiameter) {
-
-        double[][] coords = new double[grid.getNbCells()][];
-        double[][] compCoords = grid.getCartesianCoordinates();
-        for (int i = 0; i < accessibleNonHabitatPixels.length; i++) {
-            coords[accessibleNonHabitatPixels[i]] = compCoords[grid.getUngroupedPartialIndex(accessibleNonHabitatPixels[i])];
-        }
-
-        propCompact = new PropSmallestEnclosingCircleSpatialGraph(
-                restoreGraph,
-                coords,
-                model.realVar("radius", 0, 0.5 * maxDiameter, 1e-5),
-                model.realVar("centerX",
-                        Arrays.stream(grid.getCartesianCoordinates())
-                                .mapToDouble(c -> c[0]).min().getAsDouble(),
-                        Arrays.stream(grid.getCartesianCoordinates())
-                                .mapToDouble(c -> c[0]).max().getAsDouble(),
-                        1e-5
-                ),
-                model.realVar("centerY",
-                        Arrays.stream(grid.getCartesianCoordinates())
-                                .mapToDouble(c -> c[0]).min().getAsDouble(),
-                        Arrays.stream(grid.getCartesianCoordinates())
-                                .mapToDouble(c -> c[0]).max().getAsDouble(),
-                        1e-5
-                )
-        );
-        Constraint cons = new Constraint("maxDiam", propCompact);
-        model.post(cons);
+    public int[] getAvailablePlanningUnits() {
+        return accessibleNonHabitatPixels;
     }
 
     public void setDefaultSearch() {
@@ -216,28 +190,15 @@ public class BaseProblem implements IObjectiveFactory {
         }
     }
 
-    public void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) {
-        // Minimum area to ensure every site to >= proportion
-        assert minProportion >= 0 && minProportion <= 1;
-
-        int[] minArea = new int[grid.getNbCells()];
-        int[] maxRestorableArea = new int[grid.getNbCells()];
-        int threshold = (int) Math.ceil(cellArea - cellArea * minProportion);
-        for (int i = 0; i < accessibleNonHabitatPixels.length; i++) {
-            int cell = accessibleNonHabitatPixels[i];
-            int value = (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(cell)]);
-            maxRestorableArea[cell] = value;
-            int restorable = (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(cell)]);
-            minArea[cell] = restorable <= threshold ? 0 : restorable - threshold;
-        }
-        minRestore = model.intVar(minAreaToRestore, maxAreaToRestore);
-        maxRestorable = model.intVar(0, maxAreaToRestore * cellArea);
-        model.sumElements(restoreSet, minArea, minRestore).post();
-        model.sumElements(restoreSet, maxRestorableArea, maxRestorable).post();
-    }
-
     @Override
     public BaseProblem self() {
         return this;
+    }
+
+    public void testArrayPerformances(int[] array, boolean verbose) {
+        System.out.println(array.length);
+        if (verbose) {
+            System.out.println(Arrays.toString(array));
+        }
     }
 }

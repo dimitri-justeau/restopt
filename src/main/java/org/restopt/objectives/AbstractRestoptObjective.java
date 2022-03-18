@@ -1,4 +1,4 @@
-package org.restopt.objective;
+package org.restopt.objectives;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractObjective {
+public abstract class AbstractRestoptObjective {
 
     public static final String KEY_MIN_RESTORE = "min_restore";
     public static final String KEY_TOTAL_RESTORABLE = "total_restorable";
@@ -29,15 +29,15 @@ public abstract class AbstractObjective {
             KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_OPTIMALITY_PROVEN, KEY_SOLVING_TIME
     };
 
-    BaseProblem problem;
-    IntVar objective;
-    int timeLimit;
-    boolean verbose;
-    boolean maximize;
-    Map<String, String> messages;
+    protected BaseProblem problem;
+    protected IntVar objective;
+    protected int timeLimit;
+    protected boolean verbose;
+    protected boolean maximize;
+    protected Map<String, String> messages;
 
 
-    public AbstractObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize) {
+    public AbstractRestoptObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         this.problem = problem;
         this.timeLimit = timeLimit;
         this.verbose = verbose;
@@ -72,7 +72,7 @@ public abstract class AbstractObjective {
         Map<String, String> solCharacteristics = new HashMap<>();
         solCharacteristics.put(KEY_MIN_RESTORE, String.valueOf(problem.getMinRestoreValue(solution)));
         solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(problem.getMaxRestorableValue(solution)));
-        solCharacteristics.put(KEY_NB_PUS, String.valueOf(solution.getSetVal(problem.getRestoreSet()).length));
+        solCharacteristics.put(KEY_NB_PUS, String.valueOf(solution.getSetVal(problem.getRestoreSetVar()).length));
         solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeToBestSolution()));
         solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
         solCharacteristics.putAll(appendCharacteristics(solution));
@@ -132,7 +132,7 @@ public abstract class AbstractObjective {
     public void exportSolution(String outputPath, Solution solution, Map<String, String> characteristics) throws IOException {
         PartialRegularGroupedGrid grid = problem.getGrid();
         int[] sites = new int[grid.getNbUngroupedCells()];
-        ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSet()));
+        ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
         for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
             if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
                 sites[i] = 1;

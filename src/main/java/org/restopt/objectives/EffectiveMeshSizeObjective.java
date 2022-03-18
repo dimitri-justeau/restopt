@@ -1,4 +1,4 @@
-package org.restopt.objective;
+package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EffectiveMeshSizeObjective extends AbstractObjective {
+public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
 
     public static final String KEY_MESH_INITIAL = "mesh_initial";
     public static final String KEY_MESH_BEST = "mesh_best";

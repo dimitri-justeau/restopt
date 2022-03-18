@@ -1,9 +1,8 @@
-package org.restopt.objective;
+package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
 import org.restopt.BaseProblem;
-import org.restopt.DataLoader;
 import org.restopt.choco.PropIIC;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IntegralIndexOfConnectivityObjective extends AbstractObjective {
+public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjective {
 
     public static final String KEY_IIC_INITIAL = "iic_initial";
     public static final String KEY_IIC_BEST = "iic_best";
