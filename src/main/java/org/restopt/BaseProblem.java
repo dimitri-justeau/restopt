@@ -44,10 +44,6 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
 
     public IntVar minRestore;
     public IntVar maxRestorable;
-    public IntVar MESH;
-    public IntVar IIC;
-
-    PropSmallestEnclosingCircleSpatialGraph propCompact;
 
     public BaseProblem() {}
 
@@ -193,12 +189,5 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
     @Override
     public BaseProblem self() {
         return this;
-    }
-
-    public void testArrayPerformances(int[] array, boolean verbose) {
-        System.out.println(array.length);
-        if (verbose) {
-            System.out.println(Arrays.toString(array));
-        }
     }
 }

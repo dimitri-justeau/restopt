@@ -1,9 +1,6 @@
 package org.restopt.constraints;
 
 import org.restopt.BaseProblem;
-import org.restopt.objectives.EffectiveMeshSizeObjective;
-import org.restopt.objectives.IntegralIndexOfConnectivityObjective;
-import org.restopt.objectives.NoOptimizationObjective;
 
 import java.io.IOException;
 
@@ -19,7 +16,11 @@ public interface IRestoptConstraintFactory {
         new CompactnessConstraint(self(), maxDiameter).post();
     }
 
-    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) {
+    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) throws IOException {
+        new RestorableAreaConstraint(self(), minAreaToRestore, maxAreaToRestore, cellArea, minProportion).post();
+    }
+
+    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int[] cellArea, double minProportion) throws IOException {
         new RestorableAreaConstraint(self(), minAreaToRestore, maxAreaToRestore, cellArea, minProportion).post();
     }
 

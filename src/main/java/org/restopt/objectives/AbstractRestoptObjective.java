@@ -150,10 +150,12 @@ public abstract class AbstractRestoptObjective {
                 outputPath + ".tif",
                 problem.getData().noDataHabitat
         );
-        String[][] orderedCharacteristics = new String[characteristics.size()][];
+        String[][] orderedCharacteristics = new String[2][];
         String[] allKeys = ArrayUtils.append(KEYS, getAdditionalKeys());
+        orderedCharacteristics[0] = allKeys;
+        orderedCharacteristics[1] = new String[allKeys.length];
         for (int i = 0; i < allKeys.length; i++) {
-            orderedCharacteristics[i] = new String[] {allKeys[i], characteristics.get(allKeys[i])};
+            orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
         }
         exporter.exportCharacteristics(orderedCharacteristics);
         exporter.generateRaster();

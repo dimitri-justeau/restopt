@@ -24,6 +24,7 @@
 package org.restopt.raster;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.io.imageio.geotiff.GeoTiffIIOMetadataDecoder;
 import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.gce.geotiff.GeoTiffReader;
 
@@ -66,9 +67,7 @@ public class RasterReader {
         GridCoverage2D grid = reader.read(null);
         width = grid.getRenderedImage().getWidth();
         height = grid.getRenderedImage().getHeight();
-        if (CoverageUtilities.getNoDataProperty(grid) != null) {
-            noData = CoverageUtilities.getNoDataProperty(grid).getAsSingleValue();
-        }
+        noData = reader.getMetadata().getNoData();
         reader.dispose();
     }
 
