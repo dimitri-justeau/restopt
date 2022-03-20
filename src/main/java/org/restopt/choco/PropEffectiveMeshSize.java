@@ -66,7 +66,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         this.landscapeArea = landscapeArea;
         this.precision = precison;
         this.connectivityFinderGUB = new ConnectivityFinderSpatialGraph(g.getUB(), cellsArea);
-        this.connectivityFinderGLB = new ConnectivityFinderSpatialGraph(g.getLB(), cellsArea);
+        this.connectivityFinderGLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), cellsArea);
         this.maximize = maximize;
     }
 

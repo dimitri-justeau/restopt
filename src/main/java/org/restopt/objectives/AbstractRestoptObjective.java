@@ -73,7 +73,7 @@ public abstract class AbstractRestoptObjective {
         solCharacteristics.put(KEY_MIN_RESTORE, String.valueOf(problem.getMinRestoreValue(solution)));
         solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(problem.getMaxRestorableValue(solution)));
         solCharacteristics.put(KEY_NB_PUS, String.valueOf(solution.getSetVal(problem.getRestoreSetVar()).length));
-        solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeToBestSolution()));
+        solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeCount()));
         solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
         solCharacteristics.putAll(appendCharacteristics(solution));
         return solCharacteristics;

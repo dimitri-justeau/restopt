@@ -94,12 +94,13 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             return;
         }
         if (ker.size() == env.size()) {
-            double[] minidisk = minidisk(ker);
-            double x = minidisk[0];
-            double y = minidisk[1];
-            double r = minidisk[2];
-            if (x < centerX.getLB() || x > centerX.getUB() || y < centerY.getLB()
-                    || y > centerY.getUB() || r < radius.getLB() || r > radius.getUB()) {
+            double[] minidisk = minidisk(ker.toArray());
+            double x = minidisk[0] - centerX.getLB();
+            double y = minidisk[1] - centerY.getLB();
+            double r = minidisk[2] - radius.getLB();
+            if (x > centerX.getUB() + centerX.getPrecision() || x < centerX.getLB() - centerX.getPrecision() ||
+                    y > centerY.getUB() + centerY.getPrecision() || y < centerY.getLB() - centerY.getPrecision() ||
+                    r > radius.getUB() + radius.getPrecision() || r < radius.getLB() - radius.getPrecision()) {
                 fails();
             }
             radius.updateBounds(minidisk[2], minidisk[2], this);
@@ -108,21 +109,22 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             return;
         }
         if (ker.size() > 0) {
-            double[] minidisk = minidisk(ker);
+            int[] kerArray = ker.toArray();
+            double[] minidisk = minidisk(kerArray);
             double[] cker = new double[]{minidisk[0], minidisk[1]};
             double rker = minidisk[2];
-            if (rker > (radius.getUB() + radius.getPrecision())) {
+            if (rker > (radius.getUB() + radius.getPrecision()) || rker < (radius.getLB() - radius.getPrecision())) {
                 fails();
+            }
+            int[] pointsArray = new int[ker.size() + 1];
+            for (int i = 0; i < kerArray.length; i++) {
+                pointsArray[i] = kerArray[i];
             }
             for (int i : getEnvelopeMinusKernelPoints()) {
                 if (distance(cker, coordinates[i]) > rker) {
-                    pointsSet.clear();
-                    for (int e : ker) {
-                        pointsSet.add(e);
-                    }
-                    pointsSet.add(i);
-                    double[] b_disk = minidisk(pointsSet);
-                    if (b_disk[2] > (radius.getUB() + radius.getPrecision())) {
+                    pointsArray[pointsArray.length - 1] = i;
+                    double[] b_disk = minidisk(pointsArray);
+                    if (b_disk[2] > (radius.getUB() + radius.getPrecision()) || b_disk[2] < (radius.getLB() - radius.getPrecision())) {
                         g.removeNode(i, this);
                     }
                 }
@@ -141,17 +143,19 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             return ESat.UNDEFINED;
         }
         if (ker.size() == env.size()) {
-            double[] minidisk = minidisk(ker);
+            double[] minidisk = minidisk(ker.toArray());
             double x = minidisk[0];
             double y = minidisk[1];
             double r = minidisk[2];
-            if (x >= centerX.getLB() && x <= centerX.getUB() && y >= centerY.getLB()
-                    && y <= centerY.getUB() && r >= radius.getLB() && r <= radius.getUB()) {
+            if (x > centerX.getUB() + centerX.getPrecision() || x < centerX.getLB() - centerX.getPrecision() ||
+                    y > centerY.getUB() + centerY.getPrecision() || y < centerY.getLB() - centerY.getPrecision() ||
+                    r > radius.getUB() + radius.getPrecision() || r < radius.getLB() - radius.getPrecision()) {
                 return ESat.TRUE;
             }
+            return ESat.TRUE;
         }
-        double[] minidisk_LB = minidisk(ker);
-        double[] minidisk_UB = minidisk(env);
+        double[] minidisk_LB = minidisk(ker.toArray());
+        double[] minidisk_UB = minidisk(env.toArray());
         if (minidisk_UB.length > 0) {
             double x_ub = minidisk_UB[0];
             double y_ub = minidisk_UB[1];
@@ -170,11 +174,9 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
                         || y_lb > (centerY.getUB() + centerY.getPrecision())) {
                     return ESat.FALSE;
                 }
-
                 return ESat.TRUE;
             }
         }
-
         return ESat.UNDEFINED;
     }
 
@@ -184,29 +186,27 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
     // ------------------------------------------------------------------------- //
 
     /**
-     * @param points Indexes of the points.
+     * @param pointsArray Indexes of the points.
      * @return The smallest enclosing circle as new double[] {cx, cy, radius}.
      */
-    private double[] minidisk(ISet points) {
-        int nbPoints = points.size();
+    private double[] minidisk(int[] pointsArray) {
+        int nbPoints = pointsArray.length;
         if (nbPoints == 0) {
             return new double[]{};
         }
         if (nbPoints == 1) {
-            double[] center = coordinates[points.iterator().next()];
+            double[] center = coordinates[pointsArray[0]];
             return new double[]{center[0], center[1], 0};
         }
         if (nbPoints == 2) {
-            ISetIterator iter = points.iterator();
-            int i = iter.next();
-            int j = iter.next();
+            int i = pointsArray[0];
+            int j = pointsArray[1];
             double[] p1 = coordinates[i];
             double[] p2 = coordinates[j];
             double[] center = midpoint(p1, p2);
             return new double[]{center[0], center[1], (distance(p1, p2) / 2)};
         }
         // Shuffle the points
-        int[] pointsArray = points.toArray();
         ArrayUtils.randomPermutations(pointsArray, System.currentTimeMillis());
 //        List<Integer> shuffled = IntStream.of(points.toArray()).boxed().collect(Collectors.toList());
 //        Collections.shuffle(shuffled);

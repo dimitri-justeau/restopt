@@ -70,7 +70,7 @@ public class PropIIC extends Propagator<Variable> {
         this.threshold = distanceThreshold;
         this.threshNeigh = new int[grid.getNbCells()][];
         this.maximize = maximize;
-        this.ccLB = new ConnectivityFinderSpatialGraph(g.getLB(), grid.getSizeCells());
+        this.ccLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), grid.getSizeCells());
         this.ccUB = new ConnectivityFinderSpatialGraph(g.getUB(), grid.getSizeCells());
     }
 

@@ -26,7 +26,6 @@ package org.restopt.choco;
 
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -55,6 +54,7 @@ public class ConnectivityFinderSpatialGraph {
     private int[] sizeCC;
     private int[] attributeCC;
     private int[] attributeCell;
+    private int[][] neighs;
     private int nbCC;
     private int sizeMinCC;
     private int sizeMaxCC;
@@ -63,26 +63,28 @@ public class ConnectivityFinderSpatialGraph {
      * Create an object that can compute Connected Components (CC) of a graph g
      * Can also quickly tell whether g is biconnected or not (only for undirected graph)
      */
+    public ConnectivityFinderSpatialGraph(UndirectedGraph g, UndirectedGraph GUB) {
+        this(g, GUB, IntStream.range(0, g.getNbMaxNodes()).map(i -> 1).toArray());
+    }
+
     public ConnectivityFinderSpatialGraph(UndirectedGraph g) {
-        this(g, IntStream.range(0, g.getNbMaxNodes()).map(i -> 1).toArray());
+        this(g, g, IntStream.range(0, g.getNbMaxNodes()).map(i -> 1).toArray());
     }
 
     public ConnectivityFinderSpatialGraph(UndirectedGraph g, int[] attributeCell) {
+        this(g, g, attributeCell);
+    }
+
+    public ConnectivityFinderSpatialGraph(UndirectedGraph g, UndirectedGraph GUB, int[] attributeCell) {
         this.g = g;
         this.n = g.getNbMaxNodes();
         p = new int[n];
         fifo = new int[n];
         this.attributeCell = attributeCell;
-    }
-
-    public ISet getNeigh(int x) {
-        ISet s = SetFactory.makeBitSet(0);
-        for (int i : g.getNeighborsOf(x)) {
-            if (g.getNodes().contains(i)) {
-                s.add(i);
-            }
+        this.neighs = new int[n][];
+        for (int i : GUB.getNodes()) {
+            neighs[i] = GUB.getNeighborsOf(i).toArray();
         }
-        return s;
     }
 
     /**
@@ -152,7 +154,6 @@ public class ConnectivityFinderSpatialGraph {
         }
         sizeMinCC = 0;
         sizeMaxCC = 0;
-//        int[] act = g.getNodes().toArray();
         for (int i : g.getNodes()) {
             p[i] = -1;
         }
@@ -187,7 +188,7 @@ public class ConnectivityFinderSpatialGraph {
         add(start, cc);
         while (first < last) {
             int i = fifo[first++];
-            for (int j : g.getNeighborsOf(i)) {
+            for (int j : neighs[i]) {
                 if (p[j] == -1) {
                     p[j] = i;
                     add(j, cc);

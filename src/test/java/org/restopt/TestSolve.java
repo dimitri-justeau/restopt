@@ -46,7 +46,6 @@ public class TestSolve {
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
         BaseProblem baseProblem = new BaseProblem(dataLoader, 1);
-//        baseProblem.getModel().getSolver().showContradiction();
         baseProblem.postNbComponentsConstraint(1, 1);
         baseProblem.postCompactnessConstraint(6);
         baseProblem.postRestorableConstraint(90, 110, 23, 0.7);
@@ -69,4 +68,17 @@ public class TestSolve {
         baseProblem.maximizeIIC(3, temp.toString(), 0);
         Files.delete(temp);
     }
+
+/*    @Test
+    public void testProfile() throws IOException {
+        String habitat = "/home/djusteau/TEST_RESTOPT/habitat.tif";
+        String restorable = "/home/djusteau/TEST_RESTOPT/restorable.tif";
+        String locked_out = "/home/djusteau/TEST_RESTOPT/locked_out.tif";
+        DataLoader dataLoader = new DataLoader(habitat, locked_out, restorable);
+        BaseProblem baseProblem = new BaseProblem(dataLoader, 0);
+        baseProblem.postCompactnessConstraint(20);
+        Path temp = Files.createTempFile("test_mesh", "");
+        baseProblem.maximizeMESH(4, temp.toString(), 60);
+        Files.delete(temp);
+    }*/
 }
