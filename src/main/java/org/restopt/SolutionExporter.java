@@ -35,7 +35,7 @@ public class SolutionExporter {
         for (int i = 0; i < completeData.length; i++) {
             if (grid.getDiscardSet().contains(i)) {
                 if (baseProblem.data.getHabitatData()[i] == 0) {
-                    completeData[i] = -1;
+                    completeData[i] = 0;
                 } else {
                     completeData[i] = (int) noDataValue;
                 }

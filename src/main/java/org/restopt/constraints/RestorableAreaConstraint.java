@@ -51,9 +51,8 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
             int cArea = cellArea[completeUngroupedIndex];
             maxCellArea = maxCellArea < cArea ? cArea : maxCellArea;
             int threshold = (int) Math.ceil(cArea * (1 - minProportion));
-            int value = (int) Math.round(problem.getData().getRestorableData()[completeUngroupedIndex]);
-            maxRestorableArea[cell] = value;
             int restorable = (int) Math.round(problem.getData().getRestorableData()[completeUngroupedIndex]);
+            maxRestorableArea[cell] = restorable;
             minArea[cell] = restorable <= threshold ? 0 : restorable - threshold;
         }
         problem.minRestore = getModel().intVar(minAreaToRestore, maxAreaToRestore);

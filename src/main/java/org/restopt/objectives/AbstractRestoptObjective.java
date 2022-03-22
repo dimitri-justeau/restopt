@@ -135,11 +135,11 @@ public abstract class AbstractRestoptObjective {
         ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
         for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
             if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
-                sites[i] = 1;
-            } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
                 sites[i] = 2;
+            } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
+                sites[i] = 3;
             } else {
-                sites[i] = 0;
+                sites[i] = 1;
             }
         }
         SolutionExporter exporter = new SolutionExporter(
