@@ -31,7 +31,6 @@ import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.ISetIterator;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.tools.ArrayUtils;
 
@@ -95,9 +94,9 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         }
         if (ker.size() == env.size()) {
             double[] minidisk = minidisk(ker.toArray());
-            double x = minidisk[0] - centerX.getLB();
-            double y = minidisk[1] - centerY.getLB();
-            double r = minidisk[2] - radius.getLB();
+            double x = minidisk[0];
+            double y = minidisk[1];
+            double r = minidisk[2];
             if (x > centerX.getUB() + centerX.getPrecision() || x < centerX.getLB() - centerX.getPrecision() ||
                     y > centerY.getUB() + centerY.getPrecision() || y < centerY.getLB() - centerY.getPrecision() ||
                     r > radius.getUB() + radius.getPrecision() || r < radius.getLB() - radius.getPrecision()) {
@@ -207,20 +206,19 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             return new double[]{center[0], center[1], (distance(p1, p2) / 2)};
         }
         // Shuffle the points
-        ArrayUtils.randomPermutations(pointsArray, System.currentTimeMillis());
-//        List<Integer> shuffled = IntStream.of(points.toArray()).boxed().collect(Collectors.toList());
-//        Collections.shuffle(shuffled);
+        int[] pointsCopy = Arrays.copyOf(pointsArray, pointsArray.length);
+        ArrayUtils.randomPermutations(pointsCopy, System.currentTimeMillis());
         // First circle (with the two first points)
-        double[] p1 = coordinates[pointsArray[0]];
-        double[] p2 = coordinates[pointsArray[1]];
+        double[] p1 = coordinates[pointsCopy[0]];
+        double[] p2 = coordinates[pointsCopy[1]];
         double[] center = midpoint(p1, p2);
         double r = (distance(p1, p2) / 2);
         // Check other points
-        for (int i = 2; i < pointsArray.length; i++) {
-            double[] pi = coordinates[pointsArray[i]];
+        for (int i = 2; i < pointsCopy.length; i++) {
+            double[] pi = coordinates[pointsCopy[i]];
             if (distance(center, pi) > r) {
                 // Find circle with pi in the border
-                double[] circle = b_minidisk_one(pointsArray, i);
+                double[] circle = b_minidisk_one(pointsCopy, i);
                 center[0] = circle[0];
                 center[1] = circle[1];
                 r = circle[2];
