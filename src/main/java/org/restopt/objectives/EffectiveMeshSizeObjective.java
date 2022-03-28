@@ -2,7 +2,7 @@ package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.DataLoader;
 import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.choco.PropEffectiveMeshSize;
@@ -21,7 +21,7 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
     int precision;
     double initialValue;
 
-    public EffectiveMeshSizeObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
+    public EffectiveMeshSizeObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
         super(problem, timeLimit, verbose, maximize);
         this.precision = precision;
     }

@@ -2,7 +2,7 @@ package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.util.criteria.Criterion;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class NoOptimizationObjective extends AbstractRestoptObjective {
 
-    public NoOptimizationObjective(BaseProblem problem, int timeLimit, boolean verbose) {
+    public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose) {
         super(problem, timeLimit, verbose, true);
     }
 

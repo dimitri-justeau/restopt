@@ -1,8 +1,9 @@
 package org.restopt.cli;
 
 import org.chocosolver.solver.exception.ContradictionException;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.DataLoader;
+import org.restopt.exception.RestoptException;
 import org.restopt.objectives.RestoptSolution;
 import picocli.CommandLine;
 
@@ -131,7 +132,7 @@ public class Main {
     )
     int accessibleVal;
 
-    public static void main(String[] args) throws IOException, ContradictionException {
+    public static void main(String[] args) throws IOException, ContradictionException, RestoptException {
 
         if (args.length == 0) {
             new CommandLine(new Main()).usage(System.out);
@@ -157,17 +158,17 @@ public class Main {
                 main.restorableBinaryRasterPath
         );
 
-        BaseProblem baseProblem;
-        baseProblem = new BaseProblem(data, main.accessibleVal);
-        baseProblem.postNbComponentsConstraint(1, main.maxNbCC);
-        baseProblem.postCompactnessConstraint(main.maxDiam);
-        baseProblem.postRestorableConstraint(main.minRestore, main.maxRestore, main.cellArea, main.minProportion);
+        RestoptProblem restoptProblem;
+        restoptProblem = new RestoptProblem(data, main.accessibleVal);
+        restoptProblem.postNbComponentsConstraint(1, main.maxNbCC);
+        restoptProblem.postCompactnessConstraint(main.maxDiam);
+        restoptProblem.postRestorableConstraint(main.minRestore, main.maxRestore, main.cellArea, main.minProportion);
         if (main.objective == Objective.MESH) {
-            RestoptSolution sol = baseProblem.maximizeMESH(main.precision, main.timeLimit, true);
+            RestoptSolution sol = restoptProblem.maximizeMESH(main.precision, main.timeLimit, true);
             sol.export(main.outputPath, true);
         } else {
             if (main.objective == Objective.IIC) {
-                RestoptSolution sol = baseProblem.maximizeIIC(main.precision, main.timeLimit, true);
+                RestoptSolution sol = restoptProblem.maximizeIIC(main.precision, main.timeLimit, true);
                 sol.export(main.outputPath, true);
             }
         }

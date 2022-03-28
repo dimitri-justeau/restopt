@@ -3,7 +3,7 @@ package org.restopt.constraints;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 /**
@@ -12,10 +12,10 @@ import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
  */
 public abstract class AbstractRestoptConstraint {
 
-    protected BaseProblem problem;
+    protected RestoptProblem problem;
 
-    public AbstractRestoptConstraint(BaseProblem baseProblem) {
-        this.problem = baseProblem;
+    public AbstractRestoptConstraint(RestoptProblem restoptProblem) {
+        this.problem = restoptProblem;
     }
 
     public abstract void post();

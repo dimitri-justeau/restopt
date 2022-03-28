@@ -1,12 +1,13 @@
 package org.restopt.constraints;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
+import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 
 public interface IRestoptConstraintFactory {
 
-    BaseProblem self();
+    RestoptProblem self();
 
     default void postNbComponentsConstraint(int minNbCC, int maxNbCC) {
         new NbComponentsConstraint(self(), minNbCC, maxNbCC).post();
@@ -20,11 +21,11 @@ public interface IRestoptConstraintFactory {
         new CompactnessConstraint(self(), minDiameter, maxDiameter).post();
     }
 
-    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) throws IOException {
+    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int cellArea, double minProportion) throws IOException, RestoptException {
         new RestorableAreaConstraint(self(), minAreaToRestore, maxAreaToRestore, cellArea, minProportion).post();
     }
 
-    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int[] cellArea, double minProportion) throws IOException {
+    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, int[] cellArea, double minProportion) throws IOException, RestoptException {
         new RestorableAreaConstraint(self(), minAreaToRestore, maxAreaToRestore, cellArea, minProportion).post();
     }
 

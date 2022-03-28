@@ -1,7 +1,8 @@
 package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
+import org.restopt.search.OrderedRestorableAreaStrategy;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     double initialValue;
 
-    public NbPlanningUnitsObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize) {
+    public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         super(problem, timeLimit, verbose, maximize);
     }
 
@@ -20,6 +21,24 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     public void initObjective() {
         objective = problem.getRestoreSetVar().getCard();
         initialValue = objective.getLB();
+        if (this.problem.hasRestorableAreaConstraint()) {
+            int[] cardBounds = problem.getRestorableAreaConstraint().getCardinalityBounds();
+            problem.getModel().arithm(problem.getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
+            problem.getModel().arithm(problem.getRestoreSetVar().getCard(), "<=", cardBounds[1]).post();
+        }
+    }
+
+    @Override
+    public void setSearch() {
+        if (problem.hasRestorableAreaConstraint()) {
+            if (maximize) {
+                new OrderedRestorableAreaStrategy(problem, true, true).setSearch();
+            } else {
+                new OrderedRestorableAreaStrategy(problem, false, true).setSearch();
+            }
+        } else {
+            super.setSearch();
+        }
     }
 
     @Override

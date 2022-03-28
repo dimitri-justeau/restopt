@@ -2,7 +2,7 @@ package org.restopt.constraints;
 
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.DataLoader;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.objectives.RestoptSolution;
@@ -19,9 +19,9 @@ public class TestNbComponentsConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postNbComponentsConstraint(1, 1);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postNbComponentsConstraint(1, 1);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         UndirectedGraph g = sol.getRestorationGraph();
         ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
@@ -35,9 +35,9 @@ public class TestNbComponentsConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postNbComponentsConstraint(2, 2);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postNbComponentsConstraint(2, 2);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         UndirectedGraph g = sol.getRestorationGraph();
         ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
@@ -51,9 +51,9 @@ public class TestNbComponentsConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postNbComponentsConstraint(2, 10);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postNbComponentsConstraint(2, 10);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         UndirectedGraph g = sol.getRestorationGraph();
         ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);

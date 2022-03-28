@@ -1,0 +1,12 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Restorable habitat (aggregated)</Description>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">256</MDI>
+      <MDI key="STATISTICS_MEAN">71.49350921273</MDI>
+      <MDI key="STATISTICS_MINIMUM">0</MDI>
+      <MDI key="STATISTICS_STDDEV">74.733224308142</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">24.01</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>

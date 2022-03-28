@@ -7,7 +7,7 @@ import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.SolutionExporter;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
@@ -19,12 +19,12 @@ import java.util.Map;
  */
 public class RestoptSolution {
 
-    private BaseProblem problem;
+    private RestoptProblem problem;
     private AbstractRestoptObjective objective;
     private Solution solution;
     private Map<String, String> characteristics;
 
-    public RestoptSolution(BaseProblem problem, AbstractRestoptObjective objective, Solution solution) {
+    public RestoptSolution(RestoptProblem problem, AbstractRestoptObjective objective, Solution solution) {
         this.problem = problem;
         this.objective = objective;
         this.solution = solution;

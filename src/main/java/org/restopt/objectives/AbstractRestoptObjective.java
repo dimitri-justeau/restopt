@@ -4,9 +4,10 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.limits.TimeCounter;
+import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.criteria.Criterion;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,7 @@ public abstract class AbstractRestoptObjective {
             KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_OPTIMALITY_PROVEN, KEY_SOLVING_TIME
     };
 
-    protected BaseProblem problem;
+    protected RestoptProblem problem;
     protected IntVar objective;
     protected int timeLimit;
     protected boolean verbose;
@@ -31,7 +32,7 @@ public abstract class AbstractRestoptObjective {
     protected Map<String, String> messages;
 
 
-    public AbstractRestoptObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize) {
+    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         this.problem = problem;
         this.timeLimit = timeLimit;
         this.verbose = verbose;
@@ -49,6 +50,13 @@ public abstract class AbstractRestoptObjective {
         for (String[] s : appendMessages()) {
             messages.put(s[0], s[1]);
         }
+    }
+
+    /**
+     * Set the search strategy. Override according to the objective.
+     */
+    public void setSearch() {
+        problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
     }
 
     public abstract void initObjective();
@@ -74,10 +82,12 @@ public abstract class AbstractRestoptObjective {
     }
 
     public Solution solve(Criterion stop) {
+        setSearch();
         return problem.getModel().getSolver().findOptimalSolution(objective, maximize, stop);
     }
 
     public Solution solve() {
+        setSearch();
         return problem.getModel().getSolver().findOptimalSolution(objective, maximize);
     }
 

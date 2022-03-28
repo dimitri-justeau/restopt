@@ -1,6 +1,6 @@
 package org.restopt.constraints;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 
 /**
@@ -11,8 +11,8 @@ public class NbComponentsConstraint extends AbstractRestoptConstraint {
     protected int minNbCC;
     protected int maxNbCC;
 
-    public NbComponentsConstraint(BaseProblem baseProblem, int minNbCC, int maxNbCC) {
-        super(baseProblem);
+    public NbComponentsConstraint(RestoptProblem restoptProblem, int minNbCC, int maxNbCC) {
+        super(restoptProblem);
         this.minNbCC = minNbCC;
         this.maxNbCC = maxNbCC;
     }
@@ -24,6 +24,7 @@ public class NbComponentsConstraint extends AbstractRestoptConstraint {
             ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(getRestoreGraphVar().getUB());
             cf.findAllCC();
             getModel().arithm(getRestoreSetVar().getCard(), "<=", cf.getSizeMaxCC()).post();
+            getModel().arithm(getRestoreSetVar().getCard(), ">=", 1).post();
         } else {
             getModel().nbConnectedComponents(getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)).post();
         }

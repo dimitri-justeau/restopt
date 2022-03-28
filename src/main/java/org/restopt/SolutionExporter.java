@@ -21,20 +21,20 @@ public class SolutionExporter {
     public String template;
     public int[] solution;
     public int[] completeData;
-    public BaseProblem baseProblem;
+    public RestoptProblem restoptProblem;
 
-    public SolutionExporter(BaseProblem baseProblem, int[] solution, String template, String csvDest, String rastDest,
+    public SolutionExporter(RestoptProblem restoptProblem, int[] solution, String template, String csvDest, String rastDest,
                             double noDataValue) {
-        this.baseProblem = baseProblem;
+        this.restoptProblem = restoptProblem;
         this.solution = solution;
         this.template = template;
         this.csvDest = csvDest;
         this.rastDest = rastDest;
-        PartialRegularSquareGrid grid = baseProblem.grid;
+        PartialRegularSquareGrid grid = restoptProblem.grid;
         completeData = new int[grid.getNbRows() * grid.getNbCols()];
         for (int i = 0; i < completeData.length; i++) {
             if (grid.getDiscardSet().contains(i)) {
-                if (baseProblem.data.getHabitatData()[i] == 0) {
+                if (restoptProblem.data.getHabitatData()[i] == 0) {
                     completeData[i] = 0;
                 } else {
                     completeData[i] = (int) noDataValue;

@@ -2,7 +2,7 @@ package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.choco.PropIIC;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
@@ -20,7 +20,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
     int precision;
     double initialValue;
 
-    public IntegralIndexOfConnectivityObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
+    public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
         super(problem, timeLimit, verbose, maximize);
         this.precision = precision;
     }

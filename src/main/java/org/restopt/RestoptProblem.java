@@ -3,7 +3,6 @@ package org.restopt;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.search.strategy.Search;
-import org.chocosolver.solver.search.strategy.selectors.variables.Random;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
@@ -11,8 +10,9 @@ import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.choco.*;
 import org.restopt.constraints.IRestoptConstraintFactory;
+import org.restopt.constraints.RestorableAreaConstraint;
+import org.restopt.exception.RestoptException;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
  * data), it computes the necessary data structure and implements a base restoration planning problem which can be
  * further constrained, and solved with various optimization objectives.
  */
-public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
+public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
 
     public DataLoader data;
 
@@ -47,9 +47,11 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
     public IntVar minRestore;
     public IntVar totalRestorable;
 
-    public BaseProblem() {}
+    private RestorableAreaConstraint restorableAreaConstraint;
 
-    public BaseProblem(DataLoader data, int accessibleVal) {
+    public RestoptProblem() {}
+
+    public RestoptProblem(DataLoader data, int accessibleVal) {
 
         this.data = data;
         this.accessibleVal = accessibleVal;
@@ -114,8 +116,6 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         );
         restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, grid.getNbGroups()).toArray()), true);
         restoreSet = model.graphNodeSetView(restoreGraph);
-
-        setDefaultSearch();
     }
 
     /**
@@ -203,18 +203,6 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         return (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(pu)]);
     }
 
-    public void setDefaultSearch() {
-        model.getSolver().setSearch(Search.setVarSearch(restoreSet));
-    }
-
-    public void setRandomSearch() {
-        model.getSolver().setSearch(Search.setVarSearch(
-                new Random<SetVar>(model.getSeed()),
-                new SetDomainRandom(model.getSeed()),
-                true, restoreSet)
-        );
-    }
-
     /**
      * @return The search state of the solver as a String.
      */
@@ -257,8 +245,34 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         return neighborhood;
     }
 
+    /**
+     * @return True if a restorable area constraint was associated with this problem.
+     */
+    public boolean hasRestorableAreaConstraint() {
+        return restorableAreaConstraint != null;
+    }
+
+    /**
+     * @return The restorable area constraint associated with this problem.
+     */
+    public RestorableAreaConstraint getRestorableAreaConstraint() {
+        return restorableAreaConstraint;
+    }
+
+    /**
+     * Associate a restorable area constraint with this problem.
+     * @param restorableAreaConstraint
+     */
+    public void setRestorableAreaConstraint(RestorableAreaConstraint restorableAreaConstraint) throws RestoptException {
+        if (this.hasRestorableAreaConstraint()) {
+            throw new RestoptException("Only one restorable area constraint can be associated with a restopt problem");
+        }
+        this.restorableAreaConstraint = restorableAreaConstraint;
+    }
+
+
     @Override
-    public BaseProblem self() {
+    public RestoptProblem self() {
         return this;
     }
 }

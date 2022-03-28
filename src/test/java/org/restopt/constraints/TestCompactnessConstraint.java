@@ -1,6 +1,6 @@
 package org.restopt.constraints;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.DataLoader;
 import org.restopt.objectives.RestoptSolution;
 import org.testng.Assert;
@@ -16,15 +16,15 @@ public class TestCompactnessConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postCompactnessConstraint(6);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postCompactnessConstraint(6);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int[] pus = sol.getRestorationPlanningUnits();
         double[][] coords = new double[pus.length][];
-        double[][] compCoords = baseProblem.getGrid().getCartesianCoordinates();
+        double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
         for (int i = 0; i < pus.length; i++) {
-            coords[i] = compCoords[baseProblem.getGrid().getUngroupedPartialIndex(pus[i])];
+            coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
         }
         assertDiameter(coords, 0, 6);
     }
@@ -35,15 +35,15 @@ public class TestCompactnessConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postCompactnessConstraint(2, 4);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postCompactnessConstraint(2, 4);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int[] pus = sol.getRestorationPlanningUnits();
         double[][] coords = new double[pus.length][];
-        double[][] compCoords = baseProblem.getGrid().getCartesianCoordinates();
+        double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
         for (int i = 0; i < pus.length; i++) {
-            coords[i] = compCoords[baseProblem.getGrid().getUngroupedPartialIndex(pus[i])];
+            coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
         }
         assertDiameter(coords, 2, 4);
     }

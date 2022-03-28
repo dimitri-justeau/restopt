@@ -1,6 +1,7 @@
 package org.restopt.constraints;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
+import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,23 +16,24 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
     protected int maxAreaToRestore;
     protected int[] cellArea;
     protected double minProportion;
+    protected int[] minArea;
 
-    public RestorableAreaConstraint(BaseProblem baseProblem, int minAreaToRestore, int maxAreaToRestore,
-                                    int cellArea, double minProportion) throws IOException {
+    public RestorableAreaConstraint(RestoptProblem restoptProblem, int minAreaToRestore, int maxAreaToRestore,
+                                    int cellArea, double minProportion) throws IOException, RestoptException {
         this(
-                baseProblem,
+                restoptProblem,
                 minAreaToRestore,
                 maxAreaToRestore,
                 IntStream.generate(() -> cellArea)
-                        .limit(baseProblem.getData().getRestorableData().length)
+                        .limit(restoptProblem.getData().getRestorableData().length)
                         .toArray(),
                 minProportion
         );
     }
 
-    public RestorableAreaConstraint(BaseProblem baseProblem, int minAreaToRestore, int maxAreaToRestore,
-                                    int[] cellArea, double minProportion) throws IOException {
-        super(baseProblem);
+    public RestorableAreaConstraint(RestoptProblem restoptProblem, int minAreaToRestore, int maxAreaToRestore,
+                                    int[] cellArea, double minProportion) throws IOException, RestoptException {
+        super(restoptProblem);
         this.minAreaToRestore = minAreaToRestore;
         this.maxAreaToRestore = maxAreaToRestore;
         if (cellArea.length != problem.getData().getRestorableData().length) {
@@ -39,53 +41,40 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         }
         this.cellArea = cellArea;
         this.minProportion = minProportion;
+        this.problem.setRestorableAreaConstraint(this);
     }
 
     @Override
     public void post() {
         // Minimum area to ensure every site to >= proportion
         assert minProportion >= 0 && minProportion <= 1;
-        int[] minArea = new int[getGrid().getNbCells()];
-        int[] maxRestorableArea = new int[getGrid().getNbCells()];
         int[] pus = problem.getAvailablePlanningUnits();
+        this.minArea = new int[pus.length];
+        int[] maxRestorableArea = new int[pus.length];
         int maxCellArea = 0;
+        int offset = problem.getGrid().getNbGroups();
         for (int i = 0; i < problem.getAvailablePlanningUnits().length; i++) {
             int cell = pus[i];
             int completeUngroupedIndex = getGrid().getUngroupedCompleteIndex(cell);
             int cArea = cellArea[completeUngroupedIndex];
             maxCellArea = maxCellArea < cArea ? cArea : maxCellArea;
             int threshold = (int) Math.ceil(cArea * (1 - minProportion));
-            int restorable = (int) Math.round(problem.getData().getRestorableData()[completeUngroupedIndex]);
-            maxRestorableArea[cell] = restorable;
-            minArea[cell] = restorable <= threshold ? 0 : restorable - threshold;
+            int restorable = problem.getRestorableArea(cell);
+            maxRestorableArea[cell - offset] = restorable;
+            minArea[cell - offset] = restorable <= threshold ? 0 : restorable - threshold;
         }
         problem.minRestore = getModel().intVar(minAreaToRestore, maxAreaToRestore);
-        problem.totalRestorable = getModel().intVar(0, maxAreaToRestore * maxCellArea);
-        getModel().sumElements(getRestoreSetVar(), minArea, problem.minRestore).post();
-        getModel().sumElements(getRestoreSetVar(), maxRestorableArea, problem.totalRestorable).post();
-        int[] cardBounds = getCardinalityBounds();
-        getModel().arithm(getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
-        getModel().arithm(getRestoreSetVar().getCard(), "<=", cardBounds[1]).post();
+        problem.totalRestorable = getModel().intVar(0, pus.length * maxCellArea);
+        getModel().sumElements(getRestoreSetVar(), minArea, offset, problem.minRestore).post();
+        getModel().sumElements(getRestoreSetVar(), maxRestorableArea, offset, problem.totalRestorable).post();
     }
 
     public int[] getCardinalityBounds() {
-        int[] pus = problem.getAvailablePlanningUnits();
-        int[] minArea = new int[pus.length];
-        for (int i = 0; i < problem.getAvailablePlanningUnits().length; i++) {
-            int cell = pus[i];
-            int completeUngroupedIndex = getGrid().getUngroupedCompleteIndex(cell);
-            int cArea = cellArea[completeUngroupedIndex];
-            int threshold = (int) Math.ceil(cArea * (1 - minProportion));
-            int restorable = (int) Math.round(problem.getData().getRestorableData()[completeUngroupedIndex]);
-            minArea[i] = restorable <= threshold ? 0 : restorable - threshold;
-        }
-        Arrays.sort(minArea);
+        int[] areas = Arrays.copyOf(minArea, minArea.length);
+        Arrays.sort(areas);
         int UB = 0;
         int sum = 0;
-        for (int i : minArea) {
-/*            if (i == 0) {
-                continue;
-            }*/
+        for (int i : areas) {
             sum += i;
             if (sum > maxAreaToRestore) {
                 break;
@@ -95,15 +84,15 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         int LB = 0;
         sum = 0;
         boolean started = false;
-        for (int i = minArea.length - 1; i >= 0; i--) {
+        for (int i = areas.length - 1; i >= 0; i--) {
             if (!started) {
-                if (minArea[i] <= maxAreaToRestore) {
+                if (areas[i] <= maxAreaToRestore) {
                     started = true;
                     LB++;
-                    sum += minArea[i];
+                    sum += areas[i];
                 }
             } else  {
-                sum += minArea[i];
+                sum += areas[i];
                 if (sum > maxAreaToRestore) {
                     break;
                 }
@@ -111,5 +100,9 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
             }
         }
         return new int[] {LB, UB};
+    }
+
+    public int getMinArea(int pu) {
+        return minArea[pu - problem.getGrid().getNbGroups()];
     }
 }

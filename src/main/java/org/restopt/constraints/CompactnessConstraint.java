@@ -1,7 +1,7 @@
 package org.restopt.constraints;
 
 import org.chocosolver.solver.constraints.Constraint;
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
 
 import java.util.Arrays;
@@ -15,12 +15,12 @@ public class CompactnessConstraint extends AbstractRestoptConstraint {
     protected double minDiameter;
     protected double maxDiameter;
 
-    public CompactnessConstraint(BaseProblem baseProblem, double maxDiameter) {
-        this(baseProblem, 0, maxDiameter);
+    public CompactnessConstraint(RestoptProblem restoptProblem, double maxDiameter) {
+        this(restoptProblem, 0, maxDiameter);
     }
 
-    public CompactnessConstraint(BaseProblem baseProblem, double minDiameter, double maxDiameter) {
-        super(baseProblem);
+    public CompactnessConstraint(RestoptProblem restoptProblem, double minDiameter, double maxDiameter) {
+        super(restoptProblem);
         this.minDiameter = minDiameter;
         this.maxDiameter = maxDiameter;
     }

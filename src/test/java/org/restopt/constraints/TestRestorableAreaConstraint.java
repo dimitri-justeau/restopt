@@ -1,7 +1,8 @@
 package org.restopt.constraints;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 import org.restopt.DataLoader;
+import org.restopt.exception.RestoptException;
 import org.restopt.objectives.RestoptSolution;
 import org.restopt.raster.RasterReader;
 import org.testng.Assert;
@@ -12,7 +13,7 @@ import java.io.IOException;
 public class TestRestorableAreaConstraint {
 
     @Test
-    public void testMaxRestorableArea() throws IOException {
+    public void testMaxRestorableArea() throws IOException, RestoptException {
         String habitat = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
@@ -20,9 +21,9 @@ public class TestRestorableAreaConstraint {
         RasterReader r = new RasterReader(cell_area);
         int[] cellArea = r.readAsIntArray();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postRestorableConstraint(0, 110, cellArea, 1);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postRestorableConstraint(0, 110, cellArea, 1);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
         int totalRestorable = sol.getTotalRestorableArea();
@@ -31,14 +32,14 @@ public class TestRestorableAreaConstraint {
         int sum = 0;
         int[] pus = sol.getRestorationPlanningUnits();
         for (int i : pus) {
-            int completeUngroupedIndex = baseProblem.getGrid().getUngroupedCompleteIndex(i);
+            int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
             sum += (int) Math.round(dataLoader.getRestorableData()[completeUngroupedIndex]);
         }
         Assert.assertEquals(sum, restoreArea);
     }
 
     @Test
-    public void testMinMaxRestorableArea() throws IOException {
+    public void testMinMaxRestorableArea() throws IOException, RestoptException {
         String habitat = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
@@ -46,9 +47,9 @@ public class TestRestorableAreaConstraint {
         RasterReader r = new RasterReader(cell_area);
         int[] cellArea = r.readAsIntArray();
         DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
-        BaseProblem baseProblem = new BaseProblem(dataLoader, 2);
-        baseProblem.postRestorableConstraint(120, 200, cellArea, 0.7);
-        RestoptSolution sol = baseProblem.findSolution(0, true);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postRestorableConstraint(120, 200, cellArea, 0.7);
+        RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
         int totalRestorable = sol.getTotalRestorableArea();
@@ -59,7 +60,7 @@ public class TestRestorableAreaConstraint {
         int sumTotal = 0;
         int[] pus = sol.getRestorationPlanningUnits();
         for (int i : pus) {
-            int completeUngroupedIndex = baseProblem.getGrid().getUngroupedCompleteIndex(i);
+            int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
             int rest = (int) Math.round(dataLoader.getRestorableData()[completeUngroupedIndex]);
             sumTotal += rest;
             int cArea = cellArea[completeUngroupedIndex];

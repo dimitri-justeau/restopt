@@ -1,12 +1,8 @@
 package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
-import org.chocosolver.solver.constraints.Constraint;
-import org.restopt.BaseProblem;
-import org.restopt.DataLoader;
-import org.restopt.choco.LandscapeIndicesUtils;
-import org.restopt.choco.PropEffectiveMeshSize;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
+import org.restopt.RestoptProblem;
+import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 import java.util.*;
@@ -21,7 +17,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     int[] cellArea;
     double minProportion;
 
-    public MinRestoreObjective(BaseProblem problem, int timeLimit, boolean verbose, boolean maximize) throws Exception {
+    public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) throws Exception {
         super(problem, timeLimit, verbose, maximize);
         if (problem.getMinRestore() == null) {
             throw new Exception("MinRestoreObjective without cellArea and minProportion is only allowed" +
@@ -29,7 +25,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         }
     }
 
-    public MinRestoreObjective(BaseProblem problem, int cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
+    public MinRestoreObjective(RestoptProblem problem, int cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
         this(
                 problem,
                 IntStream.generate(() -> cellArea)
@@ -42,7 +38,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         );
     }
 
-    public MinRestoreObjective(BaseProblem problem, int[] cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
+    public MinRestoreObjective(RestoptProblem problem, int[] cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
         super(problem, timeLimit, verbose, maximize);
         this.cellArea = cellArea;
         this.minProportion = minProportion;
@@ -57,7 +53,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
             try {
                 problem.postRestorableConstraint(0, (int) maxRest, cellArea, minProportion);
                 objective = problem.getMinRestore();
-            } catch (IOException e) {
+            } catch (IOException | RestoptException e) {
                 e.printStackTrace();
             }
         }

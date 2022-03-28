@@ -1,12 +1,12 @@
 package org.restopt.objectives;
 
-import org.restopt.BaseProblem;
+import org.restopt.RestoptProblem;
 
 import java.io.IOException;
 
 public interface IRestoptObjectiveFactory {
 
-    BaseProblem self();
+    RestoptProblem self();
 
     default RestoptSolution findSolution(int timeLimit, boolean verbose) throws IOException {
         NoOptimizationObjective obj = new NoOptimizationObjective(self(), timeLimit, verbose);
