@@ -1,7 +1,11 @@
 package org.restopt.constraints;
 
 import org.restopt.BaseProblem;
+import org.restopt.choco.ConnectivityFinderSpatialGraph;
 
+/**
+ * Constraint over the number of connected components of the selected area for restoration.
+ */
 public class NbComponentsConstraint extends AbstractRestoptConstraint {
 
     protected int minNbCC;
@@ -15,6 +19,13 @@ public class NbComponentsConstraint extends AbstractRestoptConstraint {
 
     @Override
     public void post() {
-        getModel().nbConnectedComponents(getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)).post();
+        if (minNbCC == maxNbCC && maxNbCC == 1) {
+            getModel().connected(getRestoreGraphVar()).post();
+            ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(getRestoreGraphVar().getUB());
+            cf.findAllCC();
+            getModel().arithm(getRestoreSetVar().getCard(), "<=", cf.getSizeMaxCC()).post();
+        } else {
+            getModel().nbConnectedComponents(getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)).post();
+        }
     }
 }

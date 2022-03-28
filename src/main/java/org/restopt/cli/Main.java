@@ -3,6 +3,7 @@ package org.restopt.cli;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.restopt.BaseProblem;
 import org.restopt.DataLoader;
+import org.restopt.objectives.RestoptSolution;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -162,10 +163,12 @@ public class Main {
         baseProblem.postCompactnessConstraint(main.maxDiam);
         baseProblem.postRestorableConstraint(main.minRestore, main.maxRestore, main.cellArea, main.minProportion);
         if (main.objective == Objective.MESH) {
-            baseProblem.maximizeMESH(main.precision, main.outputPath, main.timeLimit);
+            RestoptSolution sol = baseProblem.maximizeMESH(main.precision, main.timeLimit, true);
+            sol.export(main.outputPath, true);
         } else {
             if (main.objective == Objective.IIC) {
-                baseProblem.maximizeIIC(main.precision, main.outputPath, main.timeLimit);
+                RestoptSolution sol = baseProblem.maximizeIIC(main.precision, main.timeLimit, true);
+                sol.export(main.outputPath, true);
             }
         }
     }

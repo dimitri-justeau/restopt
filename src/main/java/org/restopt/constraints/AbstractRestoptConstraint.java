@@ -6,6 +6,10 @@ import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.restopt.BaseProblem;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
+/**
+ * Abstract base class for constraints over a restopt problem. The only method that needs to be implemented by
+ * inheriting constraints is the post method.
+ */
 public abstract class AbstractRestoptConstraint {
 
     protected BaseProblem problem;

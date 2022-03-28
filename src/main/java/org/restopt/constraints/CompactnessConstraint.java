@@ -6,6 +6,10 @@ import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
 
 import java.util.Arrays;
 
+/**
+ * Constraint over the compactness of the selected restoration area. The compactness here refers to the diameter of
+ * the smallest circle enclosing all planning units of the restoration area.
+ */
 public class CompactnessConstraint extends AbstractRestoptConstraint {
 
     protected double minDiameter;

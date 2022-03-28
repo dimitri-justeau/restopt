@@ -108,13 +108,23 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             return;
         }
         if (ker.size() > 0) {
+            // Check Kernel
             int[] kerArray = ker.toArray();
             double[] minidisk = minidisk(kerArray);
             double[] cker = new double[]{minidisk[0], minidisk[1]};
             double rker = minidisk[2];
-            if (rker > (radius.getUB() + radius.getPrecision()) || rker < (radius.getLB() - radius.getPrecision())) {
+            if (rker > (radius.getUB() + radius.getPrecision())) {
                 fails();
             }
+            // Check Enveloppe
+            int[] envArray = env.toArray();
+            double[] minidiskEnv = minidisk(envArray);
+            double[] cEnv = new double[]{minidiskEnv[0], minidiskEnv[1]};
+            double rEnv = minidiskEnv[2];
+            if (rEnv < (radius.getLB() - radius.getPrecision())) {
+                fails();
+            }
+            // Filter
             int[] pointsArray = new int[ker.size() + 1];
             for (int i = 0; i < kerArray.length; i++) {
                 pointsArray[i] = kerArray[i];

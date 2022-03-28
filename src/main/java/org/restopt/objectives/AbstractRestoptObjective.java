@@ -6,14 +6,8 @@ import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.criteria.Criterion;
-import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.BaseProblem;
-import org.restopt.SolutionExporter;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,22 +65,12 @@ public abstract class AbstractRestoptObjective {
         Model model = problem.getModel();
         Map<String, String> solCharacteristics = new HashMap<>();
         solCharacteristics.put(KEY_MIN_RESTORE, String.valueOf(problem.getMinRestoreValue(solution)));
-        solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(problem.getMaxRestorableValue(solution)));
+        solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(problem.getTotalRestorableValue(solution)));
         solCharacteristics.put(KEY_NB_PUS, String.valueOf(solution.getSetVal(problem.getRestoreSetVar()).length));
         solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeCount()));
         solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
         solCharacteristics.putAll(appendCharacteristics(solution));
         return solCharacteristics;
-    }
-
-    public void printSolutionInfos(Map<String, String> solutionCharacteristics) {
-        System.out.println("\n--- Best solution ---\n");
-        for (String key : KEYS) {
-            System.out.println(messages.get(key) + solutionCharacteristics.get(key));
-        }
-        for (String key : getAdditionalKeys()) {
-            System.out.println(messages.get(key) + solutionCharacteristics.get(key));
-        }
     }
 
     public Solution solve(Criterion stop) {
@@ -97,7 +81,7 @@ public abstract class AbstractRestoptObjective {
         return problem.getModel().getSolver().findOptimalSolution(objective, maximize);
     }
 
-    public boolean findOptimalSolution(String outputPath) throws IOException {
+    public RestoptSolution findOptimalSolution() {
         initObjective();
         Model model = problem.getModel();
         Solver solver = problem.getModel().getSolver();
@@ -117,47 +101,8 @@ public abstract class AbstractRestoptObjective {
             if (verbose) {
                 System.out.println("There is no solution satisfying the constraints");
             }
-            return false;
+            return null;
         }
-        Map<String, String> characteristics = getSolutionCharacteristics(solution);
-        exportSolution(outputPath, solution, characteristics);
-        if (verbose) {
-            printSolutionInfos(characteristics);
-            System.out.println("\nRaster exported at " + outputPath + ".tif");
-            System.out.println("Solution characteristics exported at " + outputPath + ".csv\n");
-        }
-        return true;
-    }
-
-    public void exportSolution(String outputPath, Solution solution, Map<String, String> characteristics) throws IOException {
-        PartialRegularGroupedGrid grid = problem.getGrid();
-        int[] sites = new int[grid.getNbUngroupedCells()];
-        ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
-        for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
-            if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
-                sites[i] = 2;
-            } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
-                sites[i] = 3;
-            } else {
-                sites[i] = 1;
-            }
-        }
-        SolutionExporter exporter = new SolutionExporter(
-                problem,
-                sites,
-                problem.getData().getHabitatRasterPath(),
-                outputPath + ".csv",
-                outputPath + ".tif",
-                problem.getData().noDataHabitat
-        );
-        String[][] orderedCharacteristics = new String[2][];
-        String[] allKeys = ArrayUtils.append(KEYS, getAdditionalKeys());
-        orderedCharacteristics[0] = allKeys;
-        orderedCharacteristics[1] = new String[allKeys.length];
-        for (int i = 0; i < allKeys.length; i++) {
-            orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
-        }
-        exporter.exportCharacteristics(orderedCharacteristics);
-        exporter.generateRaster();
+        return new RestoptSolution(problem, this, solution);
     }
 }

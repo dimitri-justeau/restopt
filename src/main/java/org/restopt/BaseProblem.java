@@ -13,19 +13,26 @@ import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.choco.*;
 import org.restopt.constraints.IRestoptConstraintFactory;
+import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
 import org.restopt.objectives.IRestoptObjectiveFactory;
 
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
+/**
+ * Base restopt problem. Instantiated with a `DataLoader` object (which contains access to all the necessary input
+ * data), it computes the necessary data structure and implements a base restoration planning problem which can be
+ * further constrained, and solved with various optimization objectives.
+ */
 public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
 
     public DataLoader data;
 
     public PartialRegularGroupedGrid grid;
+
+    private INeighborhood neighborhood;
 
     public int accessibleVal;
 
@@ -43,7 +50,7 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
     private int[] accessibleNonHabitatPixels;
 
     public IntVar minRestore;
-    public IntVar maxRestorable;
+    public IntVar totalRestorable;
 
     public BaseProblem() {}
 
@@ -98,10 +105,12 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         // INITIALIZE PROBLEM //
         // ------------------ //
 
+        this.neighborhood = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED;
+
         model = new Model();
 
-        UndirectedGraph hab_LB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET, SetType.BIPARTITESET);
-        UndirectedGraph hab_UB = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, accessibleNonHabitatPixels), SetType.BIPARTITESET, SetType.BIPARTITESET);
+        UndirectedGraph hab_LB = neighborhood.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET, SetType.BIPARTITESET);
+        UndirectedGraph hab_UB = neighborhood.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, accessibleNonHabitatPixels), SetType.BIPARTITESET, SetType.BIPARTITESET);
 
         habitatGraphVar = model.nodeInducedGraphVar(
                 "habitatGraph",
@@ -114,38 +123,72 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         setDefaultSearch();
     }
 
+    /**
+     * @return The Choco model associated with this restopt problem.
+     */
     public Model getModel() {
         return model;
     }
 
+    /**
+     * @return The set variable representing the set of planning units selected for restoration.
+     */
     public SetVar getRestoreSetVar() {
         return restoreSet;
     }
 
+    /**
+     * @return The grid corresponding to the problem.
+     */
     public PartialRegularGroupedGrid getGrid() {
         return grid;
     }
 
+    /**
+     * @return The data loader object that was used to instantiate this problem.
+     */
     public DataLoader getData() {
         return data;
     }
 
+    /**
+     * @return The graph variable representing the existing habitat plus the restored area.
+     */
     public UndirectedGraphVar getHabitatGraphVar() {
         return habitatGraphVar;
     }
 
+    /**
+     * @return The existing habitat (without any restoration) as a graph.
+     */
     public UndirectedGraph getHabitatGraph() {
         return habGraph;
     }
 
+    /**
+     * @return The number of planning units (non habitat, non NA) that are locked up.
+     */
     public int getNbLockedUpNonHabitatCells() {
         return nonHabNonAcc;
     }
 
+    /**
+     * @return The graph variable representing the set of planning units selected for restoration.
+     */
     public UndirectedGraphVar getRestoreGraphVar() {
         return restoreGraph;
     }
 
+    /**
+     * @return The IntVar corresponding to the minimum area that need to be restored.
+     */
+    public IntVar getMinRestore() {
+        return minRestore;
+    }
+
+    /**
+     * @return The planning units of the problem.
+     */
     public int[] getAvailablePlanningUnits() {
         return accessibleNonHabitatPixels;
     }
@@ -162,10 +205,17 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         );
     }
 
+    /**
+     * @return The search state of the solver as a String.
+     */
     public String getSearchState() {
         return model.getSolver().getSearchState().toString();
     }
 
+    /**
+     * @param solution A solution to the problem.
+     * @return The minimum amount of habitat that needs to be restored in the selected restoration area.
+     */
     public int getMinRestoreValue(Solution solution) {
         if (minRestore != null) {
             return solution.getIntVal(minRestore);
@@ -174,9 +224,13 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         }
     }
 
-    public int getMaxRestorableValue(Solution solution) {
-        if (maxRestorable != null) {
-            return solution.getIntVal(maxRestorable);
+    /**
+     * @param solution A solution to the problem.
+     * @return The total amount of habitat that can be restored in the selected restoration area.
+     */
+    public int getTotalRestorableValue(Solution solution) {
+        if (totalRestorable != null) {
+            return solution.getIntVal(totalRestorable);
         } else {
             int maxRestore = 0;
             for (int i : solution.getSetVal(restoreSet)) {
@@ -184,6 +238,13 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
             }
             return maxRestore;
         }
+    }
+
+    /**
+     * @return The neighborhood relation used in the problem.
+     */
+    public INeighborhood getNeighborhood() {
+        return neighborhood;
     }
 
     @Override

@@ -3,8 +3,12 @@ package org.restopt.constraints;
 import org.restopt.BaseProblem;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
+/**
+ * Constraint over the amount of area to be restored.
+ */
 public class RestorableAreaConstraint extends AbstractRestoptConstraint {
 
     protected int minAreaToRestore;
@@ -56,8 +60,57 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
             minArea[cell] = restorable <= threshold ? 0 : restorable - threshold;
         }
         problem.minRestore = getModel().intVar(minAreaToRestore, maxAreaToRestore);
-        problem.maxRestorable = getModel().intVar(0, maxAreaToRestore * maxCellArea);
+        problem.totalRestorable = getModel().intVar(0, maxAreaToRestore * maxCellArea);
         getModel().sumElements(getRestoreSetVar(), minArea, problem.minRestore).post();
-        getModel().sumElements(getRestoreSetVar(), maxRestorableArea, problem.maxRestorable).post();
+        getModel().sumElements(getRestoreSetVar(), maxRestorableArea, problem.totalRestorable).post();
+        int[] cardBounds = getCardinalityBounds();
+        System.out.println(Arrays.toString(cardBounds));
+        getModel().arithm(getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
+        getModel().arithm(getRestoreSetVar().getCard(), "<=", cardBounds[1]).post();
+    }
+
+    public int[] getCardinalityBounds() {
+        int[] pus = problem.getAvailablePlanningUnits();
+        int[] minArea = new int[pus.length];
+        for (int i = 0; i < problem.getAvailablePlanningUnits().length; i++) {
+            int cell = pus[i];
+            int completeUngroupedIndex = getGrid().getUngroupedCompleteIndex(cell);
+            int cArea = cellArea[completeUngroupedIndex];
+            int threshold = (int) Math.ceil(cArea * (1 - minProportion));
+            int restorable = (int) Math.round(problem.getData().getRestorableData()[completeUngroupedIndex]);
+            minArea[i] = restorable <= threshold ? 0 : restorable - threshold;
+        }
+        Arrays.sort(minArea);
+        int UB = 0;
+        int sum = 0;
+        for (int i : minArea) {
+/*            if (i == 0) {
+                continue;
+            }*/
+            sum += i;
+            if (sum > maxAreaToRestore) {
+                break;
+            }
+            UB++;
+        }
+        int LB = 0;
+        sum = 0;
+        boolean started = false;
+        for (int i = minArea.length - 1; i >= 0; i--) {
+            if (!started) {
+                if (minArea[i] <= maxAreaToRestore) {
+                    started = true;
+                    LB++;
+                    sum += minArea[i];
+                }
+            } else  {
+                sum += minArea[i];
+                if (sum > maxAreaToRestore) {
+                    break;
+                }
+                LB++;
+            }
+        }
+        return new int[] {LB, UB};
     }
 }
