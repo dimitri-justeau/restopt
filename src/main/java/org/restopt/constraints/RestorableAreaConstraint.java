@@ -64,7 +64,6 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         getModel().sumElements(getRestoreSetVar(), minArea, problem.minRestore).post();
         getModel().sumElements(getRestoreSetVar(), maxRestorableArea, problem.totalRestorable).post();
         int[] cardBounds = getCardinalityBounds();
-        System.out.println(Arrays.toString(cardBounds));
         getModel().arithm(getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
         getModel().arithm(getRestoreSetVar().getCard(), "<=", cardBounds[1]).post();
     }

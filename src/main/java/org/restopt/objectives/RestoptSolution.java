@@ -79,6 +79,13 @@ public class RestoptSolution {
         }
     }
 
+    public int getMinRestoreArea() {
+        return problem.getMinRestoreValue(solution);
+    }
+
+    public int getTotalRestorableArea() {
+        return problem.getTotalRestorableValue(solution);
+    }
     public int[] getRestorationPlanningUnits() {
         return solution.getSetVal(problem.getRestoreSetVar());
     }

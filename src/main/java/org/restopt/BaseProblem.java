@@ -31,23 +31,18 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
     public DataLoader data;
 
     public PartialRegularGroupedGrid grid;
-
     private INeighborhood neighborhood;
 
     public int accessibleVal;
 
     private Model model;
     private UndirectedGraphVar habitatGraphVar;
-
     private UndirectedGraphVar restoreGraph;
-
     public UndirectedGraph habGraph;
-
     private SetVar restoreSet;
 
     public int nonHabNonAcc;
-
-    private int[] accessibleNonHabitatPixels;
+    private int[] availablePlanningUnits;
 
     public IntVar minRestore;
     public IntVar totalRestorable;
@@ -90,7 +85,7 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
 
         int[] habitatPixels = IntStream.range(0, grid.getNbGroups()).toArray();
 
-        accessibleNonHabitatPixels = IntStream.range(0, data.getAccessibleData().length)
+        availablePlanningUnits = IntStream.range(0, data.getAccessibleData().length)
                 .filter(i -> data.getAccessibleData()[i] == accessibleVal && data.getHabitatData()[i] == 0)
                 .map(i -> grid.getGroupIndexFromCompleteIndex(i))
                 .toArray();
@@ -98,7 +93,7 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         System.out.println("Current landscape state loaded");
         System.out.println("    Habitat cells = " + habitatPixelsComp.length + " ");
         System.out.println("    Non habitat cells = " + nonHabitatPixels.length + " ");
-        System.out.println("    Accessible non habitat cells = " + accessibleNonHabitatPixels.length + " ");
+        System.out.println("    Accessible non habitat cells = " + availablePlanningUnits.length + " ");
         System.out.println("    Out cells = " + outPixels.length);
 
         // ------------------ //
@@ -110,7 +105,7 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         model = new Model();
 
         UndirectedGraph hab_LB = neighborhood.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET, SetType.BIPARTITESET);
-        UndirectedGraph hab_UB = neighborhood.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, accessibleNonHabitatPixels), SetType.BIPARTITESET, SetType.BIPARTITESET);
+        UndirectedGraph hab_UB = neighborhood.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, availablePlanningUnits), SetType.BIPARTITESET, SetType.BIPARTITESET);
 
         habitatGraphVar = model.nodeInducedGraphVar(
                 "habitatGraph",
@@ -187,10 +182,25 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
     }
 
     /**
+     * @return The IntVar corresponding to the total area that can be restored.
+     */
+    public IntVar getTotalRestorable() {
+        return totalRestorable;
+    }
+
+    /**
      * @return The planning units of the problem.
      */
     public int[] getAvailablePlanningUnits() {
-        return accessibleNonHabitatPixels;
+        return availablePlanningUnits;
+    }
+
+    /**
+     * @param pu A planning unit index (partial grouped index)
+     * @return The amount of restorable habitat in pu.
+     */
+    public int getRestorableArea(int pu) {
+        return (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(pu)]);
     }
 
     public void setDefaultSearch() {
@@ -234,7 +244,7 @@ public class BaseProblem implements IRestoptObjectiveFactory, IRestoptConstraint
         } else {
             int maxRestore = 0;
             for (int i : solution.getSetVal(restoreSet)) {
-                maxRestore += Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(i)]);
+                maxRestore += getRestorableArea(i);
             }
             return maxRestore;
         }
