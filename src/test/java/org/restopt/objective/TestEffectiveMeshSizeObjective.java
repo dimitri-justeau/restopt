@@ -23,10 +23,16 @@ public class TestEffectiveMeshSizeObjective {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         List<RestoptSolution> sols = restoptProblem.maximizeMESH(3, 10, 30, true);
+        double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
             double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));
+            if (best_ref == -1) {
+                best_ref = best;
+            } else {
+                Assert.assertEquals(best, best_ref);
+            }
             Assert.assertTrue(initial < best);
         }
     }

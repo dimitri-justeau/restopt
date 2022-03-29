@@ -14,7 +14,7 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     public static final String KEY_NB_PUS_INITIAL = "nb_pus_initial";
     public static final String KEY_NB_PUS_BEST = "nb_pus_best";
 
-    double initialValue;
+    int initialValue;
 
     public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         super(problem, timeLimit, verbose, maximize);

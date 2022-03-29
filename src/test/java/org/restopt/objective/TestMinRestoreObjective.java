@@ -23,11 +23,17 @@ public class TestMinRestoreObjective {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         List<RestoptSolution> sols = restoptProblem.maximizeMinRestore(30, 10, true);
+        double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_INITIAL));
             double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_BEST));
             Assert.assertTrue(initial < best);
+            if (best_ref == -1) {
+                best_ref = best;
+            } else {
+                Assert.assertEquals(best, best_ref);
+            }
         }
     }
 }
