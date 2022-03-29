@@ -6,7 +6,7 @@ import org.restopt.RestoptProblem;
 import org.restopt.RasterDataLoader;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.exception.RestoptException;
-import org.restopt.objectives.RestoptSolution;
+import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -1,6 +1,7 @@
 package org.restopt.objectives;
 
 import org.restopt.RestoptProblem;
+import org.restopt.RestoptSolution;
 
 import java.io.IOException;
 

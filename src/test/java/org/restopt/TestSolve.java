@@ -1,7 +1,6 @@
 package org.restopt;
 
 import org.restopt.exception.RestoptException;
-import org.restopt.objectives.RestoptSolution;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class TestSolve {
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 1);
 //        baseProblem.postNbComponentsConstraint(1, 1);
         //baseProblem.postCompactnessConstraint(6);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         RestoptSolution sol = restoptProblem.maximizeNbPUS(30, true);
         sol.printSolutionInfos();
     }
@@ -35,7 +34,7 @@ public class TestSolve {
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         Path temp = Files.createTempFile("test_mesh2", "");
         RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, true);
         sol.export(temp.toString(), true);
@@ -52,7 +51,7 @@ public class TestSolve {
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 1);
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         Path temp = Files.createTempFile("test_iic", "");
         RestoptSolution sol = restoptProblem.maximizeIIC(3, 0, true);
         sol.export(temp.toString(), true);
@@ -69,7 +68,7 @@ public class TestSolve {
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         Path temp = Files.createTempFile("test_iic2", "");
         RestoptSolution sol = restoptProblem.maximizeIIC(3, 0, true);
         sol.export(temp.toString(), true);

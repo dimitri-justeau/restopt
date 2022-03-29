@@ -3,6 +3,7 @@ package org.restopt.constraints;
 import org.chocosolver.solver.constraints.Constraint;
 import org.restopt.RestoptProblem;
 import org.restopt.choco.PropSmallestEnclosingCircleSpatialGraph;
+import org.restopt.exception.RestoptException;
 
 import java.util.Arrays;
 
@@ -28,10 +29,13 @@ public class CompactnessConstraint extends AbstractRestoptConstraint {
     @Override
     public void post() {
         double[][] coords = new double[getGrid().getNbCells()][];
-        double[][] compCoords = getGrid().getCartesianCoordinates();
         int[] pus = problem.getAvailablePlanningUnits();
         for (int i = 0; i < problem.getAvailablePlanningUnits().length; i++) {
-            coords[pus[i]] = compCoords[getGrid().getUngroupedPartialIndex(pus[i])];
+            try {
+                coords[pus[i]] = getGrid().getCartesianCoordinates(pus[i]);
+            } catch (RestoptException e) {
+                e.printStackTrace();
+            }
         }
         double xMax = Arrays.stream(getGrid().getCartesianCoordinates())
                 .mapToDouble(c -> c[0]).max().getAsDouble();

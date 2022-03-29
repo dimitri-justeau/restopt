@@ -4,6 +4,7 @@ import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
+import org.restopt.exception.RestoptException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,5 +101,13 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
             coords[i] = new double[]{coord[1], coord[0]};
         }
         return coords;
+    }
+
+    public double[] getCartesianCoordinates(int partialGroupedIndex) throws RestoptException {
+        if (partialGroupedIndex < getNbGroups()) {
+            throw new RestoptException("Cannot associate cartesian coordinates to a grouped cell");
+        }
+        int[] c = super.getCoordinatesFromIndex(getUngroupedPartialIndex(partialGroupedIndex));
+        return new double[] {c[1], c[0]};
     }
 }

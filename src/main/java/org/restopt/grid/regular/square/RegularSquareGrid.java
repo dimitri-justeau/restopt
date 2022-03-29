@@ -22,6 +22,7 @@
 
 package org.restopt.grid.regular.square;
 
+import org.restopt.exception.RestoptException;
 import org.restopt.grid.Grid;
 
 /**
@@ -95,7 +96,7 @@ public class RegularSquareGrid extends Grid {
     }
 
     @Override
-    public double[] getCartesianCoordinates(int site) {
+    public double[] getCartesianCoordinates(int site) throws RestoptException {
         int[] coords = getCoordinatesFromIndex(site);
         return new double[]{(double) coords[0], (double) coords[1]};
     }

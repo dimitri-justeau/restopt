@@ -3,7 +3,7 @@ package org.restopt.objective;
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.objectives.EffectiveMeshSizeObjective;
-import org.restopt.objectives.RestoptSolution;
+import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public class TestEffectiveMeshSizeObjective {
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, true);
         sol.printSolutionInfos();
         double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));

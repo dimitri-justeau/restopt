@@ -2,7 +2,7 @@ package org.restopt.objective;
 
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
-import org.restopt.objectives.RestoptSolution;
+import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -16,7 +16,7 @@ public class TestNbPlanningUnitsObjective {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
-        restoptProblem.postRestorableConstraint(90, 110, 0.7);
+        restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         RestoptSolution sol = restoptProblem.maximizeNbPUS(30, true);
         sol.printSolutionInfos();
     }

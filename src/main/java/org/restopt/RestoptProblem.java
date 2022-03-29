@@ -211,34 +211,6 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     }
 
     /**
-     * @param solution A solution to the problem.
-     * @return The minimum amount of habitat that needs to be restored in the selected restoration area.
-     */
-    public int getMinRestoreValue(Solution solution) {
-        if (minRestore != null) {
-            return solution.getIntVal(minRestore);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param solution A solution to the problem.
-     * @return The total amount of habitat that can be restored in the selected restoration area.
-     */
-    public int getTotalRestorableValue(Solution solution) {
-        if (totalRestorable != null) {
-            return solution.getIntVal(totalRestorable);
-        } else {
-            int maxRestore = 0;
-            for (int i : solution.getSetVal(restoreSet)) {
-                maxRestore += getRestorableArea(i);
-            }
-            return maxRestore;
-        }
-    }
-
-    /**
      * @return The neighborhood relation used in the problem.
      */
     public INeighborhood getNeighborhood() {

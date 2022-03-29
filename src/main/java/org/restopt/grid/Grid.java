@@ -22,6 +22,8 @@
 
 package org.restopt.grid;
 
+import org.restopt.exception.RestoptException;
+
 /**
  * Abstract base class for grids.
  */
@@ -40,5 +42,5 @@ public abstract class Grid {
     /**
      * @return The cartesian coordinates of a site (center or centroid).
      */
-    public abstract double[] getCartesianCoordinates(int site);
+    public abstract double[] getCartesianCoordinates(int site) throws RestoptException;
 }

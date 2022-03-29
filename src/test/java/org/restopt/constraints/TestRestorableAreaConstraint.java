@@ -3,7 +3,7 @@ package org.restopt.constraints;
 import org.restopt.RestoptProblem;
 import org.restopt.RasterDataLoader;
 import org.restopt.exception.RestoptException;
-import org.restopt.objectives.RestoptSolution;
+import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public class TestRestorableAreaConstraint {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
-        restoptProblem.postRestorableConstraint(0, 110, 1);
+        restoptProblem.postRestorableConstraint(0, 110 * 11, 1);
         RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
@@ -43,14 +43,14 @@ public class TestRestorableAreaConstraint {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
-        restoptProblem.postRestorableConstraint(120, 200, 0.7);
+        restoptProblem.postRestorableConstraint(120 * 11, 200 * 11, 0.7);
         RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
         int totalRestorable = sol.getTotalRestorableArea();
         Assert.assertTrue(restoreArea != totalRestorable);
-        Assert.assertTrue(restoreArea <= 200);
-        Assert.assertTrue(restoreArea >= 120);
+        Assert.assertTrue(restoreArea <= 200 * 11);
+        Assert.assertTrue(restoreArea >= 120 * 11);
         int sumRest = 0;
         int sumTotal = 0;
         int[] pus = sol.getRestorationPlanningUnits();

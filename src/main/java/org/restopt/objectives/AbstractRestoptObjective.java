@@ -8,21 +8,12 @@ import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.criteria.Criterion;
 import org.restopt.RestoptProblem;
+import org.restopt.RestoptSolution;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractRestoptObjective {
-
-    public static final String KEY_MIN_RESTORE = "min_restore";
-    public static final String KEY_TOTAL_RESTORABLE = "total_restorable";
-    public static final String KEY_NB_PUS = "nb_planning_units";
-    public static final String KEY_OPTIMALITY_PROVEN = "optimality_proven";
-    public static final String KEY_SOLVING_TIME = "solving_time";
-    public static final String[] KEYS = {
-            KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_OPTIMALITY_PROVEN, KEY_SOLVING_TIME
-    };
 
     protected RestoptProblem problem;
     protected IntVar objective;
@@ -37,19 +28,6 @@ public abstract class AbstractRestoptObjective {
         this.timeLimit = timeLimit;
         this.verbose = verbose;
         this.maximize = maximize;
-        initMessages();
-    }
-
-    public void initMessages() {
-        this.messages = new HashMap<>();
-        messages.put(KEY_MIN_RESTORE, "Minimum area to restore: ");
-        messages.put(KEY_TOTAL_RESTORABLE, "Total restorable area: ");
-        messages.put(KEY_NB_PUS, "Number of planning units: ");
-        messages.put(KEY_OPTIMALITY_PROVEN, "Optimality proven: ");
-        messages.put(KEY_SOLVING_TIME, "Solving time (seconds): ");
-        for (String[] s : appendMessages()) {
-            messages.put(s[0], s[1]);
-        }
     }
 
     /**
@@ -68,18 +46,6 @@ public abstract class AbstractRestoptObjective {
     public abstract Map<String, String> appendCharacteristics(Solution solution);
 
     public abstract List<String[]> appendMessages();
-
-    public Map<String, String> getSolutionCharacteristics(Solution solution) {
-        Model model = problem.getModel();
-        Map<String, String> solCharacteristics = new HashMap<>();
-        solCharacteristics.put(KEY_MIN_RESTORE, String.valueOf(problem.getMinRestoreValue(solution)));
-        solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(problem.getTotalRestorableValue(solution)));
-        solCharacteristics.put(KEY_NB_PUS, String.valueOf(solution.getSetVal(problem.getRestoreSetVar()).length));
-        solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeCount()));
-        solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
-        solCharacteristics.putAll(appendCharacteristics(solution));
-        return solCharacteristics;
-    }
 
     public Solution solve(Criterion stop) {
         setSearch();
