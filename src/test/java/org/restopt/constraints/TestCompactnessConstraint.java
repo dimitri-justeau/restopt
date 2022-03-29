@@ -1,9 +1,9 @@
 package org.restopt.constraints;
 
-import org.restopt.RestoptProblem;
 import org.restopt.RasterDataLoader;
-import org.restopt.exception.RestoptException;
+import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
+import org.restopt.exception.RestoptException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

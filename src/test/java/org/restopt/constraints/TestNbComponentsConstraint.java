@@ -2,11 +2,11 @@ package org.restopt.constraints;
 
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
-import org.restopt.RestoptProblem;
 import org.restopt.RasterDataLoader;
+import org.restopt.RestoptProblem;
+import org.restopt.RestoptSolution;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.exception.RestoptException;
-import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

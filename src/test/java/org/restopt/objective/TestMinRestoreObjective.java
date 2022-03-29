@@ -7,6 +7,8 @@ import org.restopt.objectives.MinRestoreObjective;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 public class TestMinRestoreObjective {
 
     @Test
@@ -20,10 +22,12 @@ public class TestMinRestoreObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        RestoptSolution sol = restoptProblem.maximizeMinRestore(30, true);
-        sol.printSolutionInfos();
-        double initial = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_INITIAL));
-        double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_BEST));
-        Assert.assertTrue(initial < best);
+        List<RestoptSolution> sols = restoptProblem.maximizeMinRestore(30, 10, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            double initial = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_INITIAL));
+            double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_BEST));
+            Assert.assertTrue(initial < best);
+        }
     }
 }

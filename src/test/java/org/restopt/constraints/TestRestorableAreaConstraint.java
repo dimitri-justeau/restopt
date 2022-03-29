@@ -1,9 +1,9 @@
 package org.restopt.constraints;
 
-import org.restopt.RestoptProblem;
 import org.restopt.RasterDataLoader;
-import org.restopt.exception.RestoptException;
+import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
+import org.restopt.exception.RestoptException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,7 +25,7 @@ public class TestRestorableAreaConstraint {
         int restoreArea = sol.getMinRestoreArea();
         int totalRestorable = sol.getTotalRestorableArea();
         Assert.assertEquals(restoreArea, totalRestorable);
-        Assert.assertTrue(restoreArea <= 110);
+        Assert.assertTrue(restoreArea <= 110 * 11);
         int sum = 0;
         int[] pus = sol.getRestorationPlanningUnits();
         for (int i : pus) {

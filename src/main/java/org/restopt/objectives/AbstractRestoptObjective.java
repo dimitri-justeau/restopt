@@ -3,6 +3,7 @@ package org.restopt.objectives;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
@@ -10,6 +11,8 @@ import org.chocosolver.util.criteria.Criterion;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +23,6 @@ public abstract class AbstractRestoptObjective {
     protected int timeLimit;
     protected boolean verbose;
     protected boolean maximize;
-    protected Map<String, String> messages;
-
 
     public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         this.problem = problem;
@@ -47,17 +48,31 @@ public abstract class AbstractRestoptObjective {
 
     public abstract List<String[]> appendMessages();
 
-    public Solution solve(Criterion stop) {
+    public List<Solution> solve(int nbSolutions, Criterion stop) {
         setSearch();
-        return problem.getModel().getSolver().findOptimalSolution(objective, maximize, stop);
+        List<Solution> solutions;
+        if (nbSolutions == 1) {
+            solutions = new ArrayList<>();
+            solutions.add(problem.getModel().getSolver().findOptimalSolution(objective, maximize, stop));
+        } else {
+            solutions = findNOptimalSolutions(objective, maximize, nbSolutions, stop);
+        }
+        return solutions;
     }
 
-    public Solution solve() {
+    public List<Solution> solve(int nbSolutions) {
         setSearch();
-        return problem.getModel().getSolver().findOptimalSolution(objective, maximize);
+        List<Solution> solutions;
+        if (nbSolutions == 1) {
+            solutions = new ArrayList<>();
+            solutions.add(problem.getModel().getSolver().findOptimalSolution(objective, maximize));
+        } else {
+            solutions = findNOptimalSolutions(objective, maximize, nbSolutions);
+        }
+        return solutions;
     }
 
-    public RestoptSolution findOptimalSolution() {
+    public List<RestoptSolution> findOptimalSolution(int nbSolutions) {
         initObjective();
         Model model = problem.getModel();
         Solver solver = problem.getModel().getSolver();
@@ -66,19 +81,60 @@ public abstract class AbstractRestoptObjective {
             solver.showShortStatistics();
         }
         long t = System.currentTimeMillis();
-        Solution solution;
+        List<Solution> solutions;
         if (timeLimit > 0) {
             TimeCounter timeCounter = new TimeCounter(model, (long) (timeLimit * 1e9));
-            solution = solve(timeCounter);
+            solutions = solve(nbSolutions, timeCounter);
         } else {
-            solution = solve();
+            solutions = solve(nbSolutions);
         }
-        if (solution == null) {
+        if (solutions.size() == 0) {
             if (verbose) {
                 System.out.println("There is no solution satisfying the constraints");
             }
             return null;
         }
-        return new RestoptSolution(problem, this, solution);
+        List<RestoptSolution> restoptSolutions = new ArrayList<>();
+        for (Solution s : solutions) {
+            restoptSolutions.add(new RestoptSolution(problem, this, s));
+        }
+        return restoptSolutions;
+    }
+
+    protected List<Solution> findNSolutions(int nbSolutions, Criterion... stop) {
+        Solver solver = problem.getModel().getSolver();
+        solver.getModel().clearObjective();
+        solver.addStopCriterion(stop);
+        List<Solution> solutions = new ArrayList<>();
+        int i = 0;
+        while (solver.solve() && i < nbSolutions) {
+            solutions.add(new Solution(solver.getModel()).record());
+            i++;
+        }
+        solver.removeStopCriterion(stop);
+        return solutions;
+    }
+
+    private List<Solution> findNOptimalSolutions(IntVar objective, boolean maximize, int nbSolutions, Criterion... stop) {
+        Solver solver = problem.getModel().getSolver();
+        boolean defaultS = solver.getSearch() == null;// best bound (in default) is only for optim
+        solver.findOptimalSolution(objective, maximize);
+        if (!solver.isStopCriterionMet()
+                && solver.getSolutionCount() > 0) {
+            solver.removeStopCriterion(stop);
+            int opt = solver.getObjectiveManager().getBestSolutionValue().intValue();
+            solver.reset();
+            solver.getModel().clearObjective();
+            Constraint forceOptimal = solver.getModel().arithm(objective, "=", opt);
+            forceOptimal.post();
+            if (defaultS)
+                solver.setSearch(Search.defaultSearch(solver.getModel()));// best bound (in default) is only for optim
+            List<Solution> solutions = findNSolutions(nbSolutions, stop);
+            solver.getModel().unpost(forceOptimal);
+            return solutions;
+        } else {
+            solver.removeStopCriterion(stop);
+            return Collections.emptyList();
+        }
     }
 }

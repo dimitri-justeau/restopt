@@ -2,10 +2,12 @@ package org.restopt.objective;
 
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
-import org.restopt.objectives.EffectiveMeshSizeObjective;
 import org.restopt.RestoptSolution;
+import org.restopt.objectives.EffectiveMeshSizeObjective;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 public class TestEffectiveMeshSizeObjective {
 
@@ -20,11 +22,13 @@ public class TestEffectiveMeshSizeObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, true);
-        sol.printSolutionInfos();
-        double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
-        double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));
-        Assert.assertTrue(initial < best);
+        List<RestoptSolution> sols = restoptProblem.maximizeMESH(3, 10, 30, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
+            double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));
+            Assert.assertTrue(initial < best);
+        }
     }
 
     @Test

@@ -6,6 +6,8 @@ import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 public class TestNbPlanningUnitsObjective {
 
     @Test
@@ -17,8 +19,10 @@ public class TestNbPlanningUnitsObjective {
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        RestoptSolution sol = restoptProblem.maximizeNbPUS(30, true);
-        sol.printSolutionInfos();
+        List<RestoptSolution> sols = restoptProblem.maximizeNbPUS(30, 10, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+        }
     }
 
     @Test

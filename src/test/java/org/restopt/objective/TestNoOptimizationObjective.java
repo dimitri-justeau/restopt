@@ -6,6 +6,8 @@ import org.restopt.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 public class TestNoOptimizationObjective {
 
     @Test
@@ -19,12 +21,15 @@ public class TestNoOptimizationObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        RestoptSolution sol = restoptProblem.findSolution(30, true);
-        sol.printSolutionInfos();
-        int minRestore = Integer.parseInt(sol.getCharacteristics().get(sol.KEY_MIN_RESTORE));
-        Assert.assertTrue(minRestore <= 110 * 11);
-        Assert.assertTrue(minRestore >= 90 * 11);
-        Assert.assertTrue(sol.getDiameter() <= 6);
-        Assert.assertTrue(sol.getNbComponents() == 1);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(10, 30, true);
+        Assert.assertEquals(sols.size(), 10);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            int minRestore = Integer.parseInt(sol.getCharacteristics().get(sol.KEY_MIN_RESTORE));
+            Assert.assertTrue(minRestore <= 110 * 11);
+            Assert.assertTrue(minRestore >= 90 * 11);
+            Assert.assertTrue(sol.getDiameter() <= 6);
+            Assert.assertTrue(sol.getNbComponents() == 1);
+        }
     }
 }

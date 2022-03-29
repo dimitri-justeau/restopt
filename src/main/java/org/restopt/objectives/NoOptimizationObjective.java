@@ -40,12 +40,28 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
     }
 
     @Override
-    public Solution solve() {
-        return problem.getModel().getSolver().findSolution();
+    public List<Solution> solve(int nbSolutions) {
+        setSearch();
+        List<Solution> solutions;
+        if (nbSolutions == 1) {
+            solutions = new ArrayList<>();
+            solutions.add(problem.getModel().getSolver().findSolution());
+        } else {
+            solutions = findNSolutions(nbSolutions);
+        }
+        return solutions;
     }
 
     @Override
-    public Solution solve(Criterion stop) {
-        return problem.getModel().getSolver().findSolution(stop);
+    public List<Solution> solve(int nbSolutions, Criterion stop) {
+        setSearch();
+        List<Solution> solutions;
+        if (nbSolutions == 1) {
+            solutions = new ArrayList<>();
+            solutions.add(problem.getModel().getSolver().findSolution(stop));
+        } else {
+            solutions = findNSolutions(nbSolutions, stop);
+        }
+        return solutions;
     }
 }
