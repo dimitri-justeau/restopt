@@ -31,6 +31,10 @@ public class RestoptSolution {
         this.characteristics = objective.getSolutionCharacteristics(solution);
     }
 
+    public Map<String, String> getCharacteristics() {
+        return characteristics;
+    }
+
     public void printSolutionInfos() {
         System.out.println("\n--- Best solution ---\n");
         for (String key : AbstractRestoptObjective.KEYS) {

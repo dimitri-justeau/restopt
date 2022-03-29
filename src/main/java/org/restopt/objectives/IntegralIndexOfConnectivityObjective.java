@@ -28,7 +28,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
     @Override
     public void initObjective() {
         PartialRegularGroupedGrid grid = problem.getGrid();
-        int landscapeArea = grid.getNbUngroupedCells() + problem.getNbLockedUpNonHabitatCells();
+        int landscapeArea = problem.getLandscapeArea();
         objective = problem.getModel().intVar(
                 "IIC",
                 0, (int) (Math.pow(10, precision))

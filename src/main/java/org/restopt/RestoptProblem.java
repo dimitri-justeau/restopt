@@ -260,6 +260,13 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     }
 
     /**
+     * @return The total landscape area.
+     */
+    public int getLandscapeArea() {
+        return grid.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
+    }
+
+    /**
      * Associate a restorable area constraint with this problem.
      *
      * @param restorableAreaConstraint

@@ -34,7 +34,7 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
                 "MESH",
                 0, (int) ((data.getHeight() * data.getWidth() - grid.getDiscardSet().size()) * Math.pow(10, precision))
         );
-        int landscapeArea = grid.getNbUngroupedCells() + problem.getNbLockedUpNonHabitatCells();
+        int landscapeArea = problem.getLandscapeArea();
         Constraint meshCons = new Constraint(
                 "MESH_constraint",
                 new PropEffectiveMeshSize(
