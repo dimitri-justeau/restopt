@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
 
-    private int[] sizeCells;
-    private int nbGroups;
-    private ISet[] groups;
-    private int nbGroupedCells;
-    private int[] unGroupedId;
-    private Map<Integer, Integer> gridIdToGroupedId;
+    private final int[] sizeCells;
+    private final int nbGroups;
+    private final ISet[] groups;
+    private final int nbGroupedCells;
+    private final int[] unGroupedId;
+    private final Map<Integer, Integer> gridIdToGroupedId;
 
     public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, UndirectedGraph groupGraph) {
         super(nbRows, nbCols, toDiscard);

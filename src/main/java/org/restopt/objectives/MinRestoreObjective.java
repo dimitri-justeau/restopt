@@ -6,7 +6,6 @@ import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class MinRestoreObjective extends AbstractRestoptObjective {
 
@@ -14,33 +13,18 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     public static final String KEY_MIN_RESTORE_BEST = "min_restore_best";
 
     double initialValue;
-    int[] cellArea;
     double minProportion;
 
     public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) throws Exception {
         super(problem, timeLimit, verbose, maximize);
         if (problem.getMinRestore() == null) {
-            throw new Exception("MinRestoreObjective without cellArea and minProportion is only allowed" +
+            throw new Exception("MinRestoreObjective without minProportion is only allowed" +
                     "if a restorable constraint was posted");
         }
     }
 
-    public MinRestoreObjective(RestoptProblem problem, int cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
-        this(
-                problem,
-                IntStream.generate(() -> cellArea)
-                    .limit(problem.getData().getRestorableData().length)
-                    .toArray(),
-                minProportion,
-                timeLimit,
-                verbose,
-                maximize
-        );
-    }
-
-    public MinRestoreObjective(RestoptProblem problem, int[] cellArea, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
+    public MinRestoreObjective(RestoptProblem problem, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
         super(problem, timeLimit, verbose, maximize);
-        this.cellArea = cellArea;
         this.minProportion = minProportion;
     }
 
@@ -51,7 +35,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         } else {
             double maxRest = Arrays.stream(problem.getData().getRestorableData()).sum();
             try {
-                problem.postRestorableConstraint(0, (int) maxRest, cellArea, minProportion);
+                problem.postRestorableConstraint(0, (int) maxRest, minProportion);
                 objective = problem.getMinRestore();
             } catch (IOException | RestoptException e) {
                 e.printStackTrace();
@@ -67,7 +51,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]  {KEY_MIN_RESTORE_INITIAL, KEY_MIN_RESTORE_BEST};
+        return new String[]{KEY_MIN_RESTORE_INITIAL, KEY_MIN_RESTORE_BEST};
     }
 
     @Override
@@ -81,8 +65,8 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[] {KEY_MIN_RESTORE_INITIAL, "Initial min restore Value: "});
-        messages.add(new String[] {KEY_MIN_RESTORE_BEST, "Best min restore Value: "});
+        messages.add(new String[]{KEY_MIN_RESTORE_INITIAL, "Initial min restore Value: "});
+        messages.add(new String[]{KEY_MIN_RESTORE_BEST, "Best min restore Value: "});
         return messages;
     }
 }

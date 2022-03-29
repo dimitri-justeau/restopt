@@ -1,10 +1,9 @@
 package org.restopt.constraints;
 
 import org.restopt.RestoptProblem;
-import org.restopt.DataLoader;
+import org.restopt.RasterDataLoader;
 import org.restopt.exception.RestoptException;
 import org.restopt.objectives.RestoptSolution;
-import org.restopt.raster.RasterReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,11 +17,9 @@ public class TestRestorableAreaConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
-        RasterReader r = new RasterReader(cell_area);
-        int[] cellArea = r.readAsIntArray();
-        DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
+        RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
-        restoptProblem.postRestorableConstraint(0, 110, cellArea, 1);
+        restoptProblem.postRestorableConstraint(0, 110, 1);
         RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
@@ -44,11 +41,9 @@ public class TestRestorableAreaConstraint {
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
-        RasterReader r = new RasterReader(cell_area);
-        int[] cellArea = r.readAsIntArray();
-        DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
+        RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
-        restoptProblem.postRestorableConstraint(120, 200, cellArea, 0.7);
+        restoptProblem.postRestorableConstraint(120, 200, 0.7);
         RestoptSolution sol = restoptProblem.findSolution(0, true);
         sol.printSolutionInfos();
         int restoreArea = sol.getMinRestoreArea();
@@ -63,7 +58,7 @@ public class TestRestorableAreaConstraint {
             int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
             int rest = (int) Math.round(dataLoader.getRestorableData()[completeUngroupedIndex]);
             sumTotal += rest;
-            int cArea = cellArea[completeUngroupedIndex];
+            int cArea = dataLoader.getCellAreaData()[completeUngroupedIndex];
             int threshold = (int) Math.ceil(cArea * (1 - 0.7));
             sumRest += rest <= threshold ? 0 : rest - threshold;
         }

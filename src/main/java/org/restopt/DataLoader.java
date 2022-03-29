@@ -1,51 +1,42 @@
 package org.restopt;
 
-import org.restopt.feature.raster.QuantitativeRasterFeature;
-import org.restopt.raster.RasterReader;
-
-import java.io.IOException;
+import org.restopt.exception.RestoptException;
 
 /**
  * Class for loading and accessing problem's data.
  */
 public class DataLoader {
 
-    private int[] habitatData;
-    private double[] restorableData;
-    private int[] accessibleData;
+    protected int[] habitatData;
+    protected double[] restorableData;
+    protected int[] accessibleData;
+    protected int[] cellAreaData;
 
-    private int width;
-    private int height;
+    protected int width;
+    protected int height;
 
-    public double noDataHabitat;
+    protected double noDataHabitat;
 
-    private String habitatRasterPath;
-    private String accessibleRasterPath;
-
-    private String restorableRasterPath;
-
-    public DataLoader(String habitatRasterPath, String accessibleRasterPath, String restorableRasterPath) throws IOException {
-        this.habitatRasterPath = habitatRasterPath;
-        this.accessibleRasterPath = accessibleRasterPath;
-        this.restorableRasterPath = restorableRasterPath;
-        // Check rasters dimensions
-        RasterReader rasterHabitat = new RasterReader(habitatRasterPath);
-        RasterReader rasterRestorable = new RasterReader(restorableRasterPath);
-        RasterReader rasterAccessible = new RasterReader(accessibleRasterPath);
-        height = rasterHabitat.getHeight();
-        width = rasterHabitat.getWidth();
-        noDataHabitat = rasterHabitat.getNoDataValue();
-        if (height != rasterRestorable.getHeight() || height != rasterAccessible.getHeight()
-                || width != rasterRestorable.getWidth() || width != rasterAccessible.getWidth()) {
-            throw new IOException("All input rasters must have the same dimension");
+    public DataLoader(int[] habitatData, int[] accessibleData, double[] restorableData, int[] cellAreaData) throws RestoptException {
+        this.habitatData = habitatData;
+        this.accessibleData = accessibleData;
+        this.restorableData = restorableData;
+        this.cellAreaData = cellAreaData;
+        int n = habitatData.length;
+        if (accessibleData.length != n || restorableData.length != n || cellAreaData.length != n) {
+            throw new RestoptException("All input datasets must have the same size");
         }
-        // Load data
-        QuantitativeRasterFeature habitat = new QuantitativeRasterFeature(habitatRasterPath);
-        QuantitativeRasterFeature restorable = new QuantitativeRasterFeature(restorableRasterPath);
-        QuantitativeRasterFeature accessible = new QuantitativeRasterFeature(accessibleRasterPath);
-        habitatData = habitat.getQuantitativeData();
-        restorableData = restorable.getQuantitativeDataAsDouble();
-        accessibleData = accessible.getQuantitativeData();
+    }
+
+    public DataLoader(int[] habitatData, int[] accessibleData, double[] restorableData, int[] cellAreaData, int width,
+                      int height, double noDataHabitat) throws RestoptException {
+        this(habitatData, accessibleData, restorableData, cellAreaData);
+        this.width = width;
+        this.height = height;
+        this.noDataHabitat = noDataHabitat;
+        if (width * height != habitatData.length) {
+            throw new RestoptException("Input width and height do not correspond to dataset size");
+        }
     }
 
     public int[] getHabitatData() {
@@ -60,16 +51,8 @@ public class DataLoader {
         return accessibleData;
     }
 
-    public String getHabitatRasterPath() {
-        return habitatRasterPath;
-    }
-
-    public String getAccessibleRasterPath() {
-        return accessibleRasterPath;
-    }
-
-    public String getRestorableRasterPath() {
-        return restorableRasterPath;
+    public int[] getCellAreaData() {
+        return cellAreaData;
     }
 
     public int getWidth() {
@@ -78,5 +61,9 @@ public class DataLoader {
 
     public int getHeight() {
         return height;
+    }
+
+    public double getNoDataValue() {
+        return noDataHabitat;
     }
 }

@@ -1,7 +1,8 @@
 package org.restopt.constraints;
 
 import org.restopt.RestoptProblem;
-import org.restopt.DataLoader;
+import org.restopt.RasterDataLoader;
+import org.restopt.exception.RestoptException;
 import org.restopt.objectives.RestoptSolution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -11,11 +12,12 @@ import java.io.IOException;
 public class TestCompactnessConstraint {
 
     @Test
-    public void testMaxCompactness() throws IOException {
+    public void testMaxCompactness() throws IOException, RestoptException {
         String habitat = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
-        DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
+        String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
+        RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postCompactnessConstraint(6);
         RestoptSolution sol = restoptProblem.findSolution(0, true);
@@ -30,11 +32,12 @@ public class TestCompactnessConstraint {
     }
 
     @Test
-    public void testMinMaxCompactness() throws IOException {
+    public void testMinMaxCompactness() throws IOException, RestoptException {
         String habitat = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
-        DataLoader dataLoader = new DataLoader(habitat, accessible, restorable);
+        String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
+        RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postCompactnessConstraint(2, 4);
         RestoptSolution sol = restoptProblem.findSolution(0, true);

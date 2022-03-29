@@ -41,12 +41,12 @@ import java.util.Arrays;
  */
 public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable> {
 
-    private UndirectedGraphVar g;
-    private double[][] coordinates;
-    private RealVar radius;
-    private RealVar centerX;
-    private RealVar centerY;
-    private ISet pointsSet;
+    private final UndirectedGraphVar g;
+    private final double[][] coordinates;
+    private final RealVar radius;
+    private final RealVar centerX;
+    private final RealVar centerY;
+    private final ISet pointsSet;
 
     public PropSmallestEnclosingCircleSpatialGraph(UndirectedGraphVar g, double[][] coordinates, RealVar radius, RealVar centerX, RealVar centerY) {
         super(new Variable[]{g, radius, centerX, centerY},

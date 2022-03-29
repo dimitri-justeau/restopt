@@ -48,7 +48,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     protected int precision;
     public ConnectivityFinderSpatialGraph connectivityFinderGUB;
     public ConnectivityFinderSpatialGraph connectivityFinderGLB;
-    private boolean maximize;
+    private final boolean maximize;
 
     /**
      * @param g             The graph variable associated to the region for which the propagator will maintain MESH.

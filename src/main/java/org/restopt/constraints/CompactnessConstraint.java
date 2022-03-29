@@ -42,7 +42,7 @@ public class CompactnessConstraint extends AbstractRestoptConstraint {
                 coords,
                 getModel().realVar("radius", 0.5 * minDiameter, 0.5 * maxDiameter, 1e-5),
                 getModel().realVar("centerX", -xMax, xMax, 1e-5),
-                getModel().realVar("centerY", -yMax, yMax,1e-5)
+                getModel().realVar("centerY", -yMax, yMax, 1e-5)
         );
         Constraint cons = new Constraint("maxDiam", propCompact);
         getModel().post(cons);

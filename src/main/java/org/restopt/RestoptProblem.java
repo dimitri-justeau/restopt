@@ -2,7 +2,6 @@ package org.restopt;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
-import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
@@ -28,7 +27,7 @@ import java.util.stream.IntStream;
  */
 public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
 
-    public DataLoader data;
+    public RasterDataLoader data;
 
     public PartialRegularGroupedGrid grid;
     private INeighborhood neighborhood;
@@ -49,9 +48,10 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
     private RestorableAreaConstraint restorableAreaConstraint;
 
-    public RestoptProblem() {}
+    public RestoptProblem() {
+    }
 
-    public RestoptProblem(DataLoader data, int accessibleVal) {
+    public RestoptProblem(RasterDataLoader data, int accessibleVal) {
 
         this.data = data;
         this.accessibleVal = accessibleVal;
@@ -142,7 +142,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The data loader object that was used to instantiate this problem.
      */
-    public DataLoader getData() {
+    public RasterDataLoader getData() {
         return data;
     }
 
@@ -261,6 +261,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
     /**
      * Associate a restorable area constraint with this problem.
+     *
      * @param restorableAreaConstraint
      */
     public void setRestorableAreaConstraint(RestorableAreaConstraint restorableAreaConstraint) throws RestoptException {
@@ -269,7 +270,6 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
         }
         this.restorableAreaConstraint = restorableAreaConstraint;
     }
-
 
     @Override
     public RestoptProblem self() {

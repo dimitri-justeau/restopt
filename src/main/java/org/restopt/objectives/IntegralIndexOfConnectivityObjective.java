@@ -56,7 +56,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]  {KEY_IIC_INITIAL, KEY_IIC_BEST};
+        return new String[]{KEY_IIC_INITIAL, KEY_IIC_BEST};
     }
 
     @Override
@@ -70,8 +70,8 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[] {KEY_IIC_INITIAL, "Initial IIC Value: "});
-        messages.add(new String[] {KEY_IIC_BEST, "Best IIC Value: "});
+        messages.add(new String[]{KEY_IIC_INITIAL, "Initial IIC Value: "});
+        messages.add(new String[]{KEY_IIC_BEST, "Best IIC Value: "});
         return messages;
     }
 }

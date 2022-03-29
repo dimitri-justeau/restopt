@@ -51,9 +51,9 @@ public class PropIIC extends Propagator<Variable> {
     protected RegularSquareGrid grid;
     protected INeighborhood threshold;
     public int[][] threshNeigh;
-    private boolean maximize;
-    private ConnectivityFinderSpatialGraph ccLB;
-    private ConnectivityFinderSpatialGraph ccUB;
+    private final boolean maximize;
+    private final ConnectivityFinderSpatialGraph ccLB;
+    private final ConnectivityFinderSpatialGraph ccUB;
 
     /**
      * @param g             The graph variable associated to the region for which the propagator will maintain IIC.

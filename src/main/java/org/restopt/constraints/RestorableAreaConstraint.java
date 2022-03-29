@@ -5,7 +5,6 @@ import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 /**
  * Constraint over the amount of area to be restored.
@@ -19,27 +18,11 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
     protected int[] minArea;
 
     public RestorableAreaConstraint(RestoptProblem restoptProblem, int minAreaToRestore, int maxAreaToRestore,
-                                    int cellArea, double minProportion) throws IOException, RestoptException {
-        this(
-                restoptProblem,
-                minAreaToRestore,
-                maxAreaToRestore,
-                IntStream.generate(() -> cellArea)
-                        .limit(restoptProblem.getData().getRestorableData().length)
-                        .toArray(),
-                minProportion
-        );
-    }
-
-    public RestorableAreaConstraint(RestoptProblem restoptProblem, int minAreaToRestore, int maxAreaToRestore,
-                                    int[] cellArea, double minProportion) throws IOException, RestoptException {
+                                    double minProportion) throws IOException, RestoptException {
         super(restoptProblem);
         this.minAreaToRestore = minAreaToRestore;
         this.maxAreaToRestore = maxAreaToRestore;
-        if (cellArea.length != problem.getData().getRestorableData().length) {
-            throw new IOException("Cell area array must have the same dimensions as the landscape");
-        }
-        this.cellArea = cellArea;
+        this.cellArea = restoptProblem.getData().getCellAreaData();
         this.minProportion = minProportion;
         this.problem.setRestorableAreaConstraint(this);
     }
@@ -91,7 +74,7 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
                     LB++;
                     sum += areas[i];
                 }
-            } else  {
+            } else {
                 sum += areas[i];
                 if (sum > maxAreaToRestore) {
                     break;
@@ -99,7 +82,7 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
                 LB++;
             }
         }
-        return new int[] {LB, UB};
+        return new int[]{LB, UB};
     }
 
     public int getMinArea(int pu) {

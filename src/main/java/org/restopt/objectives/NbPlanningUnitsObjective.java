@@ -4,7 +4,10 @@ import org.chocosolver.solver.Solution;
 import org.restopt.RestoptProblem;
 import org.restopt.search.OrderedRestorableAreaStrategy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
@@ -48,7 +51,7 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]  {KEY_NB_PUS_INITIAL, KEY_NB_PUS_BEST};
+        return new String[]{KEY_NB_PUS_INITIAL, KEY_NB_PUS_BEST};
     }
 
     @Override
@@ -62,8 +65,8 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[] {KEY_NB_PUS_INITIAL, "Initial nb pus value: "});
-        messages.add(new String[] {KEY_NB_PUS_BEST, "Best nb pus value: "});
+        messages.add(new String[]{KEY_NB_PUS_INITIAL, "Initial nb pus value: "});
+        messages.add(new String[]{KEY_NB_PUS_BEST, "Best nb pus value: "});
         return messages;
     }
 }

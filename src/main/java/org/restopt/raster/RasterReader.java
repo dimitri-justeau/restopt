@@ -24,8 +24,6 @@
 package org.restopt.raster;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.io.imageio.geotiff.GeoTiffIIOMetadataDecoder;
-import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.gce.geotiff.GeoTiffReader;
 
 import java.io.File;
@@ -39,7 +37,7 @@ public class RasterReader {
     /**
      * Raster file path
      */
-    private String filePath;
+    private final String filePath;
 
     /**
      * Metadata of the raster

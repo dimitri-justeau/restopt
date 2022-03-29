@@ -12,5 +12,6 @@ public abstract class AbstractRestoptSearchStrategy {
     public AbstractRestoptSearchStrategy(RestoptProblem problem) {
         this.problem = problem;
     }
+
     public abstract void setSearch();
 }

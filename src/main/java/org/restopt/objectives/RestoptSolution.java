@@ -19,10 +19,10 @@ import java.util.Map;
  */
 public class RestoptSolution {
 
-    private RestoptProblem problem;
-    private AbstractRestoptObjective objective;
-    private Solution solution;
-    private Map<String, String> characteristics;
+    private final RestoptProblem problem;
+    private final AbstractRestoptObjective objective;
+    private final Solution solution;
+    private final Map<String, String> characteristics;
 
     public RestoptSolution(RestoptProblem problem, AbstractRestoptObjective objective, Solution solution) {
         this.problem = problem;
@@ -33,7 +33,7 @@ public class RestoptSolution {
 
     public void printSolutionInfos() {
         System.out.println("\n--- Best solution ---\n");
-        for (String key : objective.KEYS) {
+        for (String key : AbstractRestoptObjective.KEYS) {
             System.out.println(objective.messages.get(key) + characteristics.get(key));
         }
         for (String key : objective.getAdditionalKeys()) {
@@ -61,10 +61,10 @@ public class RestoptSolution {
                 problem.getData().getHabitatRasterPath(),
                 outputPath + ".csv",
                 outputPath + ".tif",
-                problem.getData().noDataHabitat
+                problem.getData().getNoDataValue()
         );
         String[][] orderedCharacteristics = new String[2][];
-        String[] allKeys = ArrayUtils.append(objective.KEYS, objective.getAdditionalKeys());
+        String[] allKeys = ArrayUtils.append(AbstractRestoptObjective.KEYS, objective.getAdditionalKeys());
         orderedCharacteristics[0] = allKeys;
         orderedCharacteristics[1] = new String[allKeys.length];
         for (int i = 0; i < allKeys.length; i++) {
@@ -86,6 +86,7 @@ public class RestoptSolution {
     public int getTotalRestorableArea() {
         return problem.getTotalRestorableValue(solution);
     }
+
     public int[] getRestorationPlanningUnits() {
         return solution.getSetVal(problem.getRestoreSetVar());
     }
@@ -97,7 +98,7 @@ public class RestoptSolution {
                 SetType.BIPARTITESET,
                 SetType.BIPARTITESET,
                 pus,
-                new int[][] {}
+                new int[][]{}
         );
         for (int i : pus) {
             for (int j : problem.getNeighborhood().getNeighbors(problem.getGrid(), i)) {
