@@ -95,10 +95,16 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
     }
 
     public int getUngroupedPartialIndex(int groupedIdx) {
+        if (groupedIdx < nbGroups) {
+            throw new RuntimeException("A grouped cell is not associated to a complete index");
+        }
         return unGroupedId[groupedIdx - nbGroups];
     }
 
     public int getUngroupedCompleteIndex(int groupedIdx) {
+        if (groupedIdx < nbGroups) {
+            throw new RuntimeException("A grouped cell is not associated to a complete index");
+        }
         return getCompleteIndex(unGroupedId[groupedIdx - nbGroups]);
     }
 

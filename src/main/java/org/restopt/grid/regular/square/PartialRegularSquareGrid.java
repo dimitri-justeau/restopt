@@ -22,8 +22,9 @@
 
 package org.restopt.grid.regular.square;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.objects.setDataStructures.SetFactory;
+
 import java.util.stream.IntStream;
 
 /**
@@ -31,13 +32,13 @@ import java.util.stream.IntStream;
  */
 public class PartialRegularSquareGrid extends RegularSquareGrid {
 
-    protected Set<Integer> discardSet;
+    protected ISet discardSet;
     protected int[] partialToComplete;
     protected int[] completeToPartial;
 
     public PartialRegularSquareGrid(int nbRows, int nbCols, int[] toDiscard) {
         super(nbRows, nbCols);
-        this.discardSet = new HashSet<>();
+        this.discardSet = SetFactory.makeRangeSet();
         IntStream.of(toDiscard).forEach(i -> discardSet.add(i));
         this.partialToComplete = new int[nbRows * nbCols - discardSet.size()];
         this.completeToPartial = new int[nbRows * nbCols];
@@ -98,7 +99,7 @@ public class PartialRegularSquareGrid extends RegularSquareGrid {
         return completeToPartial[completeIdx];
     }
 
-    public Set<Integer> getDiscardSet() {
+    public ISet getDiscardSet() {
         return discardSet;
     }
 

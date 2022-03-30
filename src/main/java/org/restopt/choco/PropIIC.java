@@ -47,9 +47,7 @@ public class PropIIC extends Propagator<Variable> {
     protected int landscapeArea;
     protected int precision;
     protected PartialRegularGroupedGrid grid;
-//    protected INeighborhood threshold;
     protected int distanceThreshold;
-//    public int[][] threshNeigh;
     public int[][] thresh;
     private final boolean maximize;
     private final ConnectivityFinderSpatialGraph ccLB;
@@ -67,7 +65,6 @@ public class PropIIC extends Propagator<Variable> {
         this.iic = iic;
         this.landscapeArea = landscapeArea;
         this.precision = precison;
-//        this.threshNeigh = new int[grid.getNbCells()][];
         this.thresh = new int[grid.getNbCells()][grid.getNbCells()];
         this.distanceThreshold = distanceThreshold;
         this.maximize = maximize;
@@ -169,7 +166,6 @@ public class PropIIC extends Propagator<Variable> {
         int[] nbAdj = new int[nbCC];
         boolean[][] conn = new boolean[nbCC][nbCC];
         for (int i = 0; i < nbCC; i++) {
-//            // V2 //
             int[] cc1 = ccs[i];
             for (int j = i + 1; j < nbCC; j++) {
                 int[] cc2 = ccs[j];
@@ -185,12 +181,14 @@ public class PropIIC extends Propagator<Variable> {
                                 nbAdj[j] += 1;
                                 break;
                             }
-                        } else if (distanceLessThanThreshold(X, Y)) {
-                            conn[i][j] = true;
-                            conn[j][i] = true;
-                            nbAdj[i] += 1;
-                            nbAdj[j] += 1;
-                            break;
+                        } else {
+                            if (distanceLessThanThreshold(X, Y)) {
+                                conn[i][j] = true;
+                                conn[j][i] = true;
+                                nbAdj[i] += 1;
+                                nbAdj[j] += 1;
+                                break;
+                            }
                         }
                     }
                     if (conn[i][j]) {
@@ -207,31 +205,6 @@ public class PropIIC extends Propagator<Variable> {
             }
             neigh[i] = adj;
         }
-        // V1 //
-//            boolean[] conn = new boolean[nbCC];
-//            int nAdj = 0;
-//            int[] cc = ccs[i];
-//            for (int node : cc) {
-//                if (threshNeigh[node] == null) {
-//                    threshNeigh[node] = threshold.getNeighbors(grid, node);
-//                }
-//                for (int j : threshNeigh[node]) {
-//                    if (nodeCC[j] != i && nodes.contains(j) && !conn[nodeCC[j]]) {
-//                        conn[nodeCC[j]] = true;
-//                        nAdj += 1;
-//                    }
-//                }
-//            }
-//            int[] adj = new int[nAdj];
-//            int k = 0;
-//            for (int j = 0; j < nbCC; j++) {
-//                if (conn[j]) {
-//                    adj[k++] = j;
-//                }
-//            }
-//            neigh[i] = adj;
-//        }
-
         return neigh;
     }
 
