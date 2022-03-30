@@ -30,10 +30,10 @@ public class TestPartialGrid {
         Assert.assertEquals(grid.getDiscardSet().size(), 15);
         int[] discard = grid.getDiscardSet().toArray();
         Arrays.sort(discard);
-        Assert.assertEquals(discard, new int[] {0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 34});
+        Assert.assertEquals(discard, new int[] {0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24});
         Assert.assertEquals(grid.getCompleteIndex(0), 5);
-        Assert.assertEquals(grid.getCompleteIndex(15), 5);
-        Assert.assertEquals(grid.getCompleteIndex(41), 26);
-        Assert.assertTrue(Arrays.equals(grid.getCoordinatesFromIndex(26), new int[] {5, 1}));
+        Assert.assertEquals(grid.getPartialIndex(15), 5);
+        Assert.assertEquals(grid.getPartialIndex(41), 26);
+        Assert.assertTrue(Arrays.equals(grid.getCoordinatesFromIndex(26), new int[] {4, 1}));
     }
 }
