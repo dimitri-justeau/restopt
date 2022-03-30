@@ -31,15 +31,7 @@ import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.chocosolver.util.tools.ArrayUtils;
-import org.restopt.exception.RestoptException;
-import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
-import org.restopt.grid.regular.square.RegularSquareGrid;
-
-import java.util.Arrays;
-import java.util.stream.IntStream;
 
 /**
  * Propagator maintaining a variable equals to the Integral Index of Connectivity (IIC).

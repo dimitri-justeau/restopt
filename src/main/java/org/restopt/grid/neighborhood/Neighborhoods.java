@@ -22,7 +22,9 @@
 
 package org.restopt.grid.neighborhood;
 
-import org.restopt.grid.neighborhood.regular.square.*;
+import org.restopt.grid.neighborhood.regular.square.FourConnected;
+import org.restopt.grid.neighborhood.regular.square.HeightConnected;
+import org.restopt.grid.neighborhood.regular.square.KWideFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.PartialFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.PartialHeightConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.PartialTwoWideFourConnected;

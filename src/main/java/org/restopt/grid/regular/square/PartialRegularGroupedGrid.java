@@ -8,7 +8,6 @@ import org.restopt.exception.RestoptException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
 

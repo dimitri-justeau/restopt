@@ -3,7 +3,6 @@ package org.restopt.objective;
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
-import org.restopt.objectives.MinRestoreObjective;
 import org.restopt.objectives.NbPlanningUnitsObjective;
 import org.testng.Assert;
 import org.testng.annotations.Test;
