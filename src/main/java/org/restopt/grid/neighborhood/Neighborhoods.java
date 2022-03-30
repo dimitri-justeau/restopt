@@ -23,6 +23,13 @@
 package org.restopt.grid.neighborhood;
 
 import org.restopt.grid.neighborhood.regular.square.*;
+import org.restopt.grid.neighborhood.regular.square.partial.PartialFourConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.PartialHeightConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.PartialTwoWideFourConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.PartialTwoWideHeightConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedFourConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedKWideFourConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedTwoWideFourConnected;
 
 /**
  * Utility class for accessing neighborhoods.
@@ -37,4 +44,12 @@ public class Neighborhoods {
     public final static PartialTwoWideHeightConnected PARTIAL_TWO_WIDE_HEIGHT_CONNECTED = new PartialTwoWideHeightConnected();
     public final static PartialGroupedFourConnected PARTIAL_GROUPED_FOUR_CONNECTED = new PartialGroupedFourConnected();
     public final static PartialGroupedTwoWideFourConnected PARTIAL_GROUPED_TWO_WIDE_FOUR_CONNECTED = new PartialGroupedTwoWideFourConnected();
+
+    public final static KWideFourConnected K_WIDE_FOUR_CONNECTED(int k) {
+        return new KWideFourConnected(k);
+    }
+
+    public final static PartialGroupedKWideFourConnected PARTIAL_GROUPED_K_WIDE_FOUR_CONNECTED(int k) {
+        return new PartialGroupedKWideFourConnected(k);
+    }
 }

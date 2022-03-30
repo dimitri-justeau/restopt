@@ -20,30 +20,27 @@
  * along with flsgen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.restopt.grid.neighborhood.regular.square;
+package org.restopt.grid.neighborhood.regular.square.partial;
 
-import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.grid.neighborhood.INeighborhood;
-import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 
-/**
- * The 2-wide height-connected neighborhood in a regular square org.flsgen.grid.
- */
-public class PartialTwoWideHeightConnected<T extends PartialRegularSquareGrid> implements INeighborhood<T> {
+import java.util.stream.IntStream;
 
-    public int[] getNeighbors(T grid, int i) {
-        PartialHeightConnected height = Neighborhoods.PARTIAL_HEIGHT_CONNECTED;
-        int[] heightneigh = height.getNeighbors(grid, i);
-        ISet neighbors = SetFactory.makeBitSet(0);
-        for (int neigh : heightneigh) {
-            neighbors.add(neigh);
-            for (int nneigh : height.getNeighbors(grid, neigh)) {
-                neighbors.add(nneigh);
-            }
-        }
-        return neighbors.toArray();
+/**
+ * The four-connected neighborhood in a partial regular square grid.
+ */
+public class PartialFourConnected<T extends PartialRegularSquareGrid> implements INeighborhood<T> {
+
+    public int[] getNeighbors(T grid, int partialIdx) {
+        int idx = grid.getCompleteIndex(partialIdx);
+        int nbCols = grid.getNbCols();
+        int nbRows = grid.getNbRows();
+        int left = idx % nbCols != 0 ? grid.getPartialIndex(idx - 1) : -1; // Left
+        int right = (idx + 1) % nbCols != 0 ? grid.getPartialIndex(idx + 1) : -1; // Right
+        int top = idx >= nbCols ? grid.getPartialIndex(idx - nbCols) : -1; // Top
+        int bottom = idx < nbCols * (nbRows - 1) ? grid.getPartialIndex(idx + nbCols) : -1; // Bottom
+        return IntStream.of(left, right, top, bottom).filter(x -> x >= 0).toArray();
     }
 
 }

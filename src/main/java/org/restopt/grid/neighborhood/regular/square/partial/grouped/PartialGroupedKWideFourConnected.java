@@ -20,38 +20,49 @@
  * along with flsgen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.restopt.grid.neighborhood.regular.square;
+package org.restopt.grid.neighborhood.regular.square.partial.grouped;
 
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
+import org.restopt.grid.neighborhood.regular.square.FourConnected;
+import org.restopt.grid.neighborhood.regular.square.KWideFourConnected;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
 
 
 /**
- * The four-connected neighborhood in a partial regular square org.flsgen.grid.
+ * The k-wide four-connected neighborhood in a partial grouped regular square grid
  */
-public class PartialGroupedTwoWideFourConnected<T extends PartialRegularGroupedGrid> implements INeighborhood<T> {
+public class PartialGroupedKWideFourConnected<T extends PartialRegularGroupedGrid> implements INeighborhood<T> {
+
+    private int k;
+
+    public PartialGroupedKWideFourConnected(int k) {
+        this.k = k;
+    }
 
     public int[] getNeighbors(T grid, int groupedIdx) {
         FourConnected four = Neighborhoods.FOUR_CONNECTED;
+        KWideFourConnected kFour = Neighborhoods.K_WIDE_FOUR_CONNECTED(k - 1);
         RegularSquareGrid compGrid = new RegularSquareGrid(grid.getNbRows(), grid.getNbCols());
         if (groupedIdx < grid.getNbGroups()) {
             ISet nodes = grid.getGroup(groupedIdx);
-            ISet fourNeigh = SetFactory.makeBipartiteSet(0);
+            ISet fourNeigh = SetFactory.makeRangeSet();
             for (int i : nodes) {
                 for (int j : four.getNeighbors(compGrid, grid.getCompleteIndex(i))) {
-                    fourNeigh.add(j);
+                    if (grid.getDiscardSet().contains(j) || grid.getGroupIndexFromCompleteIndex(j) != groupedIdx) {
+                        fourNeigh.add(j);
+                    }
                 }
             }
-            ISet neighbors = SetFactory.makeBipartiteSet(0);
+            ISet neighbors = SetFactory.makeRangeSet();
             for (int neigh : fourNeigh) {
                 if (!grid.getDiscardSet().contains(neigh) && grid.getGroupIndexFromCompleteIndex(neigh) != groupedIdx) {
                     neighbors.add(grid.getGroupIndexFromCompleteIndex(neigh));
                 }
-                for (int nneigh : four.getNeighbors(compGrid, neigh)) {
+                for (int nneigh : kFour.getNeighbors(compGrid, neigh)) {
                     if (!grid.getDiscardSet().contains(nneigh) && nneigh != neigh && grid.getGroupIndexFromCompleteIndex(nneigh) != groupedIdx) {
                         neighbors.add(grid.getGroupIndexFromCompleteIndex(nneigh));
                     }
@@ -60,12 +71,12 @@ public class PartialGroupedTwoWideFourConnected<T extends PartialRegularGroupedG
             return neighbors.toArray();
         } else {
             int[] fourNeigh = four.getNeighbors(compGrid, grid.getUngroupedCompleteIndex(groupedIdx));
-            ISet neighbors = SetFactory.makeBipartiteSet(0);
+            ISet neighbors = SetFactory.makeRangeSet();
             for (int neigh : fourNeigh) {
                 if (!grid.getDiscardSet().contains(neigh)) {
                     neighbors.add(grid.getGroupIndexFromCompleteIndex(neigh));
                 }
-                for (int nneigh : four.getNeighbors(compGrid, neigh)) {
+                for (int nneigh : kFour.getNeighbors(compGrid, neigh)) {
                     if (!grid.getDiscardSet().contains(nneigh) && nneigh != neigh) {
                         neighbors.add(grid.getGroupIndexFromCompleteIndex(nneigh));
                     }

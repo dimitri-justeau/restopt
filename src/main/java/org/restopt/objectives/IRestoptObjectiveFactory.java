@@ -2,6 +2,7 @@ package org.restopt.objectives;
 
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
+import org.restopt.exception.RestoptException;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface IRestoptObjectiveFactory {
         return maximizeMESH(precision, 1, timeLimit, verbose).get(0);
     }
 
-    default RestoptSolution maximizeIIC(int precision, int timeLimit, boolean verbose) {
+    default RestoptSolution maximizeIIC(int precision, int timeLimit, boolean verbose) throws RestoptException {
         return maximizeIIC(precision, 1, timeLimit, verbose).get(0);
     }
 
@@ -38,7 +39,7 @@ public interface IRestoptObjectiveFactory {
     // MULTI SOLUTIONS //
     // --------------- //
 
-    default List<RestoptSolution> findSolutions(int nbSolutions, int timeLimit, boolean verbose) throws IOException {
+    default List<RestoptSolution> findSolutions(int nbSolutions, int timeLimit, boolean verbose) {
         NoOptimizationObjective obj = new NoOptimizationObjective(self(), timeLimit, verbose);
         return obj.findOptimalSolution(nbSolutions);
     }
@@ -48,8 +49,13 @@ public interface IRestoptObjectiveFactory {
         return obj.findOptimalSolution(nbSolutions);
     }
 
-    default List<RestoptSolution> maximizeIIC(int precision, int nbSolutions, int timeLimit, boolean verbose) {
+    default List<RestoptSolution> maximizeIIC(int precision, int nbSolutions, int timeLimit, boolean verbose) throws RestoptException {
         IntegralIndexOfConnectivityObjective obj = new IntegralIndexOfConnectivityObjective(self(), timeLimit, verbose, true, precision);
+        return obj.findOptimalSolution(nbSolutions);
+    }
+
+    default List<RestoptSolution> maximizeIIC(int precision, int distanceThreshold, int nbSolutions, int timeLimit, boolean verbose) throws RestoptException {
+        IntegralIndexOfConnectivityObjective obj = new IntegralIndexOfConnectivityObjective(self(), timeLimit, verbose, true, precision, distanceThreshold);
         return obj.findOptimalSolution(nbSolutions);
     }
 

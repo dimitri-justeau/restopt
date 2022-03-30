@@ -20,7 +20,7 @@
  * along with flsgen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.restopt.grid.neighborhood.regular.square;
+package org.restopt.grid.neighborhood.regular.square.partial;
 
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.regular.square.PartialRegularSquareGrid;
@@ -28,7 +28,7 @@ import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 import java.util.stream.IntStream;
 
 /**
- * The height-connected neighborhood in a partial regular square org.flsgen.grid.
+ * The height-connected neighborhood in a partial regular square grid
  */
 public class PartialHeightConnected<T extends PartialRegularSquareGrid> implements INeighborhood<T> {
 

@@ -23,6 +23,7 @@ public abstract class AbstractRestoptObjective {
     protected int timeLimit;
     protected boolean verbose;
     protected boolean maximize;
+    protected long totalRuntime;
 
     public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         this.problem = problem;
@@ -49,6 +50,7 @@ public abstract class AbstractRestoptObjective {
     public abstract List<String[]> appendMessages();
 
     public List<Solution> solve(int nbSolutions, Criterion stop) {
+        long t = System.currentTimeMillis();
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
@@ -57,10 +59,12 @@ public abstract class AbstractRestoptObjective {
         } else {
             solutions = findNOptimalSolutions(objective, maximize, nbSolutions, stop);
         }
+        totalRuntime = System.currentTimeMillis() - t;
         return solutions;
     }
 
     public List<Solution> solve(int nbSolutions) {
+        long t = System.currentTimeMillis();
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
@@ -69,6 +73,7 @@ public abstract class AbstractRestoptObjective {
         } else {
             solutions = findNOptimalSolutions(objective, maximize, nbSolutions);
         }
+        totalRuntime = System.currentTimeMillis() - t;
         return solutions;
     }
 
@@ -136,5 +141,9 @@ public abstract class AbstractRestoptObjective {
             solver.removeStopCriterion(stop);
             return Collections.emptyList();
         }
+    }
+
+    public long getTotalRuntime() {
+        return totalRuntime;
     }
 }

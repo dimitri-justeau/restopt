@@ -20,7 +20,7 @@
  * along with flsgen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.restopt.grid.neighborhood.regular.square;
+package org.restopt.grid.neighborhood.regular.square.partial.grouped;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.util.objects.graphs.GraphFactory;
@@ -33,13 +33,13 @@ import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 /**
- * The four-connected neighborhood in a partial regular square org.flsgen.grid.
+ * The k-wide four-connected neighborhood in a partial grouped regular square grid
  */
 public class PartialGroupedFourConnected<T extends PartialRegularGroupedGrid> implements INeighborhood<T> {
 
     public int[] getNeighbors(T grid, int groupedIdx) {
         if (groupedIdx < grid.getNbGroups()) {
-            ISet neighs = SetFactory.makeBitSet(0);
+            ISet neighs = SetFactory.makeRangeSet();
             for (int partialIdx : grid.getGroup(groupedIdx)) {
                 for (int n : Neighborhoods.PARTIAL_FOUR_CONNECTED.getNeighbors(grid, partialIdx)) {
                     if (grid.getGroupIndexFromPartialIndex(n) != groupedIdx) {
@@ -49,7 +49,7 @@ public class PartialGroupedFourConnected<T extends PartialRegularGroupedGrid> im
             }
             return neighs.toArray();
         } else {
-            ISet neighbors = SetFactory.makeBipartiteSet(0);
+            ISet neighbors = SetFactory.makeRangeSet();
             for (int n : Neighborhoods.PARTIAL_FOUR_CONNECTED.getNeighbors(grid, grid.getUngroupedPartialIndex(groupedIdx))) {
                 neighbors.add(grid.getGroupIndexFromPartialIndex(n));
             }

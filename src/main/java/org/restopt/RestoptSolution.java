@@ -70,7 +70,7 @@ public class RestoptSolution {
         solCharacteristics.put(KEY_NB_PUS, String.valueOf(getRestorationPlanningUnits().length));
         solCharacteristics.put(KEY_NB_COMPONENTS, String.valueOf(getNbComponents()));
         solCharacteristics.put(KEY_DIAMETER, String.valueOf(getDiameter()));
-        solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(model.getSolver().getTimeCount()));
+        solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(1.0 * objective.getTotalRuntime() / 1000));
         solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
         solCharacteristics.putAll(objective.appendCharacteristics(solution));
         return solCharacteristics;

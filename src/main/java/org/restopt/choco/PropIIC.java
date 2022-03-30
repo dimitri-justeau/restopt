@@ -31,9 +31,15 @@ import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.objects.setDataStructures.SetFactory;
+import org.chocosolver.util.tools.ArrayUtils;
+import org.restopt.exception.RestoptException;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Propagator maintaining a variable equals to the Integral Index of Connectivity (IIC).
@@ -48,9 +54,11 @@ public class PropIIC extends Propagator<Variable> {
     protected IntVar iic;
     protected int landscapeArea;
     protected int precision;
-    protected RegularSquareGrid grid;
-    protected INeighborhood threshold;
-    public int[][] threshNeigh;
+    protected PartialRegularGroupedGrid grid;
+//    protected INeighborhood threshold;
+    protected int distanceThreshold;
+//    public int[][] threshNeigh;
+    public int[][] thresh;
     private final boolean maximize;
     private final ConnectivityFinderSpatialGraph ccLB;
     private final ConnectivityFinderSpatialGraph ccUB;
@@ -60,15 +68,16 @@ public class PropIIC extends Propagator<Variable> {
      * @param iic           The integer variable equals to IIC, maintained by this propagator.
      * @param landscapeArea The total landscape area.
      */
-    public PropIIC(UndirectedGraphVar g, IntVar iic, PartialRegularGroupedGrid grid, int landscapeArea, INeighborhood distanceThreshold, int precison, boolean maximize) {
+    public PropIIC(UndirectedGraphVar g, IntVar iic, PartialRegularGroupedGrid grid, int landscapeArea, int distanceThreshold, int precison, boolean maximize) {
         super(new Variable[]{g, iic}, PropagatorPriority.QUADRATIC, false);
         this.g = g;
         this.grid = grid;
         this.iic = iic;
         this.landscapeArea = landscapeArea;
         this.precision = precison;
-        this.threshold = distanceThreshold;
-        this.threshNeigh = new int[grid.getNbCells()][];
+//        this.threshNeigh = new int[grid.getNbCells()][];
+        this.thresh = new int[grid.getNbCells()][grid.getNbCells()];
+        this.distanceThreshold = distanceThreshold;
         this.maximize = maximize;
         this.ccLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), grid.getSizeCells());
         this.ccUB = new ConnectivityFinderSpatialGraph(g.getUB(), grid.getSizeCells());
@@ -98,6 +107,7 @@ public class PropIIC extends Propagator<Variable> {
     }
 
     public float getIICUB() {
+        ccUB.findAllCC();
         return getIIC(ccUB, g.getPotentialNodes());
     }
 
@@ -127,32 +137,109 @@ public class PropIIC extends Propagator<Variable> {
         return iic / (landscapeArea * landscapeArea);
     }
 
+    private boolean distanceLessThanThreshold(int i, int j) {
+        if (i == j) {
+            thresh[i][j] = 2;
+            return true;
+        }
+        int[] si;
+        int[] sj;
+        if(i < grid.getNbGroups()) {
+            si = grid.getGroupBorders(i).toArray();
+        } else {
+            si = new int[] {grid.getUngroupedPartialIndex(i)};
+        }
+        if (j < grid.getNbGroups()) {
+            sj = grid.getGroupBorders(j).toArray();
+        } else {
+            sj = new int[] {grid.getUngroupedPartialIndex(j)};
+        }
+        for (int x : si) {
+            for (int y : sj) {
+                if (dist(x, y) <= distanceThreshold) {
+                    thresh[i][j] = 2;
+                    return true;
+                }
+            }
+        }
+        thresh[i][j] = 1;
+        return false;
+    }
+
+    public double dist(int i, int j) {
+        double[] pi = grid.getCartesianCoordinatesFromPartialIndex(i);
+        double[] pj = grid.getCartesianCoordinatesFromPartialIndex(j);
+        return LandscapeIndicesUtils.distance(pi, pj);
+    }
+
     public int[][] getLandscapeGraph(int nbCC, int[][] ccs, int[] nodeCC, ISet nodes) {
         int[][] neigh = new int[nbCC][];
+        int[] nbAdj = new int[nbCC];
+        boolean[][] conn = new boolean[nbCC][nbCC];
         for (int i = 0; i < nbCC; i++) {
-            boolean[] conn = new boolean[nbCC];
-            int nAdj = 0;
-            int[] cc = ccs[i];
-            for (int node : cc) {
-                if (threshNeigh[node] == null) {
-                    threshNeigh[node] = threshold.getNeighbors(grid, node);
-                }
-                for (int j : threshNeigh[node]) {
-                    if (nodeCC[j] != i && nodes.contains(j) && !conn[nodeCC[j]]) {
-                        conn[nodeCC[j]] = true;
-                        nAdj += 1;
+//            // V2 //
+            int[] cc1 = ccs[i];
+            for (int j = i + 1; j < nbCC; j++) {
+                int[] cc2 = ccs[j];
+                for (int x = cc1.length - 1; x >= 0; x--) {
+                    for (int y = cc2.length - 1; y >= 0; y--) {
+                        int X = cc1[x] < cc2[y] ? cc1[x] : cc2[y];
+                        int Y = cc1[x] < cc2[y] ? cc2[y] : cc1[x];
+                        if (thresh[X][Y] != 0) {
+                            if (thresh[X][Y] == 2) {
+                                conn[i][j] = true;
+                                conn[j][i] = true;
+                                nbAdj[i] += 1;
+                                nbAdj[j] += 1;
+                                break;
+                            }
+                        } else if (distanceLessThanThreshold(X, Y)) {
+                            conn[i][j] = true;
+                            conn[j][i] = true;
+                            nbAdj[i] += 1;
+                            nbAdj[j] += 1;
+                            break;
+                        }
+                    }
+                    if (conn[i][j]) {
+                        break;
                     }
                 }
             }
-            int[] adj = new int[nAdj];
+            int[] adj = new int[nbAdj[i]];
             int k = 0;
             for (int j = 0; j < nbCC; j++) {
-                if (conn[j]) {
+                if (conn[i][j]) {
                     adj[k++] = j;
                 }
             }
             neigh[i] = adj;
         }
+        // V1 //
+//            boolean[] conn = new boolean[nbCC];
+//            int nAdj = 0;
+//            int[] cc = ccs[i];
+//            for (int node : cc) {
+//                if (threshNeigh[node] == null) {
+//                    threshNeigh[node] = threshold.getNeighbors(grid, node);
+//                }
+//                for (int j : threshNeigh[node]) {
+//                    if (nodeCC[j] != i && nodes.contains(j) && !conn[nodeCC[j]]) {
+//                        conn[nodeCC[j]] = true;
+//                        nAdj += 1;
+//                    }
+//                }
+//            }
+//            int[] adj = new int[nAdj];
+//            int k = 0;
+//            for (int j = 0; j < nbCC; j++) {
+//                if (conn[j]) {
+//                    adj[k++] = j;
+//                }
+//            }
+//            neigh[i] = adj;
+//        }
+
         return neigh;
     }
 

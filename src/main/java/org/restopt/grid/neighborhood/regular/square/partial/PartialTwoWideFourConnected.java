@@ -20,27 +20,32 @@
  * along with flsgen.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.restopt.grid.neighborhood.regular.square;
+package org.restopt.grid.neighborhood.regular.square.partial;
 
+import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.grid.neighborhood.INeighborhood;
+import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularSquareGrid;
 
-import java.util.stream.IntStream;
-
 /**
- * The four-connected neighborhood in a partial regular square org.flsgen.grid.
+ * The 2-wide four-connected neighborhood in a regular grid
  */
-public class PartialFourConnected<T extends PartialRegularSquareGrid> implements INeighborhood<T> {
+public class PartialTwoWideFourConnected<T extends PartialRegularSquareGrid> implements INeighborhood<T> {
 
-    public int[] getNeighbors(T grid, int partialIdx) {
-        int idx = grid.getCompleteIndex(partialIdx);
-        int nbCols = grid.getNbCols();
-        int nbRows = grid.getNbRows();
-        int left = idx % nbCols != 0 ? grid.getPartialIndex(idx - 1) : -1; // Left
-        int right = (idx + 1) % nbCols != 0 ? grid.getPartialIndex(idx + 1) : -1; // Right
-        int top = idx >= nbCols ? grid.getPartialIndex(idx - nbCols) : -1; // Top
-        int bottom = idx < nbCols * (nbRows - 1) ? grid.getPartialIndex(idx + nbCols) : -1; // Bottom
-        return IntStream.of(left, right, top, bottom).filter(x -> x >= 0).toArray();
+    public int[] getNeighbors(T grid, int i) {
+        PartialFourConnected four = Neighborhoods.PARTIAL_FOUR_CONNECTED;
+        int[] fourneigh = four.getNeighbors(grid, i);
+        ISet neighbors = SetFactory.makeBitSet(0);
+        for (int neigh : fourneigh) {
+            neighbors.add(neigh);
+            for (int nneigh : four.getNeighbors(grid, neigh)) {
+                if (nneigh != i) {
+                    neighbors.add(nneigh);
+                }
+            }
+        }
+        return neighbors.toArray();
     }
 
 }

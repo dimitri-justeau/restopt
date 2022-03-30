@@ -4,6 +4,8 @@ import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
 import org.restopt.RestoptProblem;
 import org.restopt.choco.PropIIC;
+import org.restopt.exception.RestoptException;
+import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
@@ -19,10 +21,30 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
 
     int precision;
     double initialValue;
+    int distanceThreshold;
 
-    public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
+    public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
+                                                int precision) throws RestoptException {
+        this(problem, timeLimit, verbose, maximize, precision, 1);
+    }
+
+    public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
+                                                int precision, int distanceThreshold) throws RestoptException {
         super(problem, timeLimit, verbose, maximize);
         this.precision = precision;
+        if (distanceThreshold < 1) {
+            throw new RestoptException("The distance threshold for the integral index of connectivity must be at least" +
+                    "equal to 1");
+        }
+        this.distanceThreshold = distanceThreshold;
+    }
+
+    private INeighborhood getNeighborhood() {
+        if (distanceThreshold == 1) {
+            return Neighborhoods.PARTIAL_GROUPED_TWO_WIDE_FOUR_CONNECTED;
+        } else {
+            return Neighborhoods.PARTIAL_GROUPED_K_WIDE_FOUR_CONNECTED(distanceThreshold + 1);
+        }
     }
 
     @Override
@@ -40,7 +62,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
                         objective,
                         grid,
                         landscapeArea,
-                        Neighborhoods.PARTIAL_GROUPED_TWO_WIDE_FOUR_CONNECTED,
+                        distanceThreshold + 1,
                         precision,
                         true
                 )
