@@ -20,7 +20,7 @@ public class TestNbPlanningUnitsObjective {
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeNbPUS(30, 10, true);
+        List<RestoptSolution> sols = restoptProblem.maximizeNbPUS(10, 30, true);
         int best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();

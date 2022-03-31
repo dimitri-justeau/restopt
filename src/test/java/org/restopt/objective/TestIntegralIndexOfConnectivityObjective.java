@@ -22,7 +22,7 @@ public class TestIntegralIndexOfConnectivityObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeIIC(3, 10, 30, true);
+        List<RestoptSolution> sols = restoptProblem.maximizeIIC(10, 3, 30, true);
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
@@ -44,11 +44,11 @@ public class TestIntegralIndexOfConnectivityObjective {
         String accessible = getClass().getClassLoader().getResource("example_data/accessible.tif").getPath();
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
-        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 0);
+        RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeIIC(3, 10, 10, 30, true);
+        List<RestoptSolution> sols = restoptProblem.maximizeIIC(10, 3, 10, 30, true);
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();

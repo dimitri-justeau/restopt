@@ -17,6 +17,7 @@ import org.restopt.objectives.AbstractRestoptObjective;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * Class representing a solution to a restopt problem
@@ -80,6 +81,29 @@ public class RestoptSolution {
         return characteristics;
     }
 
+    public String getCharacteristicsAsCsv() {
+        String[][] orderedCharacteristics = new String[2][];
+        String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
+        orderedCharacteristics[0] = allKeys;
+        orderedCharacteristics[1] = new String[allKeys.length];
+        for (int i = 0; i < allKeys.length; i++) {
+            orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String[] line : orderedCharacteristics) {
+            int i = 0;
+            for (String s : line) {
+                i++;
+                sb.append(s);
+                if (i < line.length) {
+                    sb.append(",");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     public void printSolutionInfos() {
         System.out.println("\n--- Best solution ---\n");
         for (String key : KEYS) {
@@ -91,40 +115,45 @@ public class RestoptSolution {
         System.out.println();
     }
 
-    public void export(String outputPath, boolean verbose) throws IOException {
-        PartialRegularGroupedGrid grid = problem.getGrid();
-        int[] sites = new int[grid.getNbUngroupedCells()];
-        ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
-        for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
-            if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
-                sites[i] = 2;
-            } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
-                sites[i] = 3;
-            } else {
-                sites[i] = 1;
+    public void export(String outputPath, boolean verbose) throws IOException, RestoptException {
+        if (problem.getData() instanceof RasterDataLoader) {
+            RasterDataLoader dataLoader = (RasterDataLoader) problem.getData();
+            PartialRegularGroupedGrid grid = problem.getGrid();
+            int[] sites = new int[grid.getNbUngroupedCells()];
+            ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
+            for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
+                if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
+                    sites[i] = 2;
+                } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
+                    sites[i] = 3;
+                } else {
+                    sites[i] = 1;
+                }
             }
-        }
-        SolutionExporter exporter = new SolutionExporter(
-                problem,
-                sites,
-                problem.getData().getHabitatRasterPath(),
-                outputPath + ".csv",
-                outputPath + ".tif",
-                problem.getData().getNoDataValue()
-        );
-        String[][] orderedCharacteristics = new String[2][];
-        String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
-        orderedCharacteristics[0] = allKeys;
-        orderedCharacteristics[1] = new String[allKeys.length];
-        for (int i = 0; i < allKeys.length; i++) {
-            orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
-        }
-        exporter.exportCharacteristics(orderedCharacteristics);
-        exporter.generateRaster();
-        if (verbose) {
-            printSolutionInfos();
-            System.out.println("\nRaster exported at " + outputPath + ".tif");
-            System.out.println("Solution characteristics exported at " + outputPath + ".csv\n");
+            SolutionExporter exporter = new SolutionExporter(
+                    problem,
+                    sites,
+                    dataLoader.getHabitatRasterPath(),
+                    outputPath + ".csv",
+                    outputPath + ".tif",
+                    problem.getData().getNoDataValue()
+            );
+            String[][] orderedCharacteristics = new String[2][];
+            String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
+            orderedCharacteristics[0] = allKeys;
+            orderedCharacteristics[1] = new String[allKeys.length];
+            for (int i = 0; i < allKeys.length; i++) {
+                orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
+            }
+            exporter.exportCharacteristics(orderedCharacteristics);
+            exporter.generateRaster();
+            if (verbose) {
+                printSolutionInfos();
+                System.out.println("\nRaster exported at " + outputPath + ".tif");
+                System.out.println("Solution characteristics exported at " + outputPath + ".csv\n");
+            }
+        } else {
+            throw new RestoptException("The export function can only be used if the data was loaded from a raster");
         }
     }
 
@@ -185,6 +214,12 @@ public class RestoptSolution {
 
     public int[] getRestorationPlanningUnits() {
         return solution.getSetVal(problem.getRestoreSetVar());
+    }
+
+    public int[] getRestorationPlanningUnitsCompleteIndex() {
+        return IntStream.of(getRestorationPlanningUnits())
+                .map(i -> problem.getGrid().getUngroupedCompleteIndex(i))
+                .toArray();
     }
 
     public UndirectedGraph getRestorationGraph() {

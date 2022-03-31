@@ -2,6 +2,7 @@ package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
+import org.restopt.DataLoader;
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.choco.LandscapeIndicesUtils;
@@ -28,7 +29,7 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
 
     @Override
     public void initObjective() {
-        RasterDataLoader data = problem.getData();
+        DataLoader data = problem.getData();
         PartialRegularGroupedGrid grid = problem.getGrid();
         objective = problem.getModel().intVar(
                 "MESH",

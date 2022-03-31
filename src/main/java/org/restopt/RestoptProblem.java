@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
  */
 public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstraintFactory {
 
-    public RasterDataLoader data;
+    public DataLoader data;
 
     public PartialRegularGroupedGrid grid;
     private INeighborhood neighborhood;
@@ -50,7 +50,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     public RestoptProblem() {
     }
 
-    public RestoptProblem(RasterDataLoader data, int accessibleVal) {
+    public RestoptProblem(DataLoader data, int accessibleVal) {
 
         this.data = data;
         this.accessibleVal = accessibleVal;
@@ -141,7 +141,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The data loader object that was used to instantiate this problem.
      */
-    public RasterDataLoader getData() {
+    public DataLoader getData() {
         return data;
     }
 
