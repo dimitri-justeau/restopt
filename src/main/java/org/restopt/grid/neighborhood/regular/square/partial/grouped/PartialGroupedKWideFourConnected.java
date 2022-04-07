@@ -26,10 +26,11 @@ import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
-import org.restopt.grid.neighborhood.regular.square.FourConnected;
 import org.restopt.grid.neighborhood.regular.square.KWideFourConnected;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
+
+import java.util.stream.IntStream;
 
 
 /**
@@ -44,45 +45,26 @@ public class PartialGroupedKWideFourConnected<T extends PartialRegularGroupedGri
     }
 
     public int[] getNeighbors(T grid, int groupedIdx) {
-        FourConnected four = Neighborhoods.FOUR_CONNECTED;
-        KWideFourConnected kFour = Neighborhoods.K_WIDE_FOUR_CONNECTED(k - 1);
-        RegularSquareGrid compGrid = new RegularSquareGrid(grid.getNbRows(), grid.getNbCols());
+        KWideFourConnected kFour = Neighborhoods.K_WIDE_FOUR_CONNECTED(k);
+        ISet points;
         if (groupedIdx < grid.getNbGroups()) {
-            ISet nodes = grid.getGroup(groupedIdx);
-            ISet fourNeigh = SetFactory.makeRangeSet();
-            for (int i : nodes) {
-                for (int j : four.getNeighbors(compGrid, grid.getCompleteIndex(i))) {
-                    if (grid.getDiscardSet().contains(j) || grid.getGroupIndexFromCompleteIndex(j) != groupedIdx) {
-                        fourNeigh.add(j);
-                    }
-                }
-            }
-            ISet neighbors = SetFactory.makeRangeSet();
-            for (int neigh : fourNeigh) {
-                if (!grid.getDiscardSet().contains(neigh) && grid.getGroupIndexFromCompleteIndex(neigh) != groupedIdx) {
-                    neighbors.add(grid.getGroupIndexFromCompleteIndex(neigh));
-                }
-                for (int nneigh : kFour.getNeighbors(compGrid, neigh)) {
-                    if (!grid.getDiscardSet().contains(nneigh) && nneigh != neigh && grid.getGroupIndexFromCompleteIndex(nneigh) != groupedIdx) {
-                        neighbors.add(grid.getGroupIndexFromCompleteIndex(nneigh));
-                    }
-                }
-            }
-            return neighbors.toArray();
+            points = SetFactory.makeConstantSet(
+                    IntStream.of(grid.getGroup(groupedIdx).toArray())
+                        .map(i -> grid.getCompleteIndex(i))
+                        .toArray()
+            );
         } else {
-            int[] fourNeigh = four.getNeighbors(compGrid, grid.getUngroupedCompleteIndex(groupedIdx));
-            ISet neighbors = SetFactory.makeRangeSet();
-            for (int neigh : fourNeigh) {
-                if (!grid.getDiscardSet().contains(neigh)) {
-                    neighbors.add(grid.getGroupIndexFromCompleteIndex(neigh));
-                }
-                for (int nneigh : kFour.getNeighbors(compGrid, neigh)) {
-                    if (!grid.getDiscardSet().contains(nneigh) && nneigh != neigh) {
-                        neighbors.add(grid.getGroupIndexFromCompleteIndex(nneigh));
-                    }
+            points = SetFactory.makeConstantSet(new int[] {grid.getUngroupedCompleteIndex(groupedIdx)});
+        }
+        RegularSquareGrid compGrid = new RegularSquareGrid(grid.getNbRows(), grid.getNbCols());
+        ISet neigh = SetFactory.makeRangeSet();
+        for (int i : points) {
+            for (int j : kFour.getNeighbors(compGrid, i)) {
+                if (!grid.getDiscardSet().contains(j) && j != i && grid.getGroupIndexFromCompleteIndex(j) != groupedIdx) {
+                    neigh.add(grid.getGroupIndexFromCompleteIndex(j));
                 }
             }
-            return neighbors.toArray();
         }
+        return neigh.toArray();
     }
 }
