@@ -53,7 +53,7 @@ public class TestSolve {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         Path temp = Files.createTempFile("test_iic", "");
-        RestoptSolution sol = restoptProblem.maximizeIIC(3, 0, true);
+        RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 0, true);
         sol.export(temp.toString(), true);
         Files.delete(temp);
     }
@@ -70,7 +70,7 @@ public class TestSolve {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         Path temp = Files.createTempFile("test_iic2", "");
-        RestoptSolution sol = restoptProblem.maximizeIIC(3, 0, true);
+        RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 0, true);
         sol.export(temp.toString(), true);
         Files.delete(temp);
     }

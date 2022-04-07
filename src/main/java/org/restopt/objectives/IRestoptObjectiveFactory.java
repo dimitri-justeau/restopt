@@ -23,8 +23,8 @@ public interface IRestoptObjectiveFactory {
         return maximizeMESH(1, precision, timeLimit, verbose).get(0);
     }
 
-    default RestoptSolution maximizeIIC(int precision, int timeLimit, boolean verbose) throws RestoptException {
-        return maximizeIIC(1, precision, timeLimit, verbose).get(0);
+    default RestoptSolution maximizeIIC(int precision, int distanceThreshold, int timeLimit, boolean verbose) throws RestoptException {
+        return maximizeIIC(1, precision, distanceThreshold, timeLimit, verbose).get(0);
     }
 
     default RestoptSolution maximizeMinRestore(int timeLimit, boolean verbose) throws Exception {
@@ -46,11 +46,6 @@ public interface IRestoptObjectiveFactory {
 
     default List<RestoptSolution> maximizeMESH(int nbSolutions, int precision, int timeLimit, boolean verbose) {
         EffectiveMeshSizeObjective obj = new EffectiveMeshSizeObjective(self(), timeLimit, verbose, true, precision);
-        return obj.findOptimalSolution(nbSolutions);
-    }
-
-    default List<RestoptSolution> maximizeIIC(int nbSolutions, int precision, int timeLimit, boolean verbose) throws RestoptException {
-        IntegralIndexOfConnectivityObjective obj = new IntegralIndexOfConnectivityObjective(self(), timeLimit, verbose, true, precision);
         return obj.findOptimalSolution(nbSolutions);
     }
 
