@@ -1,6 +1,7 @@
 package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
+import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.util.criteria.Criterion;
 import org.restopt.RestoptProblem;
 
@@ -47,20 +48,21 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
             solutions = new ArrayList<>();
             solutions.add(problem.getModel().getSolver().findSolution());
         } else {
-            solutions = findNSolutions(nbSolutions);
+            solutions = findNSolutions(nbSolutions, -1);
         }
         return solutions;
     }
 
     @Override
-    public List<Solution> solve(int nbSolutions, Criterion stop) {
+    public List<Solution> solve(int nbSolutions, int timeLimit) {
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();
-            solutions.add(problem.getModel().getSolver().findSolution(stop));
+            TimeCounter timeCounter = new TimeCounter(problem.getModel(), (long) (timeLimit * 1e9));
+            solutions.add(problem.getModel().getSolver().findSolution(timeCounter));
         } else {
-            solutions = findNSolutions(nbSolutions, stop);
+            solutions = findNSolutions(nbSolutions, timeLimit);
         }
         return solutions;
     }

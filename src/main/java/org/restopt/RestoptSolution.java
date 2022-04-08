@@ -30,9 +30,10 @@ public class RestoptSolution {
     public static final String KEY_NB_COMPONENTS = "nb_components";
     public static final String KEY_DIAMETER = "diameter";
     public static final String KEY_OPTIMALITY_PROVEN = "optimality_proven";
+    public static final String KEY_SEARCH_STATE = "search_state";
     public static final String KEY_SOLVING_TIME = "solving_time";
     public static final String[] KEYS = {
-            KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_NB_COMPONENTS, KEY_DIAMETER, KEY_OPTIMALITY_PROVEN, KEY_SOLVING_TIME
+            KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_NB_COMPONENTS, KEY_DIAMETER, KEY_OPTIMALITY_PROVEN, KEY_SEARCH_STATE, KEY_SOLVING_TIME
     };
 
     private final RestoptProblem problem;
@@ -57,6 +58,7 @@ public class RestoptSolution {
         messages.put(KEY_NB_COMPONENTS, "Number of connected components: ");
         messages.put(KEY_DIAMETER, "Diameter: ");
         messages.put(KEY_OPTIMALITY_PROVEN, "Optimality proven: ");
+        messages.put(KEY_SEARCH_STATE, "Search state: ");
         messages.put(KEY_SOLVING_TIME, "Solving time (seconds): ");
         for (String[] s : objective.appendMessages()) {
             messages.put(s[0], s[1]);
@@ -72,7 +74,8 @@ public class RestoptSolution {
         solCharacteristics.put(KEY_NB_COMPONENTS, String.valueOf(getNbComponents()));
         solCharacteristics.put(KEY_DIAMETER, String.valueOf(getDiameter()));
         solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(1.0 * objective.getTotalRuntime() / 1000));
-        solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(problem.getSearchState() == "TERMINATED"));
+        solCharacteristics.put(KEY_SEARCH_STATE, String.valueOf(problem.getSearchState()));
+        solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(objective.isProvenOptimal()));
         solCharacteristics.putAll(objective.appendCharacteristics(solution));
         return solCharacteristics;
     }
