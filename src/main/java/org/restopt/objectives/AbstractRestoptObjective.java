@@ -61,7 +61,10 @@ public abstract class AbstractRestoptObjective {
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();
             TimeCounter timeCounter = new TimeCounter(problem.getModel(), (long) (timeLimit * 1e9));
-            solutions.add(problem.getModel().getSolver().findOptimalSolution(objective, maximize, timeCounter));
+            Solution solution = problem.getModel().getSolver().findOptimalSolution(objective, maximize, timeCounter);
+            if (solution != null) {
+                solutions.add(solution);
+            }
             if (String.valueOf(problem.getModel().getSolver().getSearchState()) == "TERMINATED") {
                 provenOptimal = true;
             }
@@ -106,7 +109,7 @@ public abstract class AbstractRestoptObjective {
             if (verbose) {
                 System.out.println("There is no solution satisfying the constraints");
             }
-            return null;
+            return new ArrayList<>();
         }
         List<RestoptSolution> restoptSolutions = new ArrayList<>();
         for (Solution s : solutions) {
