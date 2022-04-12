@@ -14,4 +14,4 @@ Philippe Birnbaum (https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/
 
 Since version 2.0.0, there is no more CLI (command-line interface). We recommend users to use the R interface [`restoptr`](https://github.com/dimitri-justeau/restoptr), which provides many utilities to consistently prepare the input data.
 
-Last release: 
+Last release: https://github.com/dimitri-justeau/restopt/releases/tag/2.0.0
