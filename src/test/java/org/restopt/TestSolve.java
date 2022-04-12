@@ -4,8 +4,6 @@ import org.restopt.exception.RestoptException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class TestSolve {
 
@@ -35,10 +33,7 @@ public class TestSolve {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        Path temp = Files.createTempFile("test_mesh2", "");
         RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, true);
-        sol.export(temp.toString(), true);
-        Files.delete(temp);
     }
 
     @Test
@@ -52,10 +47,7 @@ public class TestSolve {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        Path temp = Files.createTempFile("test_iic", "");
         RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 0, true);
-        sol.export(temp.toString(), true);
-        Files.delete(temp);
     }
 
     @Test
@@ -69,9 +61,6 @@ public class TestSolve {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        Path temp = Files.createTempFile("test_iic2", "");
         RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 0, true);
-        sol.export(temp.toString(), true);
-        Files.delete(temp);
     }
 }

@@ -3,7 +3,6 @@ package org.restopt.objectives;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
 import org.restopt.DataLoader;
-import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.choco.PropEffectiveMeshSize;

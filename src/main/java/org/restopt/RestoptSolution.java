@@ -1,20 +1,15 @@
 package org.restopt;
 
-import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.util.objects.graphs.GraphFactory;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
-import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.exception.RestoptException;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.objectives.AbstractRestoptObjective;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -37,6 +32,7 @@ public class RestoptSolution {
     };
 
     private final RestoptProblem problem;
+
     private final AbstractRestoptObjective objective;
     private final Solution solution;
     private final Map<String, String> characteristics;
@@ -66,7 +62,6 @@ public class RestoptSolution {
     }
 
     private Map<String, String> makeCharacteristics() {
-        Model model = problem.getModel();
         Map<String, String> solCharacteristics = new HashMap<>();
         solCharacteristics.put(KEY_MIN_RESTORE, String.valueOf(getMinRestoreArea()));
         solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(getTotalRestorableArea()));
@@ -118,46 +113,12 @@ public class RestoptSolution {
         System.out.println();
     }
 
-    public void export(String outputPath, boolean verbose) throws IOException, RestoptException {
-        if (problem.getData() instanceof RasterDataLoader) {
-            RasterDataLoader dataLoader = (RasterDataLoader) problem.getData();
-            PartialRegularGroupedGrid grid = problem.getGrid();
-            int[] sites = new int[grid.getNbUngroupedCells()];
-            ISet set = SetFactory.makeConstantSet(solution.getSetVal(problem.getRestoreSetVar()));
-            for (int i = 0; i < grid.getNbUngroupedCells(); i++) {
-                if (grid.getGroupIndexFromPartialIndex(i) < grid.getNbGroups()) {
-                    sites[i] = 2;
-                } else if (set.contains(grid.getGroupIndexFromPartialIndex(i))) {
-                    sites[i] = 3;
-                } else {
-                    sites[i] = 1;
-                }
-            }
-            SolutionExporter exporter = new SolutionExporter(
-                    problem,
-                    sites,
-                    dataLoader.getHabitatRasterPath(),
-                    outputPath + ".csv",
-                    outputPath + ".tif",
-                    problem.getData().getNoDataValue()
-            );
-            String[][] orderedCharacteristics = new String[2][];
-            String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
-            orderedCharacteristics[0] = allKeys;
-            orderedCharacteristics[1] = new String[allKeys.length];
-            for (int i = 0; i < allKeys.length; i++) {
-                orderedCharacteristics[1][i] = characteristics.get(allKeys[i]);
-            }
-            exporter.exportCharacteristics(orderedCharacteristics);
-            exporter.generateRaster();
-            if (verbose) {
-                printSolutionInfos();
-                System.out.println("\nRaster exported at " + outputPath + ".tif");
-                System.out.println("Solution characteristics exported at " + outputPath + ".csv\n");
-            }
-        } else {
-            throw new RestoptException("The export function can only be used if the data was loaded from a raster");
-        }
+    public AbstractRestoptObjective getObjective() {
+        return objective;
+    }
+
+    public RestoptProblem getProblem() {
+        return problem;
     }
 
     /**

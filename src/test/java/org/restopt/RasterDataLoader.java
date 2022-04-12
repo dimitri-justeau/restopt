@@ -1,5 +1,6 @@
 package org.restopt;
 
+import org.restopt.DataLoader;
 import org.restopt.exception.RestoptException;
 import org.restopt.raster.RasterReader;
 
