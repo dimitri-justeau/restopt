@@ -4,6 +4,7 @@ import org.restopt.exception.RestoptException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class TestSolve {
 
@@ -15,8 +16,6 @@ public class TestSolve {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 1);
-//        baseProblem.postNbComponentsConstraint(1, 1);
-        //baseProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         RestoptSolution sol = restoptProblem.maximizeNbPUS(30, true);
         sol.printSolutionInfos();

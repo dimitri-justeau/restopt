@@ -122,7 +122,7 @@ public abstract class AbstractRestoptObjective {
         Solver solver = problem.getModel().getSolver();
         solver.getModel().clearObjective();
         TimeCounter timeCounter = new TimeCounter(problem.getModel(), (long) (timeLimit * 1e9));
-        if (timeLimit >= 0) {
+        if (this.timeLimit > 0) {
             solver.addStopCriterion(timeCounter);
         }
         List<Solution> solutions = new ArrayList<>();
@@ -141,7 +141,7 @@ public abstract class AbstractRestoptObjective {
         TimeCounter timeCounter = null;
         provenOptimal = false;
         Solution optimal;
-        if (timeLimit >= 0) {
+        if (timeLimit > 0) {
             timeCounter = new TimeCounter(problem.getModel(), (long) (timeLimit * 1e9));
             optimal = solver.findOptimalSolution(objective, maximize, timeCounter);
         } else {
