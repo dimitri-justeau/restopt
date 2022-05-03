@@ -15,11 +15,11 @@ public interface IRestoptObjectiveFactory {
     // SINGLE SOLUTION //
     // --------------- //
 
-    default RestoptSolution findSolution(int timeLimit, boolean verbose) throws IOException {
+    default RestoptSolution findSolution(int timeLimit, boolean verbose) throws IOException, RestoptException {
         return findSolutions(1, timeLimit, verbose).get(0);
     }
 
-    default RestoptSolution maximizeMESH(int precision, int timeLimit, boolean verbose) {
+    default RestoptSolution maximizeMESH(int precision, int timeLimit, boolean verbose) throws RestoptException {
         return maximizeMESH(1, precision, timeLimit, verbose).get(0);
     }
 
@@ -31,7 +31,7 @@ public interface IRestoptObjectiveFactory {
         return maximizeMinRestore(1, timeLimit, verbose).get(0);
     }
 
-    default RestoptSolution maximizeNbPUS(int timeLimit, boolean verbose) {
+    default RestoptSolution maximizeNbPUS(int timeLimit, boolean verbose) throws RestoptException {
         return maximizeNbPUS(1, timeLimit, verbose).get(0);
     }
 
@@ -39,28 +39,28 @@ public interface IRestoptObjectiveFactory {
     // MULTI SOLUTIONS //
     // --------------- //
 
-    default List<RestoptSolution> findSolutions(int nbSolutions, int timeLimit, boolean verbose) {
+    default List<RestoptSolution> findSolutions(int nbSolutions, int timeLimit, boolean verbose) throws RestoptException {
         NoOptimizationObjective obj = new NoOptimizationObjective(self(), timeLimit, verbose);
-        return obj.findOptimalSolution(nbSolutions);
+        return obj.findOptimalSolution(nbSolutions, 0);
     }
 
-    default List<RestoptSolution> maximizeMESH(int nbSolutions, int precision, int timeLimit, boolean verbose) {
+    default List<RestoptSolution> maximizeMESH(int nbSolutions, int precision, int timeLimit, boolean verbose) throws RestoptException {
         EffectiveMeshSizeObjective obj = new EffectiveMeshSizeObjective(self(), timeLimit, verbose, true, precision);
-        return obj.findOptimalSolution(nbSolutions);
+        return obj.findOptimalSolution(nbSolutions, 0);
     }
 
     default List<RestoptSolution> maximizeIIC(int nbSolutions, int precision, int distanceThreshold, int timeLimit, boolean verbose) throws RestoptException {
         IntegralIndexOfConnectivityObjective obj = new IntegralIndexOfConnectivityObjective(self(), timeLimit, verbose, true, precision, distanceThreshold);
-        return obj.findOptimalSolution(nbSolutions);
+        return obj.findOptimalSolution(nbSolutions, 0);
     }
 
     default List<RestoptSolution> maximizeMinRestore(int nbSolutions, int timeLimit, boolean verbose) throws Exception {
         MinRestoreObjective obj = new MinRestoreObjective(self(), timeLimit, verbose, true);
-        return obj.findOptimalSolution(nbSolutions);
+        return obj.findOptimalSolution(nbSolutions, 0);
     }
 
-    default List<RestoptSolution> maximizeNbPUS(int nbSolutions, int timeLimit, boolean verbose) {
+    default List<RestoptSolution> maximizeNbPUS(int nbSolutions, int timeLimit, boolean verbose) throws RestoptException {
         NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, true);
-        return obj.findOptimalSolution(nbSolutions);
+        return obj.findOptimalSolution(nbSolutions, 0);
     }
 }

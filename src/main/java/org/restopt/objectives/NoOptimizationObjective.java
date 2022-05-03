@@ -40,7 +40,7 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
     }
 
     @Override
-    public List<Solution> solve(int nbSolutions) {
+    public List<Solution> solve(int nbSolutions, double optimalityGap) {
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
@@ -56,7 +56,7 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
     }
 
     @Override
-    public List<Solution> solve(int nbSolutions, int timeLimit) {
+    public List<Solution> solve(int nbSolutions, int timeLimit, double optimalityGap) {
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {

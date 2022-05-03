@@ -8,6 +8,7 @@ import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
+import org.restopt.exception.RestoptException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ public abstract class AbstractRestoptObjective {
     protected boolean verbose;
     protected boolean maximize;
     protected long totalRuntime;
+    protected int optimalValue;
 
     protected boolean provenOptimal;
 
@@ -54,7 +56,7 @@ public abstract class AbstractRestoptObjective {
 
     public abstract List<String[]> appendMessages();
 
-    public List<Solution> solve(int nbSolutions, int timeLimit) {
+    public List<Solution> solve(int nbSolutions, int timeLimit, double optimalityGap) throws RestoptException {
         long t = System.currentTimeMillis();
         setSearch();
         List<Solution> solutions;
@@ -62,6 +64,7 @@ public abstract class AbstractRestoptObjective {
             solutions = new ArrayList<>();
             TimeCounter timeCounter = new TimeCounter(problem.getModel(), (long) (timeLimit * 1e9));
             Solution solution = problem.getModel().getSolver().findOptimalSolution(objective, maximize, timeCounter);
+            optimalValue = problem.getModel().getSolver().getObjectiveManager().getBestSolutionValue().intValue();
             if (solution != null) {
                 solutions.add(solution);
             }
@@ -69,30 +72,32 @@ public abstract class AbstractRestoptObjective {
                 provenOptimal = true;
             }
         } else {
-            solutions = findNOptimalSolutions(objective, maximize, nbSolutions, timeLimit);
+            solutions = findNOptimalSolutions(objective, maximize, nbSolutions, timeLimit, optimalityGap);
         }
         totalRuntime = System.currentTimeMillis() - t;
         return solutions;
     }
 
-    public List<Solution> solve(int nbSolutions) {
+    public List<Solution> solve(int nbSolutions, double optimalityGap) throws RestoptException {
         long t = System.currentTimeMillis();
         setSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();
-            solutions.add(problem.getModel().getSolver().findOptimalSolution(objective, maximize));
-            if (String.valueOf(problem.getModel().getSolver().getSearchState()) == "TERMINATED") {
+            Solution opt = problem.getModel().getSolver().findOptimalSolution(objective, maximize);
+            if (opt != null) {
                 provenOptimal = true;
+                solutions.add(opt);
+                optimalValue = problem.getModel().getSolver().getObjectiveManager().getBestSolutionValue().intValue();
             }
         } else {
-            solutions = findNOptimalSolutions(objective, maximize, nbSolutions, 0);
+            solutions = findNOptimalSolutions(objective, maximize, nbSolutions, 0, optimalityGap);
         }
         totalRuntime = System.currentTimeMillis() - t;
         return solutions;
     }
 
-    public List<RestoptSolution> findOptimalSolution(int nbSolutions) {
+    public List<RestoptSolution> findOptimalSolution(int nbSolutions, double optimalityGap) throws RestoptException {
         initObjective();
         Solver solver = problem.getModel().getSolver();
         if (verbose) {
@@ -101,9 +106,9 @@ public abstract class AbstractRestoptObjective {
         }
         List<Solution> solutions;
         if (timeLimit > 0) {
-            solutions = solve(nbSolutions, timeLimit);
+            solutions = solve(nbSolutions, timeLimit, optimalityGap);
         } else {
-            solutions = solve(nbSolutions);
+            solutions = solve(nbSolutions, optimalityGap);
         }
         if (solutions.size() == 0) {
             if (verbose) {
@@ -135,7 +140,10 @@ public abstract class AbstractRestoptObjective {
         return solutions;
     }
 
-    private List<Solution> findNOptimalSolutions(IntVar objective, boolean maximize, int nbSolutions, int timeLimit) {
+    private List<Solution> findNOptimalSolutions(IntVar objective, boolean maximize, int nbSolutions, int timeLimit, double optimalityGap) throws RestoptException {
+        if (optimalityGap < 0 || optimalityGap > 1) {
+            throw new RestoptException("Optimality gap must be comprised between 0 and 1");
+        }
         Solver solver = problem.getModel().getSolver();
         boolean defaultS = solver.getSearch() == null;// best bound (in default) is only for optim
         TimeCounter timeCounter = null;
@@ -147,6 +155,7 @@ public abstract class AbstractRestoptObjective {
         } else {
             optimal = solver.findOptimalSolution(objective, maximize);
         }
+        optimalValue = solver.getObjectiveManager().getBestSolutionValue().intValue();
         if (String.valueOf(solver.getSearchState()) != "TERMINATED") {
             List<Solution> sols = new ArrayList<>();
             sols.add(optimal);
@@ -160,10 +169,11 @@ public abstract class AbstractRestoptObjective {
             if (timeCounter != null) {
                 solver.removeStopCriterion(timeCounter);
             }
-            int opt = solver.getObjectiveManager().getBestSolutionValue().intValue();
             solver.reset();
             solver.getModel().clearObjective();
-            Constraint forceOptimal = solver.getModel().arithm(objective, "=", opt);
+            String operator = maximize ? ">=" : "<=";
+            int optWithGap = (int) (maximize ? optimalValue * (1 - optimalityGap) : optimalValue * (1 + optimalityGap));
+            Constraint forceOptimal = solver.getModel().arithm(objective, operator, optWithGap);
             forceOptimal.post();
             if (defaultS)
                 solver.setSearch(Search.defaultSearch(solver.getModel()));// best bound (in default) is only for optim
