@@ -27,7 +27,7 @@ public class TestEffectiveMeshSizeObjective {
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
-            double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));
+            double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH));
             if (best_ref == -1) {
                 best_ref = best;
             } else {
@@ -48,7 +48,7 @@ public class TestEffectiveMeshSizeObjective {
         RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, 0, true);
         sol.printSolutionInfos();
         double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
-        double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));
+        double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH));
         Assert.assertTrue(initial < best);
         Assert.assertTrue(best == restoptProblem.getLandscapeArea());
     }

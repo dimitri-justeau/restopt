@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
-    public static final String KEY_NB_PUS_INITIAL = "nb_pus_initial";
-    public static final String KEY_NB_PUS_BEST = "nb_pus_best";
+    public static final String KEY_NB_PUS_INITIAL = "nb_planning_units_initial";
+    public static final String KEY_NB_PUS_BEST = "nb_planning_units_best";
 
     int initialValue;
 
@@ -46,7 +46,7 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     @Override
     public String getInitialValueMessage() {
-        return "\nNb PUS initial = " + initialValue + "\n";
+        return "\nNb Planning units initial = " + initialValue + "\n";
     }
 
     @Override
@@ -58,15 +58,15 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     public Map<String, String> appendCharacteristics(Solution solution) {
         Map<String, String> charact = new HashMap<>();
         charact.put(KEY_NB_PUS_INITIAL, String.valueOf(initialValue));
-        charact.put(KEY_NB_PUS_BEST, String.valueOf(solution.getIntVal(objective)));
+        charact.put(KEY_NB_PUS_BEST, String.valueOf(getOptimalValue()));
         return charact;
     }
 
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[]{KEY_NB_PUS_INITIAL, "Initial nb pus value: "});
-        messages.add(new String[]{KEY_NB_PUS_BEST, "Best nb pus value: "});
+        messages.add(new String[]{KEY_NB_PUS_INITIAL, "Initial nb planning units value: "});
+        messages.add(new String[]{KEY_NB_PUS_BEST, "Best known nb planning units value: "});
         return messages;
     }
 }

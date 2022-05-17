@@ -10,6 +10,7 @@ import java.util.*;
 public class MinRestoreObjective extends AbstractRestoptObjective {
 
     public static final String KEY_MIN_RESTORE_INITIAL = "min_restore_initial";
+    public static final String KEY_MIN_RESTORE = "min_restore";
     public static final String KEY_MIN_RESTORE_BEST = "min_restore_best";
 
     double initialValue;
@@ -51,22 +52,24 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]{KEY_MIN_RESTORE_INITIAL, KEY_MIN_RESTORE_BEST};
+        return new String[]{KEY_MIN_RESTORE_INITIAL, KEY_MIN_RESTORE, KEY_MIN_RESTORE_BEST};
     }
 
     @Override
     public Map<String, String> appendCharacteristics(Solution solution) {
         Map<String, String> charact = new HashMap<>();
         charact.put(KEY_MIN_RESTORE_INITIAL, String.valueOf(initialValue));
-        charact.put(KEY_MIN_RESTORE_BEST, String.valueOf(solution.getIntVal(objective)));
+        charact.put(KEY_MIN_RESTORE, String.valueOf(solution.getIntVal(objective)));
+        charact.put(KEY_MIN_RESTORE_BEST, String.valueOf(optimalValue));
         return charact;
     }
 
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[]{KEY_MIN_RESTORE_INITIAL, "Initial min restore Value: "});
-        messages.add(new String[]{KEY_MIN_RESTORE_BEST, "Best min restore Value: "});
+        messages.add(new String[]{KEY_MIN_RESTORE_INITIAL, "Initial min restore value: "});
+        messages.add(new String[]{KEY_MIN_RESTORE, "Min restore value: "});
+        messages.add(new String[]{KEY_MIN_RESTORE_BEST, "Best known min restore value: "});
         return messages;
     }
 }

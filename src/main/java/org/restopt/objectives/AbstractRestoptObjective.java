@@ -23,6 +23,7 @@ public abstract class AbstractRestoptObjective {
     protected boolean verbose;
     protected boolean maximize;
     protected long totalRuntime;
+
     protected int optimalValue;
 
     protected boolean provenOptimal;
@@ -37,6 +38,10 @@ public abstract class AbstractRestoptObjective {
 
     public boolean isProvenOptimal() {
         return provenOptimal;
+    }
+
+    public int getOptimalValue() {
+        return optimalValue;
     }
 
     /**
@@ -172,7 +177,8 @@ public abstract class AbstractRestoptObjective {
             solver.reset();
             solver.getModel().clearObjective();
             String operator = maximize ? ">=" : "<=";
-            int optWithGap = (int) (maximize ? optimalValue * (1 - optimalityGap) : optimalValue * (1 + optimalityGap));
+            int optWithGap = (int) (maximize ?
+                    Math.ceil(optimalValue * (1 - optimalityGap)) : Math.floor(optimalValue * (1 + optimalityGap)));
             Constraint forceOptimal = solver.getModel().arithm(objective, operator, optWithGap);
             forceOptimal.post();
             if (defaultS)

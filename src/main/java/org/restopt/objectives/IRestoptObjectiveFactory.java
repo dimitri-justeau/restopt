@@ -34,6 +34,10 @@ public interface IRestoptObjectiveFactory {
         return maximizeNbPUS(1, timeLimit, optimalityGap, verbose).get(0);
     }
 
+    default RestoptSolution minimizeNbPUS(int timeLimit, double optimalityGap, boolean verbose) throws RestoptException {
+        return minimizeNbPUS(1, timeLimit, optimalityGap, verbose).get(0);
+    }
+
     // --------------- //
     // MULTI SOLUTIONS //
     // --------------- //
@@ -60,6 +64,11 @@ public interface IRestoptObjectiveFactory {
 
     default List<RestoptSolution> maximizeNbPUS(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose) throws RestoptException {
         NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, true);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> minimizeNbPUS(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose) throws RestoptException {
+        NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, false);
         return obj.findOptimalSolution(nbSolutions, optimalityGap);
     }
 }

@@ -25,7 +25,7 @@ public class TestNbPlanningUnitsObjective {
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             int initial = Integer.parseInt(sol.getCharacteristics().get(NbPlanningUnitsObjective.KEY_NB_PUS_INITIAL));
-            int best = Integer.parseInt(sol.getCharacteristics().get(NbPlanningUnitsObjective.KEY_NB_PUS_BEST));
+            int best = Integer.parseInt(sol.getCharacteristics().get(sol.KEY_NB_PUS));
             Assert.assertTrue(initial < best);
             if (best_ref == -1) {
                 best_ref = best;

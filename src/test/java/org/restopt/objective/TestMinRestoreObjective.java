@@ -27,7 +27,7 @@ public class TestMinRestoreObjective {
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_INITIAL));
-            double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_BEST));
+            double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE));
             Assert.assertTrue(initial < best);
             if (best_ref == -1) {
                 best_ref = best;

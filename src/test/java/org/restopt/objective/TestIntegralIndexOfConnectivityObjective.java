@@ -27,7 +27,7 @@ public class TestIntegralIndexOfConnectivityObjective {
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_INITIAL));
-            double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_BEST));
+            double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC));
             Assert.assertTrue(initial < best);
             if (best_ref == -1) {
                 best_ref = best;
@@ -53,7 +53,7 @@ public class TestIntegralIndexOfConnectivityObjective {
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double initial = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_INITIAL));
-            double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_BEST));
+            double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC));
             Assert.assertTrue(initial < best);
             if (best_ref == -1) {
                 best_ref = best;
@@ -74,7 +74,7 @@ public class TestIntegralIndexOfConnectivityObjective {
         RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 30, 0, true);
         sol.printSolutionInfos();
         double initial = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_INITIAL));
-        double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_BEST));
+        double best = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC));
         Assert.assertTrue(initial < best);
         Assert.assertTrue(best == 1);
     }
