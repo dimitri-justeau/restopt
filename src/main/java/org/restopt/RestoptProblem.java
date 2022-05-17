@@ -8,6 +8,7 @@ import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
+import org.restopt.constraints.EffectiveMeshSizeConstraint;
 import org.restopt.constraints.IRestoptConstraintFactory;
 import org.restopt.constraints.RestorableAreaConstraint;
 import org.restopt.exception.RestoptException;
@@ -17,6 +18,9 @@ import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
 import org.restopt.objectives.IRestoptObjectiveFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
@@ -45,7 +49,14 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     public IntVar minRestore;
     public IntVar totalRestorable;
 
+    private EffectiveMeshSizeConstraint effectiveMeshSizeConstraint;
+
     private RestorableAreaConstraint restorableAreaConstraint;
+
+    /**
+     * Map to share variables between constraints and objectives
+     */
+    private Map<String, IntVar> additionalVariables;
 
     public RestoptProblem() {
     }
@@ -54,6 +65,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
         this.data = data;
         this.accessibleVal = accessibleVal;
+        this.additionalVariables = new HashMap<>();
 
         // ------------------ //
         // PREPARE INPUT DATA //
@@ -115,6 +127,10 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
         );
         restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, grid.getNbGroups()).toArray()), true);
         restoreSet = model.graphNodeSetView(restoreGraph);
+    }
+
+    public Map<String, IntVar> getAdditionalVariables() {
+        return additionalVariables;
     }
 
     /**
@@ -231,13 +247,6 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     }
 
     /**
-     * @return The total landscape area.
-     */
-    public int getLandscapeArea() {
-        return grid.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
-    }
-
-    /**
      * Associate a restorable area constraint with this problem.
      *
      * @param restorableAreaConstraint
@@ -247,6 +256,39 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
             throw new RestoptException("Only one restorable area constraint can be associated with a restopt problem");
         }
         this.restorableAreaConstraint = restorableAreaConstraint;
+    }
+
+    /**
+     * @return True if a mesh constraint was associated with this problem.
+     */
+    public boolean hasMeshConstraint() {
+        return effectiveMeshSizeConstraint != null;
+    }
+
+    /**
+     * @return The mesh constraint associated with this problem.
+     */
+    public EffectiveMeshSizeConstraint getMeshConstraint() {
+        return effectiveMeshSizeConstraint;
+    }
+
+    /**
+     * Associate a mesh constraint with this problem.
+     *
+     * @param effectiveMeshSizeConstraint
+     */
+    public void setMeshConstraint(EffectiveMeshSizeConstraint effectiveMeshSizeConstraint) throws RestoptException {
+        if (this.hasMeshConstraint()) {
+            throw new RestoptException("Only one mesh constraint can be associated with a restopt problem");
+        }
+        this.effectiveMeshSizeConstraint = effectiveMeshSizeConstraint;
+    }
+
+    /**
+     * @return The total landscape area.
+     */
+    public int getLandscapeArea() {
+        return grid.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
     }
 
     @Override

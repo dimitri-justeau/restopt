@@ -31,23 +31,28 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
     public void initObjective() {
         DataLoader data = problem.getData();
         PartialRegularGroupedGrid grid = problem.getGrid();
-        objective = problem.getModel().intVar(
-                "MESH",
-                0, (int) ((data.getHeight() * data.getWidth() - grid.getDiscardSet().size()) * Math.pow(10, precision))
-        );
-        int landscapeArea = problem.getLandscapeArea();
-        Constraint meshCons = new Constraint(
-                "MESH_constraint",
-                new PropEffectiveMeshSize(
-                        problem.getHabitatGraphVar(),
-                        objective,
-                        grid.getSizeCells(),
-                        landscapeArea,
-                        precision,
-                        true
-                )
-        );
-        problem.getModel().post(meshCons);
+        if (problem.getAdditionalVariables().containsKey(KEY_MESH)) {
+            objective = problem.getAdditionalVariables().get(KEY_MESH);
+        } else {
+            objective = problem.getModel().intVar(
+                    "MESH",
+                    0, (int) ((data.getHeight() * data.getWidth() - grid.getDiscardSet().size()) * Math.pow(10, precision))
+            );
+            int landscapeArea = problem.getLandscapeArea();
+            Constraint meshCons = new Constraint(
+                    "MESH_constraint",
+                    new PropEffectiveMeshSize(
+                            problem.getHabitatGraphVar(),
+                            objective,
+                            grid.getSizeCells(),
+                            landscapeArea,
+                            precision,
+                            true
+                    )
+            );
+            problem.getModel().post(meshCons);
+            problem.getAdditionalVariables().put(KEY_MESH, objective);
+        }
         initialValue = LandscapeIndicesUtils.effectiveMeshSize(
                 problem.getHabitatGraph(),
                 (grid.getNbUngroupedCells() + problem.getNbLockedUpNonHabitatCells())

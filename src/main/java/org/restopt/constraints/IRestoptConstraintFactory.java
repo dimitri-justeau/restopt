@@ -21,7 +21,11 @@ public interface IRestoptConstraintFactory {
         new CompactnessConstraint(self(), minDiameter, maxDiameter).post();
     }
 
-    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, double minProportion) throws IOException, RestoptException {
+    default void postRestorableConstraint(int minAreaToRestore, int maxAreaToRestore, double minProportion) throws RestoptException {
         new RestorableAreaConstraint(self(), minAreaToRestore, maxAreaToRestore, minProportion).post();
+    }
+
+    default void postMinMeshConstraint(double minMesh, int precision) throws RestoptException {
+        new EffectiveMeshSizeConstraint(self(), minMesh, self().getLandscapeArea(), precision).post();
     }
 }

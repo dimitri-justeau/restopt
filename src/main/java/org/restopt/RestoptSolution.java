@@ -1,14 +1,17 @@
 package org.restopt;
 
 import org.chocosolver.solver.Solution;
+import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.objects.graphs.GraphFactory;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.choco.LandscapeIndicesUtils;
+import org.restopt.constraints.EffectiveMeshSizeConstraint;
 import org.restopt.exception.RestoptException;
 import org.restopt.objectives.AbstractRestoptObjective;
+import org.restopt.objectives.EffectiveMeshSizeObjective;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +62,9 @@ public class RestoptSolution {
         for (String[] s : objective.appendMessages()) {
             messages.put(s[0], s[1]);
         }
+        if (problem.hasMeshConstraint()) {
+            messages.put(EffectiveMeshSizeConstraint.KEY_MESH, "MESH valeu: ");
+        }
     }
 
     private Map<String, String> makeCharacteristics() {
@@ -72,6 +78,11 @@ public class RestoptSolution {
         solCharacteristics.put(KEY_SEARCH_STATE, String.valueOf(problem.getSearchState()));
         solCharacteristics.put(KEY_OPTIMALITY_PROVEN, String.valueOf(objective.isProvenOptimal()));
         solCharacteristics.putAll(objective.appendCharacteristics(solution));
+        if (problem.hasMeshConstraint()) {
+            IntVar mesh = problem.getMeshConstraint().getMesh();
+            int precision = problem.getMeshConstraint().getPrecision();
+            solCharacteristics.put(EffectiveMeshSizeConstraint.KEY_MESH, String.valueOf((1.0 * solution.getIntVal(mesh)) / Math.pow(10, precision)));
+        }
         return solCharacteristics;
     }
 
@@ -82,6 +93,10 @@ public class RestoptSolution {
     public String getCharacteristicsAsCsv() {
         String[][] orderedCharacteristics = new String[2][];
         String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
+        if (problem.hasMeshConstraint() && !(objective instanceof EffectiveMeshSizeObjective)) {
+            String key = EffectiveMeshSizeConstraint.KEY_MESH;
+            allKeys = ArrayUtils.append(allKeys, new String[] {key});
+        }
         orderedCharacteristics[0] = allKeys;
         orderedCharacteristics[1] = new String[allKeys.length];
         for (int i = 0; i < allKeys.length; i++) {
@@ -108,6 +123,10 @@ public class RestoptSolution {
             System.out.println(messages.get(key) + characteristics.get(key));
         }
         for (String key : objective.getAdditionalKeys()) {
+            System.out.println(messages.get(key) + characteristics.get(key));
+        }
+        if (problem.hasMeshConstraint() && !(objective instanceof EffectiveMeshSizeObjective)) {
+            String key = EffectiveMeshSizeConstraint.KEY_MESH;
             System.out.println(messages.get(key) + characteristics.get(key));
         }
         System.out.println();

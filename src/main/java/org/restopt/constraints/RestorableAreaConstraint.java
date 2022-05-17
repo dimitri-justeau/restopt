@@ -18,7 +18,7 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
     protected int[] minArea;
 
     public RestorableAreaConstraint(RestoptProblem restoptProblem, int minAreaToRestore, int maxAreaToRestore,
-                                    double minProportion) throws IOException, RestoptException {
+                                    double minProportion) throws RestoptException {
         super(restoptProblem);
         this.minAreaToRestore = minAreaToRestore;
         this.maxAreaToRestore = maxAreaToRestore;

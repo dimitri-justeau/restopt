@@ -38,7 +38,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
             try {
                 problem.postRestorableConstraint(0, (int) maxRest, minProportion);
                 objective = problem.getMinRestore();
-            } catch (IOException | RestoptException e) {
+            } catch (RestoptException e) {
                 e.printStackTrace();
             }
         }
