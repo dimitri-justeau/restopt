@@ -22,7 +22,7 @@ public class TestEffectiveMeshSizeObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeMESH(10, 3, 30, true);
+        List<RestoptSolution> sols = restoptProblem.maximizeMESH(10, 3, 30, 0,true);
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
@@ -45,7 +45,7 @@ public class TestEffectiveMeshSizeObjective {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 0);
-        RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, true);
+        RestoptSolution sol = restoptProblem.maximizeMESH(3, 30, 0, true);
         sol.printSolutionInfos();
         double initial = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_INITIAL));
         double best = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeObjective.KEY_MESH_BEST));

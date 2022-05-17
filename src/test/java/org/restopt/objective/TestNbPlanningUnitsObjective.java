@@ -20,7 +20,7 @@ public class TestNbPlanningUnitsObjective {
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeNbPUS(10, 30, true);
+        List<RestoptSolution> sols = restoptProblem.maximizeNbPUS(10, 30, 0,true);
         int best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
@@ -48,7 +48,7 @@ public class TestNbPlanningUnitsObjective {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 1);
-        RestoptSolution sol = restoptProblem.maximizeNbPUS(30, true);
+        RestoptSolution sol = restoptProblem.maximizeNbPUS(30, 0, true);
         sol.printSolutionInfos();
         Assert.assertEquals(sol.getRestorationPlanningUnits().length, restoptProblem.getAvailablePlanningUnits().length);
     }
