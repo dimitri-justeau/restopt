@@ -62,6 +62,11 @@ public interface IRestoptObjectiveFactory {
         return obj.findOptimalSolution(nbSolutions, optimalityGap);
     }
 
+    default List<RestoptSolution> minimizeMinRestore(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose) throws Exception {
+        MinRestoreObjective obj = new MinRestoreObjective(self(), timeLimit, verbose, false);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
     default List<RestoptSolution> maximizeNbPUS(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose) throws RestoptException {
         NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, true);
         return obj.findOptimalSolution(nbSolutions, optimalityGap);
