@@ -4,16 +4,13 @@ import org.chocosolver.solver.Solution;
 import org.restopt.RestoptProblem;
 import org.restopt.exception.RestoptException;
 
-import java.io.IOException;
 import java.util.*;
 
 public class MinRestoreObjective extends AbstractRestoptObjective {
 
-    public static final String KEY_MIN_RESTORE_INITIAL = "min_restore_initial";
     public static final String KEY_MIN_RESTORE = "min_restore";
     public static final String KEY_MIN_RESTORE_BEST = "min_restore_best";
 
-    double initialValue;
     double minProportion;
 
     public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) throws Exception {
@@ -42,23 +39,21 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
                 e.printStackTrace();
             }
         }
-        initialValue = objective.getLB();
     }
 
     @Override
     public String getInitialValueMessage() {
-        return "\nMin restore initial = " + initialValue + "\n";
+        return "";
     }
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]{KEY_MIN_RESTORE_INITIAL, KEY_MIN_RESTORE, KEY_MIN_RESTORE_BEST};
+        return new String[]{KEY_MIN_RESTORE, KEY_MIN_RESTORE_BEST};
     }
 
     @Override
     public Map<String, String> appendCharacteristics(Solution solution) {
         Map<String, String> charact = new HashMap<>();
-        charact.put(KEY_MIN_RESTORE_INITIAL, String.valueOf(initialValue));
         charact.put(KEY_MIN_RESTORE, String.valueOf(solution.getIntVal(objective)));
         charact.put(KEY_MIN_RESTORE_BEST, String.valueOf(optimalValue));
         return charact;
@@ -67,7 +62,6 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[]{KEY_MIN_RESTORE_INITIAL, "Initial min restore value: "});
         messages.add(new String[]{KEY_MIN_RESTORE, "Min restore value: "});
         messages.add(new String[]{KEY_MIN_RESTORE_BEST, "Best known min restore value: "});
         return messages;

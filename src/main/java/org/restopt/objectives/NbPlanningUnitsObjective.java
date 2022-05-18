@@ -11,10 +11,7 @@ import java.util.Map;
 
 public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
-    public static final String KEY_NB_PUS_INITIAL = "nb_planning_units_initial";
     public static final String KEY_NB_PUS_BEST = "nb_planning_units_best";
-
-    int initialValue;
 
     public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
         super(problem, timeLimit, verbose, maximize);
@@ -23,7 +20,6 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     @Override
     public void initObjective() {
         objective = problem.getRestoreSetVar().getCard();
-        initialValue = objective.getLB();
         if (this.problem.hasRestorableAreaConstraint()) {
             int[] cardBounds = problem.getRestorableAreaConstraint().getCardinalityBounds();
             problem.getModel().arithm(problem.getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
@@ -46,18 +42,17 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     @Override
     public String getInitialValueMessage() {
-        return "\nNb Planning units initial = " + initialValue + "\n";
+        return "";
     }
 
     @Override
     public String[] getAdditionalKeys() {
-        return new String[]{KEY_NB_PUS_INITIAL, KEY_NB_PUS_BEST};
+        return new String[]{KEY_NB_PUS_BEST};
     }
 
     @Override
     public Map<String, String> appendCharacteristics(Solution solution) {
         Map<String, String> charact = new HashMap<>();
-        charact.put(KEY_NB_PUS_INITIAL, String.valueOf(initialValue));
         charact.put(KEY_NB_PUS_BEST, String.valueOf(getOptimalValue()));
         return charact;
     }
@@ -65,7 +60,6 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
     @Override
     public List<String[]> appendMessages() {
         List<String[]> messages = new ArrayList<>();
-        messages.add(new String[]{KEY_NB_PUS_INITIAL, "Initial nb planning units value: "});
         messages.add(new String[]{KEY_NB_PUS_BEST, "Best known nb planning units value: "});
         return messages;
     }

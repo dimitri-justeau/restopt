@@ -76,9 +76,7 @@ public class TestOptimalityGap {
         double best_ref = Double.parseDouble(sols.get(0).getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_BEST));
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
-            double initial = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE_INITIAL));
             double best = Double.parseDouble(sol.getCharacteristics().get(MinRestoreObjective.KEY_MIN_RESTORE));
-            Assert.assertTrue(initial < best);
             Assert.assertTrue(best >= best_ref * (1 - optGap));
         }
     }
@@ -97,9 +95,7 @@ public class TestOptimalityGap {
         double best_ref = Double.parseDouble(sols.get(0).getCharacteristics().get(NbPlanningUnitsObjective.KEY_NB_PUS_BEST));
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
-            int initial = Integer.parseInt(sol.getCharacteristics().get(NbPlanningUnitsObjective.KEY_NB_PUS_INITIAL));
             int best = Integer.parseInt(sol.getCharacteristics().get(sol.KEY_NB_PUS));
-            Assert.assertTrue(initial < best);
             Assert.assertTrue(best <= best_ref * (1 + optGap));
         }
     }
