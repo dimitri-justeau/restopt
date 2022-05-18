@@ -10,6 +10,7 @@ import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.constraints.EffectiveMeshSizeConstraint;
 import org.restopt.constraints.IRestoptConstraintFactory;
+import org.restopt.constraints.IntegralIndexOfConnectivityConstraint;
 import org.restopt.constraints.RestorableAreaConstraint;
 import org.restopt.exception.RestoptException;
 import org.restopt.grid.neighborhood.INeighborhood;
@@ -19,7 +20,6 @@ import org.restopt.grid.regular.square.RegularSquareGrid;
 import org.restopt.objectives.IRestoptObjectiveFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -50,7 +50,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     public IntVar totalRestorable;
 
     private EffectiveMeshSizeConstraint effectiveMeshSizeConstraint;
-
+    private IntegralIndexOfConnectivityConstraint integralIndexOfConnectivityConstraint;
     private RestorableAreaConstraint restorableAreaConstraint;
 
     /**
@@ -282,6 +282,32 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
             throw new RestoptException("Only one mesh constraint can be associated with a restopt problem");
         }
         this.effectiveMeshSizeConstraint = effectiveMeshSizeConstraint;
+    }
+
+    /**
+     * @return True if an iic constraint was associated with this problem.
+     */
+    public boolean hasIICConstraint() {
+        return integralIndexOfConnectivityConstraint != null;
+    }
+
+    /**
+     * @return The iic constraint associated with this problem.
+     */
+    public IntegralIndexOfConnectivityConstraint getIICConstraint() {
+        return integralIndexOfConnectivityConstraint;
+    }
+
+    /**
+     * Associate an iic constraint with this problem.
+     *
+     * @param integralIndexOfConnectivityConstraint
+     */
+    public void setIICConstraint(IntegralIndexOfConnectivityConstraint integralIndexOfConnectivityConstraint) throws RestoptException {
+        if (this.hasIICConstraint()) {
+            throw new RestoptException("Only one iic constraint can be associated with a restopt problem");
+        }
+        this.integralIndexOfConnectivityConstraint = integralIndexOfConnectivityConstraint;
     }
 
     /**

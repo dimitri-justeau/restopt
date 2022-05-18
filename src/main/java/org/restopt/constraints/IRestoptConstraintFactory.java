@@ -28,4 +28,8 @@ public interface IRestoptConstraintFactory {
     default void postMinMeshConstraint(double minMesh, int precision) throws RestoptException {
         new EffectiveMeshSizeConstraint(self(), minMesh, self().getLandscapeArea(), precision).post();
     }
+
+    default void postMinIICConstraint(double minIIC, int distanceThreshold, int precision) throws RestoptException {
+        new IntegralIndexOfConnectivityConstraint(self(), minIIC, 1, distanceThreshold, precision).post();
+    }
 }

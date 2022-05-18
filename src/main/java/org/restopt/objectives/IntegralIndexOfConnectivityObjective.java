@@ -52,24 +52,42 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
     public void initObjective() {
         PartialRegularGroupedGrid grid = problem.getGrid();
         int landscapeArea = problem.getLandscapeArea();
-        objective = problem.getModel().intVar(
-                "IIC",
-                0, (int) (Math.pow(10, precision))
-        );
-        Constraint consIIC = new Constraint(
-                "IIC_constraint",
-                new PropIIC(
-                        problem.getHabitatGraphVar(),
-                        objective,
-                        grid,
-                        landscapeArea,
-                        distanceThreshold + 1,
-                        precision,
-                        true
-                )
-        );
-        problem.getModel().post(consIIC);
-        initialValue = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
+        if (problem.getAdditionalVariables().containsKey(KEY_IIC)) {
+            objective = problem.getAdditionalVariables().get(KEY_IIC);
+            Constraint consIIC = new Constraint(
+                    "IIC_constraint",
+                    new PropIIC(
+                            problem.getHabitatGraphVar(),
+                            objective,
+                            grid,
+                            landscapeArea,
+                            distanceThreshold + 1,
+                            precision,
+                            true
+                    )
+            );
+            initialValue = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
+        } else {
+            objective = problem.getModel().intVar(
+                    "IIC",
+                    0, (int) (Math.pow(10, precision))
+            );
+            Constraint consIIC = new Constraint(
+                    "IIC_constraint",
+                    new PropIIC(
+                            problem.getHabitatGraphVar(),
+                            objective,
+                            grid,
+                            landscapeArea,
+                            distanceThreshold + 1,
+                            precision,
+                            true
+                    )
+            );
+            problem.getModel().post(consIIC);
+            initialValue = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
+            problem.getAdditionalVariables().put(KEY_IIC, objective);
+        }
     }
 
     @Override

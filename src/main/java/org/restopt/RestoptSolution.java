@@ -9,9 +9,11 @@ import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.constraints.EffectiveMeshSizeConstraint;
+import org.restopt.constraints.IntegralIndexOfConnectivityConstraint;
 import org.restopt.exception.RestoptException;
 import org.restopt.objectives.AbstractRestoptObjective;
 import org.restopt.objectives.EffectiveMeshSizeObjective;
+import org.restopt.objectives.IntegralIndexOfConnectivityObjective;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +65,10 @@ public class RestoptSolution {
             messages.put(s[0], s[1]);
         }
         if (problem.hasMeshConstraint()) {
-            messages.put(EffectiveMeshSizeConstraint.KEY_MESH, "MESH valeu: ");
+            messages.put(EffectiveMeshSizeConstraint.KEY_MESH, "MESH value: ");
+        }
+        if (problem.hasIICConstraint()) {
+            messages.put(IntegralIndexOfConnectivityConstraint.KEY_IIC, "IIC value: ");
         }
     }
 
@@ -83,6 +88,11 @@ public class RestoptSolution {
             int precision = problem.getMeshConstraint().getPrecision();
             solCharacteristics.put(EffectiveMeshSizeConstraint.KEY_MESH, String.valueOf((1.0 * solution.getIntVal(mesh)) / Math.pow(10, precision)));
         }
+        if (problem.hasIICConstraint()) {
+            IntVar iic = problem.getIICConstraint().getIic();
+            int precision = problem.getIICConstraint().getPrecision();
+            solCharacteristics.put(IntegralIndexOfConnectivityConstraint.KEY_IIC, String.valueOf((1.0 * solution.getIntVal(iic)) / Math.pow(10, precision)));
+        }
         return solCharacteristics;
     }
 
@@ -95,6 +105,10 @@ public class RestoptSolution {
         String[] allKeys = ArrayUtils.append(KEYS, objective.getAdditionalKeys());
         if (problem.hasMeshConstraint() && !(objective instanceof EffectiveMeshSizeObjective)) {
             String key = EffectiveMeshSizeConstraint.KEY_MESH;
+            allKeys = ArrayUtils.append(allKeys, new String[] {key});
+        }
+        if (problem.hasIICConstraint() && !(objective instanceof IntegralIndexOfConnectivityObjective)) {
+            String key = IntegralIndexOfConnectivityConstraint.KEY_IIC;
             allKeys = ArrayUtils.append(allKeys, new String[] {key});
         }
         orderedCharacteristics[0] = allKeys;
@@ -127,6 +141,10 @@ public class RestoptSolution {
         }
         if (problem.hasMeshConstraint() && !(objective instanceof EffectiveMeshSizeObjective)) {
             String key = EffectiveMeshSizeConstraint.KEY_MESH;
+            System.out.println(messages.get(key) + characteristics.get(key));
+        }
+        if (problem.hasIICConstraint() && !(objective instanceof IntegralIndexOfConnectivityObjective)) {
+            String key = IntegralIndexOfConnectivityConstraint.KEY_IIC;
             System.out.println(messages.get(key) + characteristics.get(key));
         }
         System.out.println();
