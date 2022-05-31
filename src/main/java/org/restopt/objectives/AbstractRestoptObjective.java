@@ -5,17 +5,28 @@ import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
 import org.restopt.exception.RestoptException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractRestoptObjective {
+
+    private static Set<String> SEARCH_KEYS = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(
+                    "RANDOM",
+                    "DOM_OVER_W_DEG",
+                    "DOM_OVER_W_DEG_REF",
+                    "MIN_DOM_LB",
+                    "MIN_DOM_UB",
+                    "ACTIVITY_BASED",
+                    "CONFLICT_HISTORY",
+                    "FAILURE_RATE",
+                    "FAILURE_LENGTH"
+            )));
 
     protected RestoptProblem problem;
     protected IntVar objective;
@@ -23,17 +34,23 @@ public abstract class AbstractRestoptObjective {
     protected boolean verbose;
     protected boolean maximize;
     protected long totalRuntime;
+    protected String search;
 
     protected int optimalValue;
 
     protected boolean provenOptimal;
 
-    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
+    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) {
         this.problem = problem;
         this.timeLimit = timeLimit;
         this.verbose = verbose;
         this.maximize = maximize;
         this.provenOptimal = false;
+        this.search = search;
+    }
+
+    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
+        this(problem, timeLimit, verbose, maximize, "");
     }
 
     public boolean isProvenOptimal() {
@@ -48,7 +65,46 @@ public abstract class AbstractRestoptObjective {
      * Set the search strategy. Override according to the objective.
      */
     public void setSearch() {
-        problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
+        if (SEARCH_KEYS.contains(this.search)) {
+            BoolVar[] bools = new BoolVar[problem.getAvailablePlanningUnits().length];
+            for (int i = 0; i < bools.length; i++) {
+                bools[i] = problem.getModel().setBoolView(
+                        problem.getRestoreSetVar(),
+                        problem.getAvailablePlanningUnits()[i]
+                );
+            }
+            switch (this.search) {
+                case "RANDOM":
+                    problem.getModel().getSolver().setSearch(Search.randomSearch(bools, System.currentTimeMillis()));
+                    break;
+                case "DOM_OVER_W_DEG":
+                    problem.getModel().getSolver().setSearch(Search.domOverWDegSearch(bools));
+                    break;
+                case "DOM_OVER_W_DEG_REF":
+                    problem.getModel().getSolver().setSearch(Search.domOverWDegRefSearch(bools));
+                    break;
+                case "MIN_DOM_LB":
+                    problem.getModel().getSolver().setSearch(Search.minDomLBSearch(bools));
+                    break;
+                case "MIN_DOM_UB":
+                    problem.getModel().getSolver().setSearch(Search.minDomUBSearch(bools));
+                    break;
+                case "ACTIVITY_BASED":
+                    problem.getModel().getSolver().setSearch(Search.activityBasedSearch(bools));
+                    break;
+                case "CONFLICT_HISTORY":
+                    problem.getModel().getSolver().setSearch(Search.conflictHistorySearch(bools));
+                    break;
+                case "FAILURE_RATE":
+                    problem.getModel().getSolver().setSearch(Search.failureRateBasedSearch(bools));
+                    break;
+                case "FAILURE_LENGTH":
+                    problem.getModel().getSolver().setSearch(Search.failureLengthBasedSearch(bools));
+                    break;
+            }
+        } else {
+            problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
+        }
     }
 
     public abstract void initObjective();

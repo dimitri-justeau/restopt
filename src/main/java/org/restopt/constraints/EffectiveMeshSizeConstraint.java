@@ -41,7 +41,7 @@ public class EffectiveMeshSizeConstraint extends AbstractRestoptConstraint {
                             problem.getGrid().getSizeCells(),
                             problem.getLandscapeArea(),
                             precision,
-                            false
+                            true
                     )
             );
             problem.getModel().post(meshCons);

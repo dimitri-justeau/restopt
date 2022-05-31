@@ -11,8 +11,12 @@ import java.util.Map;
 
 public class NoOptimizationObjective extends AbstractRestoptObjective {
 
+    public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose, String search) {
+        super(problem, timeLimit, verbose, true, search);
+    }
+
     public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose) {
-        super(problem, timeLimit, verbose, true);
+        this(problem, timeLimit, verbose, "");
     }
 
     @Override

@@ -22,9 +22,13 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
     int precision;
     double initialValue;
 
-    public EffectiveMeshSizeObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
-        super(problem, timeLimit, verbose, maximize);
+    public EffectiveMeshSizeObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision, String search) {
+        super(problem, timeLimit, verbose, maximize, search);
         this.precision = precision;
+    }
+
+    public EffectiveMeshSizeObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, int precision) {
+        this(problem, timeLimit, verbose, maximize, precision, "");
     }
 
     @Override

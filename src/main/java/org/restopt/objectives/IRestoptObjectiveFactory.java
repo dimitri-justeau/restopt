@@ -76,4 +76,45 @@ public interface IRestoptObjectiveFactory {
         NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, false);
         return obj.findOptimalSolution(nbSolutions, optimalityGap);
     }
+
+    // With custom search
+
+    // --------------- //
+    // MULTI SOLUTIONS //
+    // --------------- //
+
+    default List<RestoptSolution> findSolutions(int nbSolutions, int timeLimit, boolean verbose, String search) throws RestoptException {
+        NoOptimizationObjective obj = new NoOptimizationObjective(self(), timeLimit, verbose, search);
+        return obj.findOptimalSolution(nbSolutions, 0);
+    }
+
+    default List<RestoptSolution> maximizeMESH(int nbSolutions, int precision, int timeLimit, double optimalityGap, boolean verbose, String search) throws RestoptException {
+        EffectiveMeshSizeObjective obj = new EffectiveMeshSizeObjective(self(), timeLimit, verbose, true, precision, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> maximizeIIC(int nbSolutions, int precision, int distanceThreshold, int timeLimit, double optimalityGap, boolean verbose, String search) throws RestoptException {
+        IntegralIndexOfConnectivityObjective obj = new IntegralIndexOfConnectivityObjective(self(), timeLimit, verbose, true, precision, distanceThreshold, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> maximizeMinRestore(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose, String search) throws Exception {
+        MinRestoreObjective obj = new MinRestoreObjective(self(), timeLimit, verbose, true, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> minimizeMinRestore(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose, String search) throws Exception {
+        MinRestoreObjective obj = new MinRestoreObjective(self(), timeLimit, verbose, false, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> maximizeNbPUS(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose, String search) throws RestoptException {
+        NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, true, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
+
+    default List<RestoptSolution> minimizeNbPUS(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose, String search) throws RestoptException {
+        NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, false, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
 }
