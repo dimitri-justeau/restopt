@@ -25,8 +25,8 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         this(problem, timeLimit, verbose, maximize, "");
     }
 
-    public MinRestoreObjective(RestoptProblem problem, double minProportion, int timeLimit, boolean verbose, boolean maximize) {
-        super(problem, timeLimit, verbose, maximize);
+    public MinRestoreObjective(RestoptProblem problem, double minProportion, int timeLimit, boolean verbose, boolean maximize, String search) {
+        super(problem, timeLimit, verbose, maximize, search);
         this.minProportion = minProportion;
     }
 
@@ -35,7 +35,9 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         if (problem.getMinRestore() != null) {
             objective = problem.getMinRestore();
         } else {
-            double maxRest = Arrays.stream(problem.getData().getRestorableData()).sum();
+            double maxRest = Arrays.stream(problem.getData().getRestorableData())
+                    .filter(x -> !Double.isNaN(x))
+                    .sum();
             try {
                 problem.postRestorableConstraint(0, (int) maxRest, minProportion);
                 objective = problem.getMinRestore();
