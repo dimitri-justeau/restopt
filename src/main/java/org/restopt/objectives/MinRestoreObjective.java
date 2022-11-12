@@ -16,7 +16,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) throws Exception {
         super(problem, timeLimit, verbose, maximize, search);
         if (problem.getMinRestore() == null) {
-            throw new Exception("MinRestoreObjective without minProportion is only allowed" +
+            throw new Exception("MinRestoreObjective without minProportion is only allowed " +
                     "if a restorable constraint was posted");
         }
     }
