@@ -21,6 +21,10 @@ public class SmallestEnclosingCircle {
 
     public SmallestEnclosingCircle(int[] pointsArray, double[][] coordinates) {
         this.coordinates = coordinates;
+        this.init(pointsArray);
+    }
+
+    public void init(int[] pointsArray) {
         this.pointsArray = pointsArray;
         this.shuffledPoints = Arrays.copyOf(pointsArray, pointsArray.length);
         ArrayUtils.randomPermutations(shuffledPoints, System.currentTimeMillis());
@@ -33,19 +37,39 @@ public class SmallestEnclosingCircle {
     }
 
     public double[] addPoint(double[] pi) {
-        double[] p1 = coordinates[shuffledPoints[0]];
-        double[] center = midpoint(p1, pi);
-        double r = (distance(p1, pi) / 2);
-        for (int j = 1; j < shuffledPoints.length; j++) {
-            double[] pj = coordinates[shuffledPoints[j]];
-            if (distance(center, pj) > r) {
-                double[] circle = b_minidisk_two(coordinates, shuffledPoints, pi, j);
-                center[0] = circle[0];
-                center[1] = circle[1];
-                r = circle[2];
-            }
+        int nbPoints = pointsArray.length + 1;
+        if (nbPoints == 1) {
+            double[] center = pi;
+            return new double[]{center[0], center[1], 0};
         }
-        return new double[] { center[0], center[1], r };
+        if (nbPoints == 2) {
+            System.out.println("YOYOYO");
+            double[] p1 = coordinates[pointsArray[0]];
+            double[] p2 = pi;
+            double[] center = midpoint(p1, p2);
+            return new double[]{center[0], center[1], (distance(p1, p2) / 2)};
+        }
+        if (distance(getCenter(), pi) > radius) {
+            double[] p1 = coordinates[shuffledPoints[0]];
+            double[] center = midpoint(p1, pi);
+            double r = (distance(p1, pi) / 2);
+            for (int j = 1; j < shuffledPoints.length; j++) {
+                double[] pj = coordinates[shuffledPoints[j]];
+                if (distance(center, pj) > r) {
+                    double[] circle = b_minidisk_two(coordinates, shuffledPoints, pi, j);
+                    center[0] = circle[0];
+                    center[1] = circle[1];
+                    r = circle[2];
+                }
+            }
+            return new double[] { center[0], center[1], r };
+        } else {
+            return new double[] { centerX, centerY, radius };
+        }
+    }
+
+    public double[] getCenter() {
+        return new double[] { centerX, centerY };
     }
 
     /**
