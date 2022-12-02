@@ -21,10 +21,6 @@ public class NbComponentsConstraint extends AbstractRestoptConstraint {
     public void post() {
         if (minNbCC == maxNbCC && maxNbCC == 1) {
             getModel().connected(getRestoreGraphVar()).post();
-            ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(getRestoreGraphVar().getUB());
-            cf.findAllCC();
-            getModel().arithm(getRestoreSetVar().getCard(), "<=", cf.getSizeMaxCC()).post();
-            getModel().arithm(getRestoreSetVar().getCard(), ">=", 1).post();
         } else {
             getModel().nbConnectedComponents(getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)).post();
         }

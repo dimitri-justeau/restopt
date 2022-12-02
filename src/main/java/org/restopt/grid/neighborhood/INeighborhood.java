@@ -29,22 +29,22 @@ import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.restopt.grid.Grid;
 
 /**
- * Interface specifying a neighborhood definition in a org.flsgen.grid.
+ * Interface specifying a neighborhood definition in a Grid.
  */
 public interface INeighborhood<T extends Grid> {
 
     /**
-     * @param grid A org.flsgen.grid.
+     * @param grid Grid.
      * @param i    The index of a cell.
-     * @return The neighbors of i in the org.flsgen.grid.
+     * @return The neighbors of i in the Grid.
      */
     int[] getNeighbors(T grid, int i);
 
     /**
-     * @param grid    A org.flsgen.grid.
+     * @param grid    Grid.
      * @param model   The GraphModel to be associated with the graph.
      * @param setType The SetType to use for encoding the graph.
-     * @return The full spatial graph associated to the org.flsgen.grid. Full means that there will be one node for each cell.
+     * @return The full spatial graph associated to the Grid. Full means that there will be one node for each cell.
      */
     default UndirectedGraph getFullGraph(T grid, Model model, SetType setType) {
         int nbCells = grid.getNbCells();
@@ -77,11 +77,11 @@ public interface INeighborhood<T extends Grid> {
     }
 
     /**
-     * @param grid    A org.flsgen.grid.
+     * @param grid    Grid.
      * @param model   The GraphModel to be associated with the graph.
      * @param cells   The cells to be included in the graph.
      * @param setType The SetType to use for encoding the graph.
-     * @return The partial graph associated to a subset of cells of the org.flsgen.grid.
+     * @return The partial graph associated to a subset of cells of the Grid.
      */
     default UndirectedGraph getPartialGraph(T grid, Model model, int[] cells, SetType setType) {
         return getPartialGraph(grid, model, cells, setType, setType);
@@ -114,11 +114,11 @@ public interface INeighborhood<T extends Grid> {
 
 
     /**
-     * @param grid    A org.flsgen.grid.
+     * @param grid    Grid.
      * @param model   The GraphModel to be associated with the graph.
      * @param cells   The cells to be included in the graph.
      * @param setType The SetType to use for encoding the graph.
-     * @return The partial graph associated to a subset of cells of the org.flsgen.grid.
+     * @return The partial graph associated to a subset of cells of the Grid.
      */
     default UndirectedGraph getPartialGraphUB(T grid, Model model, int[] cells, SetType setType, boolean decr) {
         int nbCells = grid.getNbCells();

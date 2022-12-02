@@ -85,6 +85,11 @@ public class ConnectivityFinderSpatialGraph {
         for (int i : GUB.getNodes()) {
             neighs[i] = GUB.getNeighborsOf(i).toArray();
         }
+        CCFirstNode = new int[n];
+        CCNextNode = new int[n];
+        nodeCC = new int[n];
+        sizeCC = new int[n];
+        attributeCC = new int[n];
     }
 
     /**
@@ -145,19 +150,12 @@ public class ConnectivityFinderSpatialGraph {
      * Complexity : O(M+N) light and fast in practice
      */
     public void findAllCC() {
-        if (nodeCC == null) {
-            CCFirstNode = new int[n];
-            CCNextNode = new int[n];
-            nodeCC = new int[n];
-            sizeCC = new int[n];
-            attributeCC = new int[n];
-        }
         sizeMinCC = 0;
         sizeMaxCC = 0;
         for (int i : g.getNodes()) {
             p[i] = -1;
         }
-        for (int i = 0; i < CCFirstNode.length; i++) {
+        for (int i = CCFirstNode.length; --i >= 0; ) {
             CCFirstNode[i] = -1;
             sizeCC[i] = -1;
             attributeCC[i] = -1;

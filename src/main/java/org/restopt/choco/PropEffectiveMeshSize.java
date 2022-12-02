@@ -50,6 +50,8 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     public ConnectivityFinderSpatialGraph connectivityFinderGLB;
     private final boolean maximize;
 
+    private int multiplier;
+
     /**
      * @param g             The graph variable associated to the region for which the propagator will maintain MESH.
      * @param mesh          The integer variable equals to MESH, maintained by this propagator.
@@ -65,6 +67,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         this.mesh = mesh;
         this.landscapeArea = landscapeArea;
         this.precision = precison;
+        this.multiplier = (int) Math.pow(10, precision);
         this.connectivityFinderGUB = new ConnectivityFinderSpatialGraph(g.getUB(), cellsArea);
         this.connectivityFinderGLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), cellsArea);
         this.maximize = maximize;
@@ -77,7 +80,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
     @Override
     public void propagate(int evtmask) throws ContradictionException {
         // LB
-        if (!maximize || g.isInstantiated()) {
+        if (!maximize || (g.getMandatoryNodes().size() == g.getPotentialNodes().size())) {
             int mesh_LB_round = getLB();
             mesh.updateLowerBound(mesh_LB_round, this);
         }
@@ -85,27 +88,30 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
         // UB
         int mesh_UB_round = getUB();
         mesh.updateUpperBound(mesh_UB_round, this);
-
         if (mesh.getLB() == mesh_UB_round) {
             for (int i : g.getPotentialNodes()) {
-                g.enforceNode(i, this);
+                if (!g.getMandatoryNodes().contains(i)) {
+                    g.enforceNode(i, this);
+                }
             }
-            mesh.updateLowerBound(mesh_UB_round, this);
+            mesh.instantiateTo(mesh_UB_round, this);
         } else {
             boolean filtered = false;
-            if (!g.isInstantiated()) {
+            if (!(g.getMandatoryNodes().size() == g.getPotentialNodes().size())) {
                 for (int i = 0; i < connectivityFinderGUB.getNBCC(); i++) {
                     int s = connectivityFinderGUB.getAttributeCC()[i];
                     double d = (1.0 / landscapeArea) * ((s - 1) * (s - 1) - (s * s));
-                    int delta = (int) Math.round(d * Math.pow(10, precision));
+                    int delta = (int) Math.round(d * multiplier);
                     if (mesh_UB_round + delta < mesh.getLB()) {
                         filtered = true;
                         for (int j : connectivityFinderGUB.getCC(i)) {
-                            g.enforceNode(j, this);
+                            if (!g.getMandatoryNodes().contains(j)) {
+                                g.enforceNode(j, this);
+                            }
                         }
                     }
                 }
-                if (filtered && (!maximize || g.isInstantiated())) {
+                if (filtered && (!maximize || (g.getMandatoryNodes().size() == g.getPotentialNodes().size()))) {
                     int mesh_LB_round = getLB();
                     mesh.updateLowerBound(mesh_LB_round, this);
                 }
@@ -121,7 +127,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
             mesh_LB += 1.0 * s * s;
         }
         mesh_LB /= 1.0 * landscapeArea;
-        int mesh_LB_round = (int) Math.round(mesh_LB * Math.pow(10, precision));
+        int mesh_LB_round = (int) Math.round(mesh_LB * multiplier);
         return mesh_LB_round;
     }
 
@@ -133,7 +139,7 @@ public class PropEffectiveMeshSize extends Propagator<Variable> {
             mesh_UB += 1.0 * s * s;
         }
         mesh_UB /= 1.0 * landscapeArea;
-        int mesh_UB_round = (int) Math.round(mesh_UB * Math.pow(10, precision));
+        int mesh_UB_round = (int) Math.round(mesh_UB * multiplier);
         return mesh_UB_round;
     }
 

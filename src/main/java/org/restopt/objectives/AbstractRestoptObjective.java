@@ -29,6 +29,7 @@ public abstract class AbstractRestoptObjective {
             )));
 
     protected RestoptProblem problem;
+
     protected IntVar objective;
     protected int timeLimit;
     protected boolean verbose;
@@ -59,6 +60,10 @@ public abstract class AbstractRestoptObjective {
 
     public int getOptimalValue() {
         return optimalValue;
+    }
+
+    public IntVar getObjective() {
+        return objective;
     }
 
     /**

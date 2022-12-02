@@ -32,7 +32,6 @@ import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.chocosolver.util.objects.setDataStructures.dynamic.SetDifference;
 
 import static org.restopt.choco.LandscapeIndicesUtils.*;
 
@@ -120,21 +119,27 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
                     fails();
                 }
             }
+
             // Filter
+
+            ISet remove = SetFactory.makeRangeSet();
             for (int i : getEnvelopePoints()) {
                 if (!getKernelPoints().contains(i)) {
                     double d = distance(cKer, coordinates[i]);
                     if (d > radius.getUB() + radius.getPrecision()) {
                         if ((d > rKer + 2 * (radius.getUB() + radius.getPrecision()))) {
-                            g.removeNode(i, this);
+                            remove.add(i);
                         } else if (ker.size() > 1) {
                             double[] b_disk = minidiskLB.addPoint(coordinates[i]);
                             if (b_disk[2] > (radius.getUB() + radius.getPrecision()) || b_disk[2] < (radius.getLB() - radius.getPrecision())) {
-                                g.removeNode(i, this);
+                                remove.add(i);
                             }
                         }
                     }
                 }
+            }
+            for (int i : remove) {
+                g.removeNode(i, this);
             }
         }
     }
