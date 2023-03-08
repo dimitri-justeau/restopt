@@ -32,6 +32,8 @@ import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
+import org.chocosolver.util.objects.setDataStructures.SetType;
+import org.chocosolver.util.objects.setDataStructures.dynamic.SetDifference;
 
 import static org.restopt.choco.LandscapeIndicesUtils.*;
 
@@ -45,6 +47,8 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
     private final RealVar radius;
     private final RealVar centerX;
     private final RealVar centerY;
+
+    private ISet envMinusKer;
 
     private final SmallestEnclosingCircle minidiskLB;
 
@@ -66,6 +70,7 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
         this.centerY = centerY;
         this.ignoreLB = ignoreLB;
         this.minidiskLB = new SmallestEnclosingCircle(getKernelPoints().toArray(), coordinates);
+        this.envMinusKer = new SetDifference(getModel(), g.getPotentialNodes(), g.getMandatoryNodes(), SetType.BIPARTITESET, 0);
     }
 
     private ISet getKernelPoints() {
@@ -123,17 +128,15 @@ public class PropSmallestEnclosingCircleSpatialGraph extends Propagator<Variable
             // Filter
 
             ISet remove = SetFactory.makeRangeSet();
-            for (int i : getEnvelopePoints()) {
-                if (!getKernelPoints().contains(i)) {
-                    double d = distance(cKer, coordinates[i]);
-                    if (d > radius.getUB() + radius.getPrecision()) {
-                        if ((d > rKer + 2 * (radius.getUB() + radius.getPrecision()))) {
+            for (int i : envMinusKer) {
+                double d = distance(cKer, coordinates[i]);
+                if (d > radius.getUB() + radius.getPrecision()) {
+                    if ((d > rKer + 2 * (radius.getUB() + radius.getPrecision()))) {
+                        remove.add(i);
+                    } else if (ker.size() > 1) {
+                        double[] b_disk = minidiskLB.addPoint(coordinates[i]);
+                        if (b_disk[2] > (radius.getUB() + radius.getPrecision()) || b_disk[2] < (radius.getLB() - radius.getPrecision())) {
                             remove.add(i);
-                        } else if (ker.size() > 1) {
-                            double[] b_disk = minidiskLB.addPoint(coordinates[i]);
-                            if (b_disk[2] > (radius.getUB() + radius.getPrecision()) || b_disk[2] < (radius.getLB() - radius.getPrecision())) {
-                                remove.add(i);
-                            }
                         }
                     }
                 }
