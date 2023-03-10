@@ -2,6 +2,9 @@ package org.restopt;
 
 import org.restopt.exception.RestoptException;
 
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+
 /**
  * Class for loading and accessing problem's data.
  */
@@ -37,6 +40,14 @@ public class DataLoader {
         if (width * height != habitatData.length) {
             throw new RestoptException("Input width and height do not correspond to dataset size");
         }
+    }
+
+    public DataLoader(int[] habitatData, int accessibleVal, double noDataHabitat, int width, int height) throws RestoptException {
+        this(habitatData,
+             IntStream.generate(() -> accessibleVal).limit(habitatData.length).toArray(),
+             DoubleStream.generate(() -> 1).limit(habitatData.length).toArray(),
+             IntStream.generate(() -> 1).limit(habitatData.length).toArray(),
+             width, height, noDataHabitat);
     }
 
     public int[] getHabitatData() {

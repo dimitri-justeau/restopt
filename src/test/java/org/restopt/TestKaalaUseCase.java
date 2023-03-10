@@ -15,7 +15,7 @@ public class TestKaalaUseCase {
         //restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(11);
         restoptProblem.postMinMeshConstraint(275.2538, 3);
-        RestoptSolution sol = restoptProblem.minimizeMinRestore(0.75, 1, 120, 0, true, "DEFAULT").get(0);
+        RestoptSolution sol = restoptProblem.minimizeMinRestore(0.75, 1, 60, 0, true, "DEFAULT").get(0);
         System.out.println(sol.getDiameter());
     }
 

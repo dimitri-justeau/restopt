@@ -7,6 +7,7 @@ import org.restopt.choco.PropIIC;
 import org.restopt.exception.RestoptException;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
+import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
 
     @Override
     public void initObjective() {
-        PartialRegularGroupedGrid grid = problem.getGrid();
+        GroupedGrid grid = problem.getGrid();
         int landscapeArea = problem.getLandscapeArea();
         if (problem.getAdditionalVariables().containsKey(KEY_IIC)) {
             objective = problem.getAdditionalVariables().get(KEY_IIC);

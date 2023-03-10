@@ -72,6 +72,10 @@ public class PartialRegularSquareGrid extends RegularSquareGrid {
         return getPartialIndex(getNbCols() * row + col);
     }
 
+    public int getCompleteIndexFromCoordinates(int row, int col) {
+        return super.getIndexFromCoordinates(row, col);
+    }
+
     /**
      * @param index The flattened index of a cell.
      * @return The org.flsgen.grid coordinates [row, col] from its flattened index.

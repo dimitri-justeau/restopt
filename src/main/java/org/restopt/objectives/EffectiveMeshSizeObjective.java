@@ -6,6 +6,7 @@ import org.restopt.DataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.choco.LandscapeIndicesUtils;
 import org.restopt.choco.PropEffectiveMeshSize;
+import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
     @Override
     public void initObjective() {
         DataLoader data = problem.getData();
-        PartialRegularGroupedGrid grid = problem.getGrid();
+        GroupedGrid grid = problem.getGrid();
         if (problem.getAdditionalVariables().containsKey(KEY_MESH)) {
             objective = problem.getAdditionalVariables().get(KEY_MESH);
         } else {
@@ -59,7 +60,7 @@ public class EffectiveMeshSizeObjective extends AbstractRestoptObjective {
         }
         initialValue = LandscapeIndicesUtils.effectiveMeshSize(
                 problem.getHabitatGraph(),
-                (grid.getNbUngroupedCells() + problem.getNbLockedUpNonHabitatCells())
+                problem.getLandscapeArea()
         );
     }
 

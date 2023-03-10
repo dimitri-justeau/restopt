@@ -35,6 +35,7 @@ import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
+import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 /**
@@ -50,7 +51,7 @@ public class PropIIC extends Propagator<Variable> {
     protected IntVar iic;
     protected int landscapeArea;
     protected int precision;
-    protected PartialRegularGroupedGrid grid;
+    protected GroupedGrid grid;
     protected int distanceThreshold;
     protected INeighborhood threshold;
     public int[][] threshNeigh;
@@ -65,7 +66,7 @@ public class PropIIC extends Propagator<Variable> {
      * @param iic           The integer variable equals to IIC, maintained by this propagator.
      * @param landscapeArea The total landscape area.
      */
-    public PropIIC(UndirectedGraphVar g, IntVar iic, PartialRegularGroupedGrid grid, int landscapeArea, int distanceThreshold, int precison, boolean maximize) {
+    public PropIIC(UndirectedGraphVar g, IntVar iic, GroupedGrid grid, int landscapeArea, int distanceThreshold, int precison, boolean maximize) {
         super(new Variable[]{g, iic}, PropagatorPriority.QUADRATIC, true);
         this.g = g;
         this.grid = grid;

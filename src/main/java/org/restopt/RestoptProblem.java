@@ -15,8 +15,7 @@ import org.restopt.constraints.RestorableAreaConstraint;
 import org.restopt.exception.RestoptException;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
-import org.restopt.grid.regular.square.RegularSquareGrid;
+import org.restopt.grid.regular.square.*;
 import org.restopt.objectives.IRestoptObjectiveFactory;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
     public DataLoader data;
 
-    public PartialRegularGroupedGrid grid;
+    public GroupedGrid grid;
     private INeighborhood neighborhood;
 
     public int accessibleVal;
@@ -45,6 +44,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
     public int nonHabNonAcc;
     private int[] availablePlanningUnits;
+    private int aggregationFactor;
 
     public IntVar minRestore;
     public IntVar totalRestorable;
@@ -62,10 +62,15 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     }
 
     public RestoptProblem(DataLoader data, int accessibleVal) {
+        this(data, accessibleVal, 1);
+    }
 
+    public RestoptProblem(DataLoader data, int accessibleVal, int aggregationFactor) {
+        this.aggregationFactor = aggregationFactor;
         this.data = data;
         this.accessibleVal = accessibleVal;
         this.additionalVariables = new HashMap<>();
+        this.aggregationFactor = aggregationFactor;
 
         // ------------------ //
         // PREPARE INPUT DATA //
@@ -90,18 +95,31 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
         nonHabNonAcc = nonHabitatNonAccessiblePixels.length;
 
-        this.grid = new PartialRegularGroupedGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph);
+        if (aggregationFactor > 1) {
+            this.grid = new PartialRegularGroupedAggGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph, aggregationFactor);
+        } else {
+            this.grid = new PartialRegularGroupedGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph);
+        }
 
         int[] nonHabitatPixels = IntStream.range(0, data.getHabitatData().length)
                 .filter(i -> data.getHabitatData()[i] == 0)
                 .toArray();
 
-        int[] habitatPixels = IntStream.range(0, grid.getNbGroups()).toArray();
+        int nbGroups = grid.getNbGroups();
 
-        availablePlanningUnits = IntStream.range(0, data.getAccessibleData().length)
-                .filter(i -> data.getAccessibleData()[i] == accessibleVal && data.getHabitatData()[i] == 0)
-                .map(i -> grid.getGroupIndexFromCompleteIndex(i))
-                .toArray();
+        int[] habitatPixels = IntStream.range(0, nbGroups).toArray();
+
+        if (grid instanceof PartialRegularGroupedGrid) {
+            PartialRegularGroupedGrid g = (PartialRegularGroupedGrid) grid;
+            availablePlanningUnits = IntStream.range(0, data.getAccessibleData().length)
+                    .filter(i -> data.getAccessibleData()[i] == accessibleVal && data.getHabitatData()[i] == 0)
+                    .map(i -> g.getGroupIndexFromCompleteIndex(i))
+                    .toArray();
+        } else {
+            PartialRegularGroupedAggGrid g = (PartialRegularGroupedAggGrid) grid;
+            availablePlanningUnits = IntStream.range(nbGroups, g.getNbCells()).toArray();
+        }
+
 
         System.out.println("Current landscape state loaded");
         System.out.println("    Habitat cells = " + habitatPixelsComp.length + " ");
@@ -113,7 +131,11 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
         // INITIALIZE PROBLEM //
         // ------------------ //
 
-        this.neighborhood = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED;
+        if (grid instanceof PartialRegularGroupedGrid) {
+            this.neighborhood = Neighborhoods.PARTIAL_GROUPED_FOUR_CONNECTED;
+        } else {
+            this.neighborhood = Neighborhoods.PARTIAL_GROUPED_AGG_FOUR_CONNECTED;
+        }
 
         model = new Model();
 
@@ -125,7 +147,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
                 hab_LB,
                 hab_UB
         );
-        restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, grid.getNbGroups()).toArray()), true);
+        restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, nbGroups).toArray()), true);
         restoreSet = model.graphNodeSetView(restoreGraph);
     }
 
@@ -150,7 +172,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The grid corresponding to the problem.
      */
-    public PartialRegularGroupedGrid getGrid() {
+    public GroupedGrid getGrid() {
         return grid;
     }
 
@@ -215,7 +237,23 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
      * @return The amount of restorable habitat in pu.
      */
     public int getRestorableArea(int pu) {
-        return (int) Math.round(data.getRestorableData()[grid.getUngroupedCompleteIndex(pu)]);
+        if (grid instanceof PartialRegularGroupedGrid) {
+            PartialRegularGroupedGrid g = (PartialRegularGroupedGrid) grid;
+            return (int) Math.round(data.getRestorableData()[g.getUngroupedCompleteIndex(pu)]);
+        } else {
+            PartialRegularGroupedAggGrid g = (PartialRegularGroupedAggGrid) grid;
+            return g.getAggregatePartialIndices(pu).length;
+        }
+    }
+
+    public int getCellArea(int pu) {
+        if (grid instanceof PartialRegularGroupedGrid) {
+            PartialRegularGroupedGrid g = (PartialRegularGroupedGrid) grid;
+            return data.getCellAreaData()[g.getUngroupedCompleteIndex(pu)];
+        } else {
+            PartialRegularGroupedAggGrid g = (PartialRegularGroupedAggGrid) grid;
+            return IntStream.of(g.getAggregateCompleteIndices(pu)).map(i -> data.getCellAreaData()[i]).sum();
+        }
     }
 
     /**
@@ -314,7 +352,14 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
      * @return The total landscape area.
      */
     public int getLandscapeArea() {
-        return grid.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
+        if (grid instanceof PartialRegularGroupedGrid) {
+            PartialRegularGroupedGrid g = (PartialRegularGroupedGrid) grid;
+            return g.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
+        } else {
+            PartialRegularGroupedAggGrid g = (PartialRegularGroupedAggGrid) grid;
+            return g.getNbUngroupedCells() + getNbLockedUpNonHabitatCells();
+
+        }
     }
 
     @Override
