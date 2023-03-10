@@ -13,7 +13,6 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
 
     protected int minAreaToRestore;
     protected int maxAreaToRestore;
-    protected int[] cellArea;
     protected double minProportion;
     protected int[] minArea;
 
@@ -22,7 +21,6 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         super(restoptProblem);
         this.minAreaToRestore = minAreaToRestore;
         this.maxAreaToRestore = maxAreaToRestore;
-        this.cellArea = restoptProblem.getData().getCellAreaData();
         this.minProportion = minProportion;
         this.problem.setRestorableAreaConstraint(this);
     }
@@ -38,8 +36,7 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         int offset = problem.getGrid().getNbGroups();
         for (int i = 0; i < problem.getAvailablePlanningUnits().length; i++) {
             int cell = pus[i];
-            int completeUngroupedIndex = getGrid().getUngroupedCompleteIndex(cell);
-            int cArea = cellArea[completeUngroupedIndex];
+            int cArea = problem.getCellArea(cell);
             maxCellArea = maxCellArea < cArea ? cArea : maxCellArea;
             int threshold = (int) Math.ceil(cArea * (1 - minProportion));
             int restorable = problem.getRestorableArea(cell);

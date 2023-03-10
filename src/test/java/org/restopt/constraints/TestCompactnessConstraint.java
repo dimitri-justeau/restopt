@@ -24,9 +24,10 @@ public class TestCompactnessConstraint {
         sol.printSolutionInfos();
         int[] pus = sol.getRestorationPlanningUnits();
         double[][] coords = new double[pus.length][];
-        double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
+        //double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
         for (int i = 0; i < pus.length; i++) {
-            coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
+            coords[i] = restoptProblem.getGrid().getCartesianCoordinates(pus[i]);
+            //coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
         }
         assertDiameter(coords, 0, 6);
     }
@@ -44,9 +45,10 @@ public class TestCompactnessConstraint {
         sol.printSolutionInfos();
         int[] pus = sol.getRestorationPlanningUnits();
         double[][] coords = new double[pus.length][];
-        double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
+        //double[][] compCoords = restoptProblem.getGrid().getCartesianCoordinates();
         for (int i = 0; i < pus.length; i++) {
-            coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
+            coords[i] = restoptProblem.getGrid().getCartesianCoordinates(pus[i]);
+            //coords[i] = compCoords[restoptProblem.getGrid().getUngroupedPartialIndex(pus[i])];
         }
         assertDiameter(coords, 2, 4);
     }

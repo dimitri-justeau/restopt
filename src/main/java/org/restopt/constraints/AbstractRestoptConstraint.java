@@ -4,6 +4,7 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.restopt.RestoptProblem;
+import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 /**
@@ -32,7 +33,7 @@ public abstract class AbstractRestoptConstraint {
         return problem.getRestoreGraphVar();
     }
 
-    protected PartialRegularGroupedGrid getGrid() {
+    protected GroupedGrid getGrid() {
         return problem.getGrid();
     }
 }

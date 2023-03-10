@@ -8,8 +8,9 @@ import org.restopt.exception.RestoptException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
-public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
+public class PartialRegularGroupedGrid extends GroupedGrid {
 
     private final int[] sizeCells;
     private final int nbGroups;
@@ -74,10 +75,6 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
         return super.getNbCells() - nbGroupedCells + nbGroups;
     }
 
-    public int getNbUngroupedCells() {
-        return super.getNbCells();
-    }
-
     public ISet getGroup(int groupId) {
         return groups[groupId];
     }
@@ -107,6 +104,14 @@ public class PartialRegularGroupedGrid extends PartialRegularSquareGrid {
         }
         return getCompleteIndex(unGroupedId[groupedIdx - nbGroups]);
     }
+
+    @Override
+    public int[] getUngroupedCompleteIndices(int[] pus) {
+        return IntStream.of(pus)
+                .map(i -> getUngroupedCompleteIndex(i))
+                .toArray();
+    }
+
 
     public int getGroupIndexFromCompleteIndex(int completeIndex) {
         int partialIndex = getPartialIndex(completeIndex);

@@ -218,9 +218,7 @@ public class RestoptSolution {
     }
 
     public int[] getRestorationPlanningUnitsCompleteIndex() {
-        return IntStream.of(getRestorationPlanningUnits())
-                .map(i -> problem.getGrid().getUngroupedCompleteIndex(i))
-                .toArray();
+        return problem.getGrid().getUngroupedCompleteIndices(getRestorationPlanningUnits());
     }
 
     public UndirectedGraph getRestorationGraph() {

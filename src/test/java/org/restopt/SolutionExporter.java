@@ -8,6 +8,7 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.gce.geotiff.GeoTiffWriter;
 import org.restopt.exception.RestoptException;
+import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 
 import java.awt.*;
@@ -33,7 +34,7 @@ public class SolutionExporter {
         this.restoptProblem = solution.getProblem();
         if (restoptProblem.getData() instanceof RasterDataLoader) {
             RasterDataLoader dataLoader = (RasterDataLoader) restoptProblem.getData();
-            PartialRegularGroupedGrid grid = restoptProblem.getGrid();
+            GroupedGrid grid = restoptProblem.getGrid();
             sites = new int[grid.getNbUngroupedCells()];
             ISet set = SetFactory.makeConstantSet(solution.getRestorationPlanningUnits());
             for (int i = 0; i < grid.getNbUngroupedCells(); i++) {

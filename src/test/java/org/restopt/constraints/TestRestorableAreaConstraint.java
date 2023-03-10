@@ -29,8 +29,8 @@ public class TestRestorableAreaConstraint {
         int sum = 0;
         int[] pus = sol.getRestorationPlanningUnits();
         for (int i : pus) {
-            int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
-            sum += (int) Math.round(dataLoader.getRestorableData()[completeUngroupedIndex]);
+            //int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
+            sum += restoptProblem.getRestorableArea(i);
         }
         Assert.assertEquals(sum, restoreArea);
     }
@@ -55,10 +55,10 @@ public class TestRestorableAreaConstraint {
         int sumTotal = 0;
         int[] pus = sol.getRestorationPlanningUnits();
         for (int i : pus) {
-            int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
-            int rest = (int) Math.round(dataLoader.getRestorableData()[completeUngroupedIndex]);
+            //int completeUngroupedIndex = restoptProblem.getGrid().getUngroupedCompleteIndex(i);
+            int rest = restoptProblem.getRestorableArea(i);
             sumTotal += rest;
-            int cArea = dataLoader.getCellAreaData()[completeUngroupedIndex];
+            int cArea = restoptProblem.getCellArea(i);
             int threshold = (int) Math.ceil(cArea * (1 - 0.7));
             sumRest += rest <= threshold ? 0 : rest - threshold;
         }

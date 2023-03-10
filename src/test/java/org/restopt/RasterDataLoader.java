@@ -13,6 +13,18 @@ public class RasterDataLoader extends DataLoader {
 
     private final String habitatRasterPath;
 
+    public RasterDataLoader(String habitatRasterPath, int accessibleVal) throws IOException, RestoptException {
+        super(new RasterReader(habitatRasterPath).readAsIntArray(), accessibleVal, -1.0, new RasterReader(habitatRasterPath).getWidth(), new RasterReader(habitatRasterPath).getHeight());
+        this.habitatRasterPath = habitatRasterPath;
+        RasterReader rasterHabitat = new RasterReader(habitatRasterPath);
+        this.width = rasterHabitat.getWidth();
+        this.height = rasterHabitat.getHeight();
+        this.noDataHabitat = rasterHabitat.getNoDataValue();
+        if (width * height != habitatData.length) {
+            throw new RestoptException("Input width and height do not correspond to dataset size");
+        }
+    }
+
     public RasterDataLoader(String habitatRasterPath, String accessibleRasterPath, String restorableRasterPath,
                             String cellAreaRasterPath) throws IOException, RestoptException {
         super(

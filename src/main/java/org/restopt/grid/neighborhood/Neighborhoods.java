@@ -29,6 +29,7 @@ import org.restopt.grid.neighborhood.regular.square.partial.PartialFourConnected
 import org.restopt.grid.neighborhood.regular.square.partial.PartialHeightConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.PartialTwoWideFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.PartialTwoWideHeightConnected;
+import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedAggFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedKWideFourConnected;
 import org.restopt.grid.neighborhood.regular.square.partial.grouped.PartialGroupedTwoWideFourConnected;
@@ -46,6 +47,7 @@ public class Neighborhoods {
     public final static PartialTwoWideHeightConnected PARTIAL_TWO_WIDE_HEIGHT_CONNECTED = new PartialTwoWideHeightConnected();
     public final static PartialGroupedFourConnected PARTIAL_GROUPED_FOUR_CONNECTED = new PartialGroupedFourConnected();
     public final static PartialGroupedTwoWideFourConnected PARTIAL_GROUPED_TWO_WIDE_FOUR_CONNECTED = new PartialGroupedTwoWideFourConnected();
+    public final static PartialGroupedAggFourConnected PARTIAL_GROUPED_AGG_FOUR_CONNECTED = new PartialGroupedAggFourConnected();
 
     public final static KWideFourConnected K_WIDE_FOUR_CONNECTED(int k) {
         return new KWideFourConnected(k);
