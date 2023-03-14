@@ -24,6 +24,7 @@
 package org.restopt.choco;
 
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
+import org.restopt.RasterConnectivityFinder;
 
 import java.util.stream.IntStream;
 
@@ -33,12 +34,10 @@ import java.util.stream.IntStream;
  */
 public class LandscapeIndicesUtils {
 
-    public static double effectiveMeshSize(UndirectedGraph g, int landscapeArea) {
-        ConnectivityFinderSpatialGraph connFinder = new ConnectivityFinderSpatialGraph(g);
-        connFinder.findAllCC();
+    public static double effectiveMeshSize(RasterConnectivityFinder g, int landscapeArea) {
         double mesh = 0;
-        for (int i = 0; i < connFinder.getNBCC(); i++) {
-            int s = connFinder.getSizeCC()[i];
+        for (int i = 0; i < g.getNBCC(); i++) {
+            int s = g.getSizeCC()[i];
             mesh += 1.0 * s * s;
         }
         mesh /= 1.0 * landscapeArea;

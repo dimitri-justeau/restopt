@@ -28,8 +28,8 @@ public class TestKaalaUseCaseAgg {
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 0, 2);
         restoptProblem.postNbComponentsConstraint(1, 1);
-        restoptProblem.postCompactnessConstraint(30);
-        double meshLB = LandscapeIndicesUtils.effectiveMeshSize(restoptProblem.getHabitatGraphVar().getLB(), restoptProblem.getLandscapeArea());
+        restoptProblem.postCompactnessConstraint(20);
+        double meshLB = LandscapeIndicesUtils.effectiveMeshSize(restoptProblem.getHabitatGraph(), restoptProblem.getLandscapeArea());
         System.out.println(meshLB * Math.pow(10, 4));
         restoptProblem.postMinMeshConstraint(800, 4);
         RestoptSolution sol = restoptProblem.minimizeMinRestore(1, 1, 60, 0, true, "DEFAULT").get(0);

@@ -1,18 +1,15 @@
 package org.restopt;
 
-import org.chocosolver.util.objects.graphs.UndirectedGraph;
-import org.chocosolver.util.objects.setDataStructures.SetType;
 import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
-import org.restopt.grid.regular.square.RegularSquareGrid;
 
 import java.util.stream.IntStream;
 
 public class FocalHabitatClass {
 
     int classValue;
-    UndirectedGraph habGraph;
+    RasterConnectivityFinder habGraph;
     int nonHabNonAcc;
     PartialRegularGroupedGrid grid;
     int[] availablePlanningUnits;
@@ -33,8 +30,11 @@ public class FocalHabitatClass {
                 .filter(i -> data.getHabitatData()[i] == classValue)
                 .toArray();
 
-        habGraph = Neighborhoods.FOUR_CONNECTED.getPartialGraph(new RegularSquareGrid(data.getHeight(), data.getWidth()), habitatPixelsComp, SetType.RANGESET, SetType.RANGESET);
-
+        habGraph = new RasterConnectivityFinder(
+                data.getHeight(), data.getWidth(),
+                data.getHabitatData(), 1,
+                Neighborhoods.FOUR_CONNECTED
+        );
         nonHabNonAcc = nonHabitatNonAccessiblePixels.length;
 
         this.grid = new PartialRegularGroupedGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph);
@@ -42,8 +42,6 @@ public class FocalHabitatClass {
         int[] nonHabitatPixels = IntStream.range(0, data.getHabitatData().length)
                 .filter(i -> data.getHabitatData()[i] == nonHabitatValue)
                 .toArray();
-
-        int[] habitatPixels = IntStream.range(0, grid.getNbGroups()).toArray();
 
         availablePlanningUnits = IntStream.range(0, data.getAccessibleData().length)
                 .filter(i -> data.getAccessibleData()[i] == accessibleVal && data.getHabitatData()[i] == nonHabitatValue)

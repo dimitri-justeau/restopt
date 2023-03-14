@@ -39,7 +39,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     private Model model;
     private UndirectedGraphVar habitatGraphVar;
     private UndirectedGraphVar restoreGraph;
-    public UndirectedGraph habGraph;
+    public RasterConnectivityFinder habGraph;
     private SetVar restoreSet;
 
     public int nonHabNonAcc;
@@ -91,14 +91,26 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
                 .filter(i -> data.getHabitatData()[i] == 1)
                 .toArray();
 
-        habGraph = Neighborhoods.FOUR_CONNECTED.getPartialGraph(new RegularSquareGrid(data.getHeight(), data.getWidth()), habitatPixelsComp, SetType.RANGESET, SetType.RANGESET);
+        habGraph = new RasterConnectivityFinder(
+                data.getHeight(), data.getWidth(),
+                data.getHabitatData(), 1,
+                Neighborhoods.FOUR_CONNECTED
+        );
 
         nonHabNonAcc = nonHabitatNonAccessiblePixels.length;
 
         if (aggregationFactor > 1) {
-            this.grid = new PartialRegularGroupedAggGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph, aggregationFactor);
+            this.grid = new PartialRegularGroupedAggGrid(
+                    data.getHeight(), data.getWidth(),
+                    ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels),
+                    habGraph, aggregationFactor
+            );
         } else {
-            this.grid = new PartialRegularGroupedGrid(data.getHeight(), data.getWidth(), ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels), habGraph);
+            this.grid = new PartialRegularGroupedGrid(
+                    data.getHeight(), data.getWidth(),
+                    ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels),
+                    habGraph
+            );
         }
 
         int[] nonHabitatPixels = IntStream.range(0, data.getHabitatData().length)
@@ -193,7 +205,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The existing habitat (without any restoration) as a graph.
      */
-    public UndirectedGraph getHabitatGraph() {
+    public RasterConnectivityFinder getHabitatGraph() {
         return habGraph;
     }
 
