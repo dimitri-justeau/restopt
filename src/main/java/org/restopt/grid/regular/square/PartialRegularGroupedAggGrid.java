@@ -3,6 +3,7 @@ package org.restopt.grid.regular.square;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
+import org.restopt.RasterConnectivityFinder;
 import org.restopt.choco.ConnectivityFinderSpatialGraph;
 import org.restopt.exception.RestoptException;
 
@@ -23,14 +24,12 @@ public class PartialRegularGroupedAggGrid extends GroupedGrid {
     private final Map<Integer, Integer> gridIdToGroupedId;
     private final int aggregationFactor;
 
-    public PartialRegularGroupedAggGrid(int nbRows, int nbCols, int[] toDiscard, UndirectedGraph groupGraph, int aggregationFactor) {
+    public PartialRegularGroupedAggGrid(int nbRows, int nbCols, int[] toDiscard, RasterConnectivityFinder groupGraph, int aggregationFactor) {
         super(nbRows, nbCols, toDiscard);
         this.aggregationFactor = aggregationFactor;
-        this.nbGroupedCells = groupGraph.getNodes().size();
-        this.groupedCells = groupGraph.getNodes();
-        ConnectivityFinderSpatialGraph connectivityFinder = new ConnectivityFinderSpatialGraph(groupGraph);
-        connectivityFinder.findAllCC();
-        this.nbGroups = connectivityFinder.getNBCC();
+        this.nbGroupedCells = groupGraph.getNbNodes();
+        this.groupedCells = SetFactory.makeConstantSet(groupGraph.getNodesRasterIdx());
+        this.nbGroups = groupGraph.getNBCC();
         this.sizeCells = new int[super.getNbCells() - nbGroupedCells + nbGroups];
         this.groups = new ISet[nbGroups];
         this.gridIdToGroupedId = new HashMap<>();
@@ -53,9 +52,9 @@ public class PartialRegularGroupedAggGrid extends GroupedGrid {
         this.aggregates = Arrays.copyOfRange(aggregates, 0, nbAggregates);
 
         for (int cc = 0; cc < nbGroups; cc++) {
-            int sizeCC = connectivityFinder.getSizeCC()[cc];
+            int sizeCC = groupGraph.getSizeCC()[cc];
             sizeCells[cc] = sizeCC;
-            int[] g = connectivityFinder.getCC(cc);
+            int[] g = groupGraph.getCC(cc);
             for (int i = 0; i < sizeCC; i++) {
                 g[i] = getPartialIndex(g[i]);
             }
@@ -110,6 +109,10 @@ public class PartialRegularGroupedAggGrid extends GroupedGrid {
 
     public int[] getSizeCells() {
         return sizeCells;
+    }
+
+    public int getNbAggregates() {
+        return nbAggregates;
     }
 
     public int getNbGroups() {

@@ -1,8 +1,7 @@
 package org.restopt.grid;
 
-import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.ISet;
-import org.chocosolver.util.objects.setDataStructures.SetType;
+import org.restopt.RasterConnectivityFinder;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
 import org.restopt.grid.regular.square.RegularSquareGrid;
@@ -33,7 +32,9 @@ public class TestPartialGroupedGrid {
         int[] out = IntStream.range(0, data.length).filter(i -> data[i] == 1).toArray();
         int[] groups = IntStream.range(0, data.length).filter(i -> data[i] == 2).toArray();
         RegularSquareGrid regGrid = new RegularSquareGrid(height, width);
-        UndirectedGraph g = Neighborhoods.FOUR_CONNECTED.getPartialGraph(regGrid, groups, SetType.BIPARTITESET);
+        RasterConnectivityFinder g = new RasterConnectivityFinder(
+                height, width, data, 2, Neighborhoods.FOUR_CONNECTED
+        );
         PartialRegularGroupedGrid grid = new PartialRegularGroupedGrid(height, width, out, g);
         Assert.assertEquals(grid.getNbGroups(), 4);
         // 4 groups totalizing 14 cells -> -10 cells from the original grid

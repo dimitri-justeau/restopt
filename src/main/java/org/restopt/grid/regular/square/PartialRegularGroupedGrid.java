@@ -1,9 +1,8 @@
 package org.restopt.grid.regular.square;
 
-import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.restopt.choco.ConnectivityFinderSpatialGraph;
+import org.restopt.RasterConnectivityFinder;
 import org.restopt.exception.RestoptException;
 
 import java.util.HashMap;
@@ -15,42 +14,28 @@ public class PartialRegularGroupedGrid extends GroupedGrid {
     private final int[] sizeCells;
     private final int nbGroups;
     private final ISet[] groups;
-    private final ISet[] groupBorders;
     private final int nbGroupedCells;
     private final int[] unGroupedId;
     private final Map<Integer, Integer> gridIdToGroupedId;
 
-    public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, UndirectedGraph groupGraph) {
+    public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, RasterConnectivityFinder groupGraph) {
         this(nbRows, nbCols, toDiscard, groupGraph, 4);
     }
 
-    public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, UndirectedGraph groupGraph, int maxNeighCard) {
+    public PartialRegularGroupedGrid(int nbRows, int nbCols, int[] toDiscard, RasterConnectivityFinder groupGraph, int maxNeighCard) {
         super(nbRows, nbCols, toDiscard);
-        this.nbGroupedCells = groupGraph.getNodes().size();
-        ConnectivityFinderSpatialGraph connectivityFinder = new ConnectivityFinderSpatialGraph(groupGraph);
-        connectivityFinder.findAllCC();
-        this.nbGroups = connectivityFinder.getNBCC();
+        this.nbGroupedCells = groupGraph.getNbNodes();
+        this.nbGroups = groupGraph.getNBCC();
         this.sizeCells = new int[super.getNbCells() - nbGroupedCells + nbGroups];
         this.groups = new ISet[nbGroups];
-        this.groupBorders = new ISet[nbGroups];
         for (int cc = 0; cc < nbGroups; cc++) {
-            int sizeCC = connectivityFinder.getSizeCC()[cc];
+            int sizeCC = groupGraph.getSizeCC()[cc];
             sizeCells[cc] = sizeCC;
-            int[] g = connectivityFinder.getCC(cc);
-            groupBorders[cc] = SetFactory.makeRangeSet();
+            int[] g = groupGraph.getCC(cc);
             for (int i = 0; i < sizeCC; i++) {
-                if (groupGraph.getNeighborsOf(g[i]).size() < maxNeighCard) {
-                    groupBorders[cc].add(getPartialIndex(g[i]));
-                }
                 g[i] = getPartialIndex(g[i]);
             }
             groups[cc] = SetFactory.makeConstantSet(g);
-//            groups[cc] = SetFactory.makeRangeSet();
-//            int i = connectivityFinder.getCCFirstNode()[cc];
-//            while (i != -1) {
-//                groups[cc].add(getPartialIndex(i));
-//                i = connectivityFinder.getCCNextNode()[i];
-//            }
         }
         this.gridIdToGroupedId = new HashMap<>();
         for (int cc = 0; cc < nbGroups; cc++) {
@@ -77,10 +62,6 @@ public class PartialRegularGroupedGrid extends GroupedGrid {
 
     public ISet getGroup(int groupId) {
         return groups[groupId];
-    }
-
-    public ISet getGroupBorders(int group) {
-        return groupBorders[group];
     }
 
     public int[] getSizeCells() {
