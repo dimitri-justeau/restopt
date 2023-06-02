@@ -127,4 +127,9 @@ public interface IRestoptObjectiveFactory {
         NbPlanningUnitsObjective obj = new NbPlanningUnitsObjective(self(), timeLimit, verbose, false, search);
         return obj.findOptimalSolution(nbSolutions, optimalityGap);
     }
+
+    default List<RestoptSolution> minimizeNbPatches(int nbSolutions, int timeLimit, double optimalityGap, boolean verbose, String search) throws RestoptException {
+        NbPatchesObjective obj = new NbPatchesObjective(self(), timeLimit, verbose, false, search);
+        return obj.findOptimalSolution(nbSolutions, optimalityGap);
+    }
 }
