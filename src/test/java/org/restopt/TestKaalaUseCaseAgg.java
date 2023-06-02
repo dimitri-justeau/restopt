@@ -34,12 +34,12 @@ public class TestKaalaUseCaseAgg {
         restoptProblem.postMinMeshConstraint(800, 4);
         RestoptSolution sol = restoptProblem.minimizeMinRestore(1, 1, 60, 0, true, "DEFAULT").get(0);
         System.out.println(sol.getCharacteristics());
-        SolutionExporter exp = new SolutionExporter(
+        /*SolutionExporter exp = new SolutionExporter(
                 sol,
                 "/home/justeau-allaire/GIS/1.csv",
                 "/home/justeau-allaire/GIS/1.tif",
                 -1
         );
-        exp.generateRaster();
+        exp.generateRaster();*/
     }
 }
