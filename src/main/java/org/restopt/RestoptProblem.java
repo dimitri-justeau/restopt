@@ -66,7 +66,6 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     }
 
     public RestoptProblem(DataLoader data, int accessibleVal, int aggregationFactor) {
-        this.aggregationFactor = aggregationFactor;
         this.data = data;
         this.accessibleVal = accessibleVal;
         this.additionalVariables = new HashMap<>();
@@ -99,7 +98,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
 
         nonHabNonAcc = nonHabitatNonAccessiblePixels.length;
 
-        if (aggregationFactor > 1) {
+        if (this.aggregationFactor > 1) {
             this.grid = new PartialRegularGroupedAggGrid(
                     data.getHeight(), data.getWidth(),
                     ArrayUtils.concat(outPixels, nonHabitatNonAccessiblePixels),
