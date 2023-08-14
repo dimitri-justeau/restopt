@@ -29,7 +29,7 @@ public class NbPatchesObjective extends AbstractRestoptObjective {
     @Override
     public void initObjective() {
         objective = problem.getModel().intVar(1, problem.getLandscapeArea());
-        Constraint c = new Constraint("nbCC", new PropSubGraphNbCC(problem.getHabitatGraphVar(), objective));
+        Constraint c = new Constraint("nbCC", new PropSubGraphNbCC(problem.getHabitatGraphVar(), objective, true));
         problem.getModel().post(c);
         initialValue = problem.getHabitatGraph().getNBCC();
     }
