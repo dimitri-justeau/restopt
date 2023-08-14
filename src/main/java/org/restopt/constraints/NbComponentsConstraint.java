@@ -1,7 +1,9 @@
 package org.restopt.constraints;
 
+import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.constraints.graph.subgraph.PropSubGraphConnected;
+import org.chocosolver.solver.constraints.graph.subgraph.PropSubGraphNbCC;
 import org.restopt.RestoptProblem;
-import org.restopt.choco.ConnectivityFinderSpatialGraph;
 
 /**
  * Constraint over the number of connected components of the selected area for restoration.
@@ -20,9 +22,11 @@ public class NbComponentsConstraint extends AbstractRestoptConstraint {
     @Override
     public void post() {
         if (minNbCC == maxNbCC && maxNbCC == 1) {
-            getModel().connected(getRestoreGraphVar()).post();
+            Constraint c = new Constraint("connected", new PropSubGraphConnected(problem.getRestoreGraphVar()));
+            getModel().post(c);
         } else {
-            getModel().nbConnectedComponents(getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)).post();
+            Constraint c = new Constraint("nbCC", new PropSubGraphNbCC(problem.getRestoreGraphVar(), getModel().intVar(minNbCC, maxNbCC)));
+            getModel().post(c);
         }
     }
 }

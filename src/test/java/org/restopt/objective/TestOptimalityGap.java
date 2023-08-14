@@ -49,7 +49,7 @@ public class TestOptimalityGap {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         double optGap = 0.005;
-        List<RestoptSolution> sols = restoptProblem.maximizeIIC(5, 4, 1, 30, 0.005,true);
+        List<RestoptSolution> sols = restoptProblem.maximizeIIC(5, 4, 1, 30, 0.005,true, "ACTIVITY_BASED");
         double best_ref = Double.parseDouble(sols.get(0).getCharacteristics().get(IntegralIndexOfConnectivityObjective.KEY_IIC_BEST));
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();

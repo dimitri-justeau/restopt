@@ -72,6 +72,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
                             true
                     )
             );
+            problem.getHabitatGraphVar().updateConnectivity();
             initialValue = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
         } else {
             objective = problem.getModel().intVar(
@@ -91,6 +92,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
                     )
             );
             problem.getModel().post(consIIC);
+            problem.getHabitatGraphVar().updateConnectivity();
             initialValue = ((PropIIC) consIIC.getPropagator(0)).getIICLB();
             problem.getAdditionalVariables().put(KEY_IIC, objective);
         }

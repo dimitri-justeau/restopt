@@ -2,10 +2,12 @@ package org.restopt.search;
 
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.BoolVar;
+import org.chocosolver.solver.variables.subgraph.NodeSubGraphVar;
 import org.restopt.RestoptProblem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Search strategy which create boolean views over the planning units of the restore set variable, that are ordered
@@ -44,14 +46,14 @@ public class OrderedRestorableAreaStrategy extends AbstractRestoptSearchStrategy
                 return (jr - ir);
             }
         });
-        BoolVar[] boolVars = new BoolVar[pus.length];
-        for (int i = 0; i < a.size(); i++) {
-            boolVars[i] = problem.getModel().setBoolView(problem.getRestoreSetVar(), pus[a.get(i)]);
-        }
+        BoolVar[] bools = IntStream.range(0, a.size())
+                .filter(i -> problem.getRestoreGraphVar().getNodeVars()[pus[a.get(i)]] instanceof NodeSubGraphVar)
+                .mapToObj(i -> problem.getRestoreGraphVar().getNodeVars()[pus[a.get(i)]])
+                .toArray(BoolVar[]::new);
         if (UB) {
-            problem.getModel().getSolver().setSearch(Search.inputOrderUBSearch(boolVars));
+            problem.getModel().getSolver().setSearch(Search.inputOrderUBSearch(bools));
         } else {
-            problem.getModel().getSolver().setSearch(Search.inputOrderLBSearch(boolVars));
+            problem.getModel().getSolver().setSearch(Search.inputOrderLBSearch(bools));
         }
     }
 }

@@ -1,10 +1,12 @@
 package org.restopt.constraints;
 
+import org.chocosolver.solver.variables.BoolVar;
+import org.chocosolver.solver.variables.subgraph.NodeSubGraphVar;
 import org.restopt.RestoptProblem;
 import org.restopt.exception.RestoptException;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Constraint over the amount of area to be restored.
@@ -45,8 +47,14 @@ public class RestorableAreaConstraint extends AbstractRestoptConstraint {
         }
         problem.minRestore = getModel().intVar(minAreaToRestore, maxAreaToRestore);
         problem.totalRestorable = getModel().intVar(0, pus.length * maxCellArea);
-        getModel().sumElements(getRestoreSetVar(), minArea, offset, problem.minRestore).post();
-        getModel().sumElements(getRestoreSetVar(), maxRestorableArea, offset, problem.totalRestorable).post();
+
+        BoolVar[] bools = IntStream.range(0, problem.getRestoreGraphVar().getNodeVars().length)
+                .filter(i -> problem.getRestoreGraphVar().getNodeVars()[i] instanceof NodeSubGraphVar)
+                .mapToObj(i -> problem.getRestoreGraphVar().getNodeVars()[i])
+                .toArray(BoolVar[]::new);
+
+        getModel().scalar(bools, minArea, "=", problem.minRestore).post();
+        getModel().scalar(bools, maxRestorableArea, "=", problem.totalRestorable).post();
     }
 
     public int[] getCardinalityBounds() {

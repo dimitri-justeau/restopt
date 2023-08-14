@@ -1,5 +1,6 @@
 package org.restopt.constraints;
 
+import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
@@ -22,7 +23,7 @@ public class TestEffectiveMeshSizeConstraint {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         restoptProblem.postMinMeshConstraint(652, 3);
-        List<RestoptSolution> sols = restoptProblem.findSolutions(10, 30, true);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(10, 30, true, "INPUT_ORDER_LB");
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double mesh = Double.parseDouble(sol.getCharacteristics().get(EffectiveMeshSizeConstraint.KEY_MESH));

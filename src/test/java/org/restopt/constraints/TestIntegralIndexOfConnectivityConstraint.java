@@ -23,7 +23,7 @@ public class TestIntegralIndexOfConnectivityConstraint {
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
         restoptProblem.postMinIICConstraint(0.195, 1, 3);
-        List<RestoptSolution> sols = restoptProblem.findSolutions(15, 30, true);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(15, 30, true, "MIN_DOM_LB");
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
             double iic = Double.parseDouble(sol.getCharacteristics().get(IntegralIndexOfConnectivityConstraint.KEY_IIC));

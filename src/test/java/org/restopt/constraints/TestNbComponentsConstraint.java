@@ -11,6 +11,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class TestNbComponentsConstraint {
 
@@ -22,13 +23,16 @@ public class TestNbComponentsConstraint {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postMinNbPUsConstraint(10);
         restoptProblem.postNbComponentsConstraint(1, 1);
-        RestoptSolution sol = restoptProblem.findSolution(0, true);
-        sol.printSolutionInfos();
-        UndirectedGraph g = sol.getRestorationGraph();
-        ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
-        cf.findAllCC();
-        Assert.assertEquals(cf.getNBCC(), 1);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(20, 60, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            UndirectedGraph g = sol.getRestorationGraph();
+            ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
+            cf.findAllCC();
+            Assert.assertEquals(cf.getNBCC(), 1);
+        }
     }
 
     @Test
@@ -39,13 +43,16 @@ public class TestNbComponentsConstraint {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
+        restoptProblem.postMinNbPUsConstraint(10);
         restoptProblem.postNbComponentsConstraint(2, 2);
-        RestoptSolution sol = restoptProblem.findSolution(0, true);
-        sol.printSolutionInfos();
-        UndirectedGraph g = sol.getRestorationGraph();
-        ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
-        cf.findAllCC();
-        Assert.assertEquals(cf.getNBCC(), 2);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(20, 60, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            UndirectedGraph g = sol.getRestorationGraph();
+            ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
+            cf.findAllCC();
+            Assert.assertEquals(cf.getNBCC(), 2);
+        }
     }
 
     @Test
@@ -57,12 +64,14 @@ public class TestNbComponentsConstraint {
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 2);
         restoptProblem.postNbComponentsConstraint(2, 10);
-        RestoptSolution sol = restoptProblem.findSolution(0, true);
-        sol.printSolutionInfos();
-        UndirectedGraph g = sol.getRestorationGraph();
-        ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
-        cf.findAllCC();
-        Assert.assertTrue(cf.getNBCC() >= 2);
-        Assert.assertTrue(cf.getNBCC() <= 10);
+        List<RestoptSolution> sols = restoptProblem.findSolutions(20, 60, true);
+        for (RestoptSolution sol : sols) {
+            sol.printSolutionInfos();
+            UndirectedGraph g = sol.getRestorationGraph();
+            ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(g);
+            cf.findAllCC();
+            Assert.assertTrue(cf.getNBCC() >= 2);
+            Assert.assertTrue(cf.getNBCC() <= 10);
+        }
     }
 }

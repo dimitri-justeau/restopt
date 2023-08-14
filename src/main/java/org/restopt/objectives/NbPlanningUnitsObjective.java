@@ -23,17 +23,19 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     @Override
     public void initObjective() {
-        objective = problem.getRestoreSetVar().getCard();
+        objective = problem.getModel().intVar(0, problem.getRestoreGraphVar().getNodeVars().length);
+        problem.getModel().sum(problem.getRestoreGraphVar().getNodeVars(), "=", objective).post();
+        //objective = problem.getRestoreSetVar().getCard();
         if (this.problem.hasRestorableAreaConstraint()) {
             int[] cardBounds = problem.getRestorableAreaConstraint().getCardinalityBounds();
-            problem.getModel().arithm(problem.getRestoreSetVar().getCard(), ">=", cardBounds[0]).post();
-            problem.getModel().arithm(problem.getRestoreSetVar().getCard(), "<=", cardBounds[1]).post();
+            problem.getModel().arithm(objective, ">=", cardBounds[0]).post();
+            problem.getModel().arithm(objective, "<=", cardBounds[1]).post();
         }
     }
 
     @Override
     public void setSearch() {
-        if (problem.hasRestorableAreaConstraint()) {
+        if (problem.hasRestorableAreaConstraint() && !SEARCH_KEYS.contains(search)) {
             if (maximize) {
                 new OrderedRestorableAreaStrategy(problem, true, true).setSearch();
             } else {

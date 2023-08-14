@@ -32,12 +32,12 @@ public class EffectiveMeshSizeConstraint extends AbstractRestoptConstraint {
             this.getModel().arithm(mesh, ">=", minMESH).post();
             this.getModel().arithm(mesh, "<=", maxMESH).post();
         } else {
-            this.mesh = problem.getModel().intVar(minMESH, maxMESH);
+            this.mesh = problem.getModel().intVar("mesh", minMESH, maxMESH);
             Constraint meshCons = new Constraint(
                     "MESH_constraint",
                     new PropEffectiveMeshSize(
                             problem.getHabitatGraphVar(),
-                            mesh,
+                            this.mesh,
                             problem.getGrid().getSizeCells(),
                             problem.getLandscapeArea(),
                             precision,

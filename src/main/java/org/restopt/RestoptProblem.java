@@ -3,6 +3,7 @@ package org.restopt;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
+import org.chocosolver.solver.variables.subgraph.SubGraphVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
 import org.chocosolver.util.objects.graphs.UndirectedGraph;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
@@ -37,10 +38,10 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     public int accessibleVal;
 
     private Model model;
-    private UndirectedGraphVar habitatGraphVar;
-    private UndirectedGraphVar restoreGraph;
+    private SubGraphVar habitatGraphVar;
+    private SubGraphVar restoreGraph;
     public RasterConnectivityFinder habGraph;
-    private SetVar restoreSet;
+    //private SetVar restoreSet;
 
     public int nonHabNonAcc;
     private int[] availablePlanningUnits;
@@ -153,13 +154,16 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
         UndirectedGraph hab_LB = neighborhood.getPartialGraph(grid, model, habitatPixels, SetType.BIPARTITESET, SetType.BIPARTITESET);
         UndirectedGraph hab_UB = neighborhood.getPartialGraph(grid, model, ArrayUtils.concat(habitatPixels, availablePlanningUnits), SetType.BIPARTITESET, SetType.BIPARTITESET);
 
-        habitatGraphVar = model.nodeInducedGraphVar(
+        habitatGraphVar = new SubGraphVar(model, hab_LB.getNodes(), hab_UB, grid.getSizeCells());
+/*        habitatGraphVar = model.nodeInducedGraphVar(
                 "habitatGraph",
                 hab_LB,
                 hab_UB
-        );
-        restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, nbGroups).toArray()), true);
-        restoreSet = model.graphNodeSetView(restoreGraph);
+        );*/
+
+        restoreGraph = new SubGraphVar(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, nbGroups).toArray()), true);
+        //restoreGraph = model.nodeInducedSubgraphView(habitatGraphVar, SetFactory.makeConstantSet(IntStream.range(0, nbGroups).toArray()), true);
+        //restoreSet = model.graphNodeSetView(restoreGraph);
     }
 
     public Map<String, IntVar> getAdditionalVariables() {
@@ -176,9 +180,9 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The set variable representing the set of planning units selected for restoration.
      */
-    public SetVar getRestoreSetVar() {
+/*    public SetVar getRestoreSetVar() {
         return restoreSet;
-    }
+    }*/
 
     /**
      * @return The grid corresponding to the problem.
@@ -197,7 +201,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The graph variable representing the existing habitat plus the restored area.
      */
-    public UndirectedGraphVar getHabitatGraphVar() {
+    public SubGraphVar getHabitatGraphVar() {
         return habitatGraphVar;
     }
 
@@ -218,7 +222,7 @@ public class RestoptProblem implements IRestoptObjectiveFactory, IRestoptConstra
     /**
      * @return The graph variable representing the set of planning units selected for restoration.
      */
-    public UndirectedGraphVar getRestoreGraphVar() {
+    public SubGraphVar getRestoreGraphVar() {
         return restoreGraph;
     }
 

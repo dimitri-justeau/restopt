@@ -28,15 +28,18 @@ import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.UndirectedGraphVar;
-import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.solver.variables.events.GraphEventType;
+import org.chocosolver.solver.variables.events.IntEventType;
+import org.chocosolver.solver.variables.subgraph.SubGraphConnectedComponents;
+import org.chocosolver.solver.variables.subgraph.SubGraphVar;
 import org.chocosolver.util.ESat;
-import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.tools.ArrayUtils;
 import org.restopt.grid.neighborhood.INeighborhood;
 import org.restopt.grid.neighborhood.Neighborhoods;
 import org.restopt.grid.regular.square.GroupedGrid;
-import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Propagator maintaining a variable equals to the Integral Index of Connectivity (IIC).
@@ -45,9 +48,9 @@ import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
  *
  * @author Dimitri Justeau-Allaire
  */
-public class PropIIC extends Propagator<Variable> {
+public class PropIIC extends Propagator<IntVar> {
 
-    protected UndirectedGraphVar g;
+    protected SubGraphVar g;
     protected IntVar iic;
     protected int landscapeArea;
     protected int precision;
@@ -57,8 +60,8 @@ public class PropIIC extends Propagator<Variable> {
     public int[][] threshNeigh;
     public int[][] thresh;
     private final boolean maximize;
-    private final ConnectivityFinderSpatialGraph ccLB;
-    private final ConnectivityFinderSpatialGraph ccUB;
+    //private final ConnectivityFinderSpatialGraph ccLB;
+    //private final ConnectivityFinderSpatialGraph ccUB;
     private IStateInt iicUB;
 
     /**
@@ -66,8 +69,8 @@ public class PropIIC extends Propagator<Variable> {
      * @param iic           The integer variable equals to IIC, maintained by this propagator.
      * @param landscapeArea The total landscape area.
      */
-    public PropIIC(UndirectedGraphVar g, IntVar iic, GroupedGrid grid, int landscapeArea, int distanceThreshold, int precison, boolean maximize) {
-        super(new Variable[]{g, iic}, PropagatorPriority.QUADRATIC, true);
+    public PropIIC(SubGraphVar g, IntVar iic, GroupedGrid grid, int landscapeArea, int distanceThreshold, int precison, boolean maximize) {
+        super(ArrayUtils.concat(g.getNodeVars(), iic), PropagatorPriority.QUADRATIC, false);
         this.g = g;
         this.grid = grid;
         this.iic = iic;
@@ -78,17 +81,18 @@ public class PropIIC extends Propagator<Variable> {
         this.threshold = Neighborhoods.PARTIAL_GROUPED_K_WIDE_FOUR_CONNECTED(distanceThreshold);
         this.distanceThreshold = distanceThreshold;
         this.maximize = maximize;
-        this.ccLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), grid.getSizeCells());
-        this.ccUB = new ConnectivityFinderSpatialGraph(g.getUB(), grid.getSizeCells());
+        //this.ccLB = new ConnectivityFinderSpatialGraph(g.getLB(), g.getUB(), grid.getSizeCells());
+        //this.ccUB = new ConnectivityFinderSpatialGraph(g.getUB(), grid.getSizeCells());
         this.iicUB = getModel().getEnvironment().makeInt(landscapeArea);
     }
 
     @Override
     public void propagate(int idxVarInProp, int mask) throws ContradictionException {
-        if (idxVarInProp == 0 && maximize && !g.isInstantiated() && (mask & GraphEventType.REMOVE_NODE.getMask()) == 0) {
+        if (idxVarInProp < getNbVars() - 1 && maximize && !g.isInstantiated() && !g.getNodeVars()[idxVarInProp].isInstantiatedTo(0)) {
             return;
         } else {
-            if (idxVarInProp == 0) {
+            if (idxVarInProp < getNbVars() - 1) {
+                g.updateConnectivity();
                 // LB
                 if (!maximize || g.isInstantiated()) {
                     int iic_LB = (int) Math.round(getIICLB() * Math.pow(10, precision));
@@ -100,14 +104,16 @@ public class PropIIC extends Propagator<Variable> {
                 iic.updateUpperBound(iic_UB, this);
                 iicUB.set(iic_UB);
                 if (iic.getLB() == iicUB.get()) {
-                    for (int i : g.getPotentialNodes()) {
-                        g.enforceNode(i, this);
+                    for (int i = 0; i < g.getNbPotentialNodes(); i++) {
+                        int node = g.getPotentialNode(i);
+                        g.enforceNode(node, this);
                     }
                 }
             } else {
                 if (iic.getLB() == iicUB.get()) {
-                    for (int i : g.getPotentialNodes()) {
-                        g.enforceNode(i, this);
+                    for (int i = 0; i < g.getNbPotentialNodes(); i++) {
+                        int node = g.getPotentialNode(i);
+                        g.enforceNode(node, this);
                     }
                 }
             }
@@ -115,6 +121,7 @@ public class PropIIC extends Propagator<Variable> {
     }
     @Override
     public void propagate(int evtmask) throws ContradictionException {
+        g.updateConnectivity();
         // LB
         if (!maximize || g.isInstantiated()) {
             int iic_LB = (int) Math.round(getIICLB() * Math.pow(10, precision));
@@ -126,47 +133,48 @@ public class PropIIC extends Propagator<Variable> {
         iicUB.set(iic_UB);
 
         if (iic.getLB() == iic_UB) {
-            for (int i : g.getPotentialNodes()) {
-                g.enforceNode(i, this);
+            for (int i = 0; i < g.getNbPotentialNodes(); i++) {
+                int node = g.getPotentialNode(i);
+                g.enforceNode(node, this);
             }
         }
     }
 
     public float getIICLB() {
-        return getIIC(ccLB, g.getMandatoryNodes());
+        return getIIC(true);
     }
 
     public float getIICUB() {
-        return getIIC(ccUB, g.getPotentialNodes());
+        return getIIC(false);
     }
 
-    public float getIIC(ConnectivityFinderSpatialGraph connectivityFinder, ISet nodes) {
+    public float getIIC(boolean lb) {
         // GET CCs
-        connectivityFinder.findAllCC();
-        int nbCC = connectivityFinder.getNBCC();
+        SubGraphConnectedComponents ccf = lb ? g.getConnectedComponentsLB() : g.getConnectedComponentsUB();
+        int nbCC = ccf.getNbCC();
         int[][] ccs = new int[nbCC][];
         for (int i = 0; i < nbCC; i++) {
-            ccs[i] = new int[connectivityFinder.getSizeCC()[i]];
+            ccs[i] = new int[ccf.getSizeCC(i)];
             int k = 0;
-            for (int j = connectivityFinder.getCCFirstNode()[i]; j >= 0; j = connectivityFinder.getCCNextNode()[j]) {
+            for (int j = ccf.getCCFirstNode(i); j >= 0; j = ccf.getCCNextNode(j)) {
                 ccs[i][k++] = j;
             }
         }
-        int[] nodeCC = connectivityFinder.getNodeCC();
-        int[][] adj = getLandscapeGraph(nbCC, ccs, nodeCC, nodes);
+        int[][] adj = getLandscapeGraph(nbCC, ccs, lb);
         float iic = 0;
         for (int i = 0; i < adj.length; i++) {
             int[] dists = bfs(i, adj);
             for (int j = 0; j < adj.length; j++) {
                 if (dists[j] >= 0) {
-                    iic += (connectivityFinder.getAttributeCC()[i] * connectivityFinder.getAttributeCC()[j]) / (1 + dists[j]);
+                    iic += (ccf.getAttributeCC(i) * ccf.getAttributeCC(j)) / (1 + dists[j]);
                 }
             }
         }
         return iic / (landscapeArea * landscapeArea);
     }
 
-    public int[][] getLandscapeGraph(int nbCC, int[][] ccs, int[] nodeCC, ISet nodes) {
+    public int[][] getLandscapeGraph(int nbCC, int[][] ccs, boolean lb) {
+        SubGraphConnectedComponents ccf = lb ? g.getConnectedComponentsLB() : g.getConnectedComponentsUB();
         int[][] neigh = new int[nbCC][];
         for (int i = 0; i < nbCC; i++) {
             boolean[] conn = new boolean[nbCC];
@@ -177,8 +185,8 @@ public class PropIIC extends Propagator<Variable> {
                     threshNeigh[node] = threshold.getNeighbors(grid, node);
                 }
                 for (int j : threshNeigh[node]) {
-                    if (nodeCC[j] != i && nodes.contains(j) && !conn[nodeCC[j]]) {
-                        conn[nodeCC[j]] = true;
+                    if (ccf.getNodeCC(j) != i && ccf.containsNode(j) && !conn[ccf.getNodeCC(j)]) {
+                        conn[ccf.getNodeCC(j)] = true;
                         nAdj += 1;
                     }
                 }
@@ -226,6 +234,7 @@ public class PropIIC extends Propagator<Variable> {
 
     @Override
     public ESat isEntailed() {
+        g.updateConnectivity();
         int iic_LB = (int) Math.round(getIICLB() * Math.pow(10, precision));
         int iic_UB = (int) Math.round(getIICUB() * Math.pow(10, precision));
         if (iic_LB > iic.getUB() || iic_UB < iic.getLB()) {

@@ -16,7 +16,6 @@ public class TestKaalaUseCaseAgg {
         DataLoader data = new DataLoader(habitat, 0, -1.0, 5, 4);
         RestoptProblem restoptProblem = new RestoptProblem(data, 0, 2);
         RestoptSolution sol = restoptProblem.findSolution(10, true);
-        System.out.println(sol);
     }
 
     @Test
@@ -32,7 +31,9 @@ public class TestKaalaUseCaseAgg {
         double meshLB = LandscapeIndicesUtils.effectiveMeshSize(restoptProblem.getHabitatGraph(), restoptProblem.getLandscapeArea());
         System.out.println(meshLB * Math.pow(10, 4));
         restoptProblem.postMinMeshConstraint(800, 4);
-        RestoptSolution sol = restoptProblem.minimizeMinRestore(1, 1, 60, 0, true, "DEFAULT").get(0);
+        RestoptSolution sol = restoptProblem.minimizeMinRestore(
+                1, 1, 30, 0, true, "ACTIVITY_BASED"
+        ).get(0);
         System.out.println(sol.getCharacteristics());
         /*SolutionExporter exp = new SolutionExporter(
                 sol,

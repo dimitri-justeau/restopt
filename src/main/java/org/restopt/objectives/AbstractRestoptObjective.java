@@ -7,15 +7,17 @@ import org.chocosolver.solver.search.limits.TimeCounter;
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.subgraph.NodeSubGraphVar;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
 import org.restopt.exception.RestoptException;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public abstract class AbstractRestoptObjective {
 
-    private static Set<String> SEARCH_KEYS = Collections.unmodifiableSet(
+    protected static Set<String> SEARCH_KEYS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
                     "RANDOM",
                     "DOM_OVER_W_DEG",
@@ -25,7 +27,9 @@ public abstract class AbstractRestoptObjective {
                     "ACTIVITY_BASED",
                     "CONFLICT_HISTORY",
                     "FAILURE_RATE",
-                    "FAILURE_LENGTH"
+                    "FAILURE_LENGTH",
+                    "INPUT_ORDER_LB",
+                    "INPUT_ORDER_UB"
             )));
 
     protected RestoptProblem problem;
@@ -70,14 +74,11 @@ public abstract class AbstractRestoptObjective {
      * Set the search strategy. Override according to the objective.
      */
     public void setSearch() {
+        BoolVar[] bools = IntStream.range(0, problem.getRestoreGraphVar().getNodeVars().length)
+                .filter(i -> problem.getRestoreGraphVar().getNodeVars()[i] instanceof NodeSubGraphVar)
+                .mapToObj(i -> problem.getRestoreGraphVar().getNodeVars()[i])
+                .toArray(BoolVar[]::new);
         if (SEARCH_KEYS.contains(this.search)) {
-            BoolVar[] bools = new BoolVar[problem.getAvailablePlanningUnits().length];
-            for (int i = 0; i < bools.length; i++) {
-                bools[i] = problem.getModel().setBoolView(
-                        problem.getRestoreSetVar(),
-                        problem.getAvailablePlanningUnits()[i]
-                );
-            }
             switch (this.search) {
                 case "RANDOM":
                     problem.getModel().getSolver().setSearch(Search.randomSearch(bools, System.currentTimeMillis()));
@@ -106,9 +107,15 @@ public abstract class AbstractRestoptObjective {
                 case "FAILURE_LENGTH":
                     problem.getModel().getSolver().setSearch(Search.failureLengthBasedSearch(bools));
                     break;
+                case "INPUT_ORDER_LB":
+                    problem.getModel().getSolver().setSearch(Search.inputOrderLBSearch(bools));
+                    break;
+                case "INPUT_ORDER_UB":
+                    problem.getModel().getSolver().setSearch(Search.inputOrderUBSearch(bools));
+                    break;
             }
         } else {
-            problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
+            problem.getModel().getSolver().setSearch(Search.minDomUBSearch(bools));
         }
     }
 

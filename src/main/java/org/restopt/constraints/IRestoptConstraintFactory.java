@@ -32,4 +32,16 @@ public interface IRestoptConstraintFactory {
     default void postMinIICConstraint(double minIIC, int distanceThreshold, int precision) throws RestoptException {
         new IntegralIndexOfConnectivityConstraint(self(), minIIC, 1, distanceThreshold, precision).post();
     }
+
+    default void postNbPUsConstraint(int minNbPUs, int maxNbPUs) {
+        new NbPlanningUnitsConstraint(self(), minNbPUs, maxNbPUs).post();
+    }
+
+    default void postMinNbPUsConstraint(int minNbPUs) {
+        postNbPUsConstraint(minNbPUs, self().getAvailablePlanningUnits().length);
+    }
+
+    default void postMaxNbPUsConstraint(int maxNbPUs) {
+        postNbPUsConstraint(0, maxNbPUs);
+    }
 }

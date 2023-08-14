@@ -22,7 +22,9 @@ public class TestIntegralIndexOfConnectivityObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.maximizeIIC(5, 4, 1, 30, 0,true);
+        List<RestoptSolution> sols = restoptProblem.maximizeIIC(
+                5, 4, 1, 30, 0,true, "ACTIVITY_BASED"
+        );
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();

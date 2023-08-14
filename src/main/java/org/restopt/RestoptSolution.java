@@ -213,8 +213,18 @@ public class RestoptSolution {
         return minidisk[2] * 2;
      }
 
+    public int[] getHabitatWithRestorationPUs() {
+        return IntStream.range(0, problem.getHabitatGraphVar().getNodeVars().length)
+                .filter(i -> solution.getIntVal(problem.getHabitatGraphVar().getNodeVars()[i]) == 1)
+                .toArray();
+        //return solution.getSetVal(problem.getRestoreSetVar());
+    }
+
     public int[] getRestorationPlanningUnits() {
-        return solution.getSetVal(problem.getRestoreSetVar());
+        return IntStream.range(0, problem.getRestoreGraphVar().getNodeVars().length)
+                .filter(i -> solution.getIntVal(problem.getRestoreGraphVar().getNodeVars()[i]) == 1)
+                .toArray();
+        //return solution.getSetVal(problem.getRestoreSetVar());
     }
 
     public int[] getRestorationPlanningUnitsCompleteIndex() {

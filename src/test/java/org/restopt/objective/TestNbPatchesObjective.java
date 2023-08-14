@@ -1,5 +1,11 @@
 package org.restopt.objective;
 
+import org.chocosolver.solver.Model;
+import org.chocosolver.solver.variables.subgraph.SubGraphVar;
+import org.chocosolver.util.graphOperations.connectivity.ConnectivityFinder;
+import org.chocosolver.util.objects.graphs.UndirectedGraph;
+import org.chocosolver.util.objects.setDataStructures.ISet;
+import org.chocosolver.util.objects.setDataStructures.SetFactory;
 import org.restopt.RasterDataLoader;
 import org.restopt.RestoptProblem;
 import org.restopt.RestoptSolution;
@@ -38,7 +44,7 @@ public class TestNbPatchesObjective {
     }
 
     @Test
-    public void testEffectiveMeshSizeObjectiveUnconstrained() throws Exception {
+    public void testNbPatchesObjectiveUnconstrained() throws Exception {
         String habitat = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();
         String restorable = getClass().getClassLoader().getResource("example_data/restorable.tif").getPath();
         String accessible = getClass().getClassLoader().getResource("example_data/habitat.tif").getPath();

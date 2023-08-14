@@ -3,6 +3,7 @@ package org.restopt.constraints;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.SetVar;
 import org.chocosolver.solver.variables.UndirectedGraphVar;
+import org.chocosolver.solver.variables.subgraph.SubGraphVar;
 import org.restopt.RestoptProblem;
 import org.restopt.grid.regular.square.GroupedGrid;
 import org.restopt.grid.regular.square.PartialRegularGroupedGrid;
@@ -25,11 +26,11 @@ public abstract class AbstractRestoptConstraint {
         return problem.getModel();
     }
 
-    protected SetVar getRestoreSetVar() {
+/*    protected SetVar getRestoreSetVar() {
         return problem.getRestoreSetVar();
-    }
+    }*/
 
-    protected UndirectedGraphVar getRestoreGraphVar() {
+    protected SubGraphVar getRestoreGraphVar() {
         return problem.getRestoreGraphVar();
     }
 

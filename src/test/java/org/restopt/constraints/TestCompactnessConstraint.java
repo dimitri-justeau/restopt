@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TestCompactnessConstraint {
 
@@ -54,18 +55,22 @@ public class TestCompactnessConstraint {
     }
 
     private void assertDiameter(double[][] coords, double minDiameter, double maxDiameter) {
-        boolean minDiamOk = false;
-        for (int i = 0; i < coords.length; i++) {
-            for (int j = i + 1; j < coords.length; j++) {
-                double[] ci = coords[i];
-                double[] cj = coords[j];
-                double dist = Math.sqrt(Math.pow(cj[0] - ci[0], 2) + Math.pow(cj[1] - ci[1], 2));
-                Assert.assertTrue(dist <= maxDiameter);
-                if (dist >= minDiameter) {
-                    minDiamOk = true;
+        if (coords.length == 0) {
+            Assert.assertTrue(minDiameter >= 0);
+        } else {
+            boolean minDiamOk = false;
+            for (int i = 0; i < coords.length; i++) {
+                for (int j = i + 1; j < coords.length; j++) {
+                    double[] ci = coords[i];
+                    double[] cj = coords[j];
+                    double dist = Math.sqrt(Math.pow(cj[0] - ci[0], 2) + Math.pow(cj[1] - ci[1], 2));
+                    Assert.assertTrue(dist <= maxDiameter);
+                    if (dist >= minDiameter) {
+                        minDiamOk = true;
+                    }
                 }
             }
+            Assert.assertTrue(minDiamOk);
         }
-        Assert.assertTrue(minDiamOk);
     }
 }

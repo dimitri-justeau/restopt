@@ -1,6 +1,8 @@
 package org.restopt.objectives;
 
 import org.chocosolver.solver.Solution;
+import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.constraints.graph.subgraph.PropSubGraphNbCC;
 import org.restopt.RestoptProblem;
 
 import java.util.ArrayList;
@@ -27,7 +29,8 @@ public class NbPatchesObjective extends AbstractRestoptObjective {
     @Override
     public void initObjective() {
         objective = problem.getModel().intVar(1, problem.getLandscapeArea());
-        problem.getModel().nbConnectedComponents(problem.getHabitatGraphVar(), objective).post();
+        Constraint c = new Constraint("nbCC", new PropSubGraphNbCC(problem.getHabitatGraphVar(), objective));
+        problem.getModel().post(c);
         initialValue = problem.getHabitatGraph().getNBCC();
     }
 

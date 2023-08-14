@@ -60,6 +60,9 @@ public class TestSolve {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        RestoptSolution sol = restoptProblem.maximizeIIC(3, 1, 0, 0, true);
+        RestoptSolution sol = restoptProblem.maximizeIIC(
+                1, 3, 1, 30, 0, true, "MIN_DOM_LB"
+        ).get(0);
+        sol.printSolutionInfos();
     }
 }

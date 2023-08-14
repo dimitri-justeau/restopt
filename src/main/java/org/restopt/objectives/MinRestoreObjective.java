@@ -3,6 +3,7 @@ package org.restopt.objectives;
 import org.chocosolver.solver.Solution;
 import org.restopt.RestoptProblem;
 import org.restopt.exception.RestoptException;
+import org.restopt.search.OrderedRestorableAreaStrategy;
 
 import java.util.*;
 
@@ -47,9 +48,9 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         }
     }
 
-/*    @Override
+   @Override
     public void setSearch() {
-        if (problem.hasRestorableAreaConstraint()) {
+        if (problem.hasRestorableAreaConstraint() && !SEARCH_KEYS.contains(search)) {
             if (maximize) {
                 new OrderedRestorableAreaStrategy(problem, true, true).setSearch();
             } else {
@@ -58,7 +59,7 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
         } else {
             super.setSearch();
         }
-    }*/
+    }
 
     @Override
     public String getInitialValueMessage() {

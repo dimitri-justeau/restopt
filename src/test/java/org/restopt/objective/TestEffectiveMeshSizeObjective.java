@@ -22,6 +22,7 @@ public class TestEffectiveMeshSizeObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
+        //restoptProblem.getModel().getSolver().showContradiction();
         List<RestoptSolution> sols = restoptProblem.maximizeMESH(10, 3, 30, 0,true);
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
