@@ -128,7 +128,7 @@ public abstract class AbstractRestoptObjective {
                     break;
             }
         } else {
-            problem.getModel().getSolver().setSearch(Search.minDomUBSearch(bools));
+            //problem.getModel().getSolver().setSearch(Search.minDomUBSearch(bools));
         }
     }
 

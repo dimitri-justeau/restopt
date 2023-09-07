@@ -32,11 +32,9 @@ import org.chocosolver.solver.variables.subgraph.SubGraphVar;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.objects.setDataStructures.ISet;
 import org.chocosolver.util.objects.setDataStructures.SetFactory;
-import org.chocosolver.util.objects.setDataStructures.SetType;
-import org.chocosolver.util.objects.setDataStructures.dynamic.SetDifference;
+
 import org.chocosolver.util.tools.ArrayUtils;
 
-import java.util.Arrays;
 
 import static org.restopt.choco.LandscapeIndicesUtils.*;
 

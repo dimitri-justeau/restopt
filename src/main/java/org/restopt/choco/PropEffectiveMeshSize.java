@@ -82,9 +82,21 @@ public class PropEffectiveMeshSize extends Propagator<IntVar> {
 
     @Override
     public void propagate(int evtmask) throws ContradictionException {
-        g.updateConnectivity();
+        //g.updateConnectivity();
+
+        SubGraphConnectedComponents ccUB = g.getConnectedComponentsUB();
+        ccUB.findAllCC();
+
+        for (int i = 0; i < g.getNbPotentialNodes(); i++) {
+            int node = g.getPotentialNode(i);
+            if (!ccUB.isReachableFromLB(ccUB.getNodeCC(node))) {
+                g.removeNode(node, this);
+            }
+        }
+
         // LB
-        if (!maximize || (g.getNbMandatoryNodes() == g.getNbPotentialNodes())) {
+        if (!maximize || (g.getMandatoryNodes().size() == g.getPotentialNodes().size())) {
+            g.getConnectedComponentsLB().findAllCC();
             int mesh_LB_round = getLB();
             mesh.updateLowerBound(mesh_LB_round, this);
         }
@@ -96,14 +108,13 @@ public class PropEffectiveMeshSize extends Propagator<IntVar> {
             for (int i = 0; i < g.getNbPotentialNodes(); i++) {
                 int node = g.getPotentialNode(i);
                 if (!g.getConnectedComponentsUB().isAlsoInLB(node)) {
-                    g.enforceNode(i, this);
+                    g.enforceNode(node, this);
                 }
             }
             mesh.instantiateTo(mesh_UB_round, this);
         } else {
             boolean filtered = false;
-            SubGraphConnectedComponents ccUB = g.getConnectedComponentsUB();
-            if (!(g.getNbMandatoryNodes() == g.getNbPotentialNodes())) {
+            if (!(g.getMandatoryNodes().size() == g.getPotentialNodes().size())) {
                 for (int i = 0; i < ccUB.getNbCC(); i++) {
                     int s = ccUB.getAttributeCC(i);
                     double d = (1.0 / landscapeArea) * ((s - 1) * (s - 1) - (s * s));
@@ -117,8 +128,8 @@ public class PropEffectiveMeshSize extends Propagator<IntVar> {
                         }
                     }
                 }
-                g.updateConnectivity();
-                if (filtered && (!maximize || (g.getNbMandatoryNodes() == g.getNbPotentialNodes()))) {
+                if (filtered && (!maximize || (g.getMandatoryNodes().size() == g.getPotentialNodes().size()))) {
+                    g.getConnectedComponentsLB().findAllCC();
                     int mesh_LB_round = getLB();
                     mesh.updateLowerBound(mesh_LB_round, this);
                 }
