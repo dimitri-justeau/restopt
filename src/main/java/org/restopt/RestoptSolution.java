@@ -28,12 +28,14 @@ public class RestoptSolution {
     public static final String KEY_TOTAL_RESTORABLE = "total_restorable";
     public static final String KEY_NB_PUS = "nb_planning_units";
     public static final String KEY_NB_COMPONENTS = "nb_components";
+    public static final String KEY_NB_PATCHES = "nb_patches";
     public static final String KEY_DIAMETER = "diameter";
     public static final String KEY_OPTIMALITY_PROVEN = "optimality_proven";
     public static final String KEY_SEARCH_STATE = "search_state";
     public static final String KEY_SOLVING_TIME = "solving_time";
     public static final String[] KEYS = {
-            KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_NB_COMPONENTS, KEY_DIAMETER, KEY_OPTIMALITY_PROVEN, KEY_SEARCH_STATE, KEY_SOLVING_TIME
+            KEY_MIN_RESTORE, KEY_TOTAL_RESTORABLE, KEY_NB_PUS, KEY_NB_COMPONENTS, KEY_NB_PATCHES,
+            KEY_DIAMETER, KEY_OPTIMALITY_PROVEN, KEY_SEARCH_STATE, KEY_SOLVING_TIME
     };
 
     private final RestoptProblem problem;
@@ -57,6 +59,7 @@ public class RestoptSolution {
         messages.put(KEY_TOTAL_RESTORABLE, "Total restorable area: ");
         messages.put(KEY_NB_PUS, "Number of planning units: ");
         messages.put(KEY_NB_COMPONENTS, "Number of connected components: ");
+        messages.put(KEY_NB_PATCHES, "Number of patches: ");
         messages.put(KEY_DIAMETER, "Diameter: ");
         messages.put(KEY_OPTIMALITY_PROVEN, "Optimality proven: ");
         messages.put(KEY_SEARCH_STATE, "Search state: ");
@@ -78,6 +81,7 @@ public class RestoptSolution {
         solCharacteristics.put(KEY_TOTAL_RESTORABLE, String.valueOf(getTotalRestorableArea()));
         solCharacteristics.put(KEY_NB_PUS, String.valueOf(getRestorationPlanningUnits().length));
         solCharacteristics.put(KEY_NB_COMPONENTS, String.valueOf(getNbComponents()));
+        solCharacteristics.put(KEY_NB_PATCHES, String.valueOf(getNbPatches()));
         solCharacteristics.put(KEY_DIAMETER, String.valueOf(getDiameter()));
         solCharacteristics.put(KEY_SOLVING_TIME, String.valueOf(1.0 * objective.getTotalRuntime() / 1000));
         solCharacteristics.put(KEY_SEARCH_STATE, String.valueOf(problem.getSearchState()));
@@ -194,6 +198,15 @@ public class RestoptSolution {
     }
 
     /**
+     * @return The number of patches of the solution.
+     */
+    public int getNbPatches() {
+        ConnectivityFinderSpatialGraph cf = new ConnectivityFinderSpatialGraph(getHabitatGraph());
+        cf.findAllCC();
+        return cf.getNBCC();
+    }
+
+    /**
      * @return The diameter of the solution.
      */
     public double getDiameter() {
@@ -213,6 +226,12 @@ public class RestoptSolution {
         return minidisk[2] * 2;
      }
 
+    public int[] getHabitatAndRestorationPlanningUnits() {
+        int[] hab = IntStream.range(0, problem.getGrid().getNbGroups()).toArray();
+        int[] rest = getRestorationPlanningUnits();
+        return ArrayUtils.concat(hab, rest);
+    }
+
     public int[] getRestorationPlanningUnits() {
         return solution.getSetVal(problem.getRestoreSetVar());
     }
@@ -223,6 +242,25 @@ public class RestoptSolution {
 
     public UndirectedGraph getRestorationGraph() {
         int[] pus = getRestorationPlanningUnits();
+        UndirectedGraph g = GraphFactory.makeUndirectedGraph(
+                problem.grid.getNbCells(),
+                SetType.BIPARTITESET,
+                SetType.BIPARTITESET,
+                pus,
+                new int[][]{}
+        );
+        for (int i : pus) {
+            for (int j : problem.getNeighborhood().getNeighbors(problem.getGrid(), i)) {
+                if (g.containsNode(j)) {
+                    g.addEdge(i, j);
+                }
+            }
+        }
+        return g;
+    }
+
+    public UndirectedGraph getHabitatGraph() {
+        int[] pus = getHabitatAndRestorationPlanningUnits();
         UndirectedGraph g = GraphFactory.makeUndirectedGraph(
                 problem.grid.getNbCells(),
                 SetType.BIPARTITESET,

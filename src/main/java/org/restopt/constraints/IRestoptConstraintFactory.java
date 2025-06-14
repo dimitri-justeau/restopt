@@ -13,6 +13,10 @@ public interface IRestoptConstraintFactory {
         new NbComponentsConstraint(self(), minNbCC, maxNbCC).post();
     }
 
+    default void postNbPatchesConstraint(int minNP, int maxNP) {
+        new NbPatchesConstraint(self(), minNP, maxNP).post();
+    }
+
     default void postCompactnessConstraint(double maxDiameter) {
         new CompactnessConstraint(self(), maxDiameter).post();
     }
