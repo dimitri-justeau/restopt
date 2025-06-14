@@ -243,7 +243,7 @@ public abstract class AbstractRestoptObjective {
             Constraint forceOptimal = solver.getModel().arithm(objective, operator, optWithGap);
             forceOptimal.post();
             if (defaultS)
-                solver.setSearch(Search.defaultSearch(solver.getModel()));// best bound (in default) is only for optim
+                Search.defaultSearch(solver.getModel());// best bound (in default) is only for optim
             List<Solution> solutions;
             if (timeLimit > 0) {
                 solutions = findNSolutions(nbSolutions, nTimeLimit);
