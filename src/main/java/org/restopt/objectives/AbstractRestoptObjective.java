@@ -108,6 +108,9 @@ public abstract class AbstractRestoptObjective {
                     break;
             }
         } else {
+            if (!this.search.equals("")) {
+                System.out.println("Warning: the search strategy '" + this.search + "' does not exist. Setting default search");
+            }
             problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
         }
     }
