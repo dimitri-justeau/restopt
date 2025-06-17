@@ -22,7 +22,9 @@ public class TestNbPatchesObjective {
         restoptProblem.postNbComponentsConstraint(1, 1);
         restoptProblem.postCompactnessConstraint(6);
         restoptProblem.postRestorableConstraint(90 * 11, 110 * 11, 0.7);
-        List<RestoptSolution> sols = restoptProblem.minimizeNbPatches(10,30, 0,true, "");
+        List<RestoptSolution> sols = restoptProblem.minimizeNbPatches(
+                10,30, 0,true, "", false
+        );
         double best_ref = -1;
         for (RestoptSolution sol : sols) {
             sol.printSolutionInfos();
@@ -45,7 +47,9 @@ public class TestNbPatchesObjective {
         String cell_area = getClass().getClassLoader().getResource("example_data/cell_area.tif").getPath();
         RasterDataLoader dataLoader = new RasterDataLoader(habitat, accessible, restorable, cell_area);
         RestoptProblem restoptProblem = new RestoptProblem(dataLoader, 0);
-        RestoptSolution sol = restoptProblem.minimizeNbPatches(1,30, 0,true, "").get(0);
+        RestoptSolution sol = restoptProblem.minimizeNbPatches(
+                1,30, 0,true, "", false
+        ).get(0);
         sol.printSolutionInfos();
         double initial = Double.parseDouble(sol.getCharacteristics().get(NbPatchesObjective.KEY_NB_PATCHES_INITIAL));
         double best = Double.parseDouble(sol.getCharacteristics().get(NbPatchesObjective.KEY_NB_PATCHES));

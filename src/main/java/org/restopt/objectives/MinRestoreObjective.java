@@ -13,8 +13,9 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
 
     double minProportion;
 
-    public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) throws Exception {
-        super(problem, timeLimit, verbose, maximize, search);
+    public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
+                               String search, boolean lns) throws Exception {
+        super(problem, timeLimit, verbose, maximize, search, lns);
         if (problem.getMinRestore() == null) {
             throw new Exception("MinRestoreObjective without minProportion is only allowed " +
                     "if a restorable constraint was posted");
@@ -22,11 +23,12 @@ public class MinRestoreObjective extends AbstractRestoptObjective {
     }
 
     public MinRestoreObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) throws Exception {
-        this(problem, timeLimit, verbose, maximize, "");
+        this(problem, timeLimit, verbose, maximize, "", false);
     }
 
-    public MinRestoreObjective(RestoptProblem problem, double minProportion, int timeLimit, boolean verbose, boolean maximize, String search) {
-        super(problem, timeLimit, verbose, maximize, search);
+    public MinRestoreObjective(RestoptProblem problem, double minProportion, int timeLimit, boolean verbose, boolean maximize,
+                               String search, boolean lns) {
+        super(problem, timeLimit, verbose, maximize, search, lns);
         this.minProportion = minProportion;
     }
 

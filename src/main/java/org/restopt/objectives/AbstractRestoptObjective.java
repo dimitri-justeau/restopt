@@ -4,6 +4,7 @@ import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.search.limits.TimeCounter;
+import org.chocosolver.solver.search.loop.lns.INeighborFactory;
 import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
@@ -36,22 +37,27 @@ public abstract class AbstractRestoptObjective {
     protected boolean maximize;
     protected long totalRuntime;
     protected String search;
+    protected boolean lns;
+    protected BoolVar[] decisionVars;
 
     protected int optimalValue;
 
     protected boolean provenOptimal;
 
-    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) {
+    public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search,
+                                    boolean lns) {
         this.problem = problem;
         this.timeLimit = timeLimit;
         this.verbose = verbose;
         this.maximize = maximize;
         this.provenOptimal = false;
         this.search = search;
+        this.lns = lns;
+        this.decisionVars = null;
     }
 
     public AbstractRestoptObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
-        this(problem, timeLimit, verbose, maximize, "");
+        this(problem, timeLimit, verbose, maximize, "", false);
     }
 
     public boolean isProvenOptimal() {
@@ -66,45 +72,51 @@ public abstract class AbstractRestoptObjective {
         return objective;
     }
 
+    public void initDecisionVars() {
+        decisionVars = new BoolVar[problem.getAvailablePlanningUnits().length];
+        for (int i = 0; i < decisionVars.length; i++) {
+            decisionVars[i] = problem.getModel().setBoolView(
+                    problem.getRestoreSetVar(),
+                    problem.getAvailablePlanningUnits()[i]
+            );
+        }
+    }
+
     /**
      * Set the search strategy. Override according to the objective.
      */
     public void setSearch() {
         if (SEARCH_KEYS.contains(this.search)) {
-            BoolVar[] bools = new BoolVar[problem.getAvailablePlanningUnits().length];
-            for (int i = 0; i < bools.length; i++) {
-                bools[i] = problem.getModel().setBoolView(
-                        problem.getRestoreSetVar(),
-                        problem.getAvailablePlanningUnits()[i]
-                );
+            if (decisionVars == null) {
+                initDecisionVars();
             }
             switch (this.search) {
                 case "RANDOM":
-                    problem.getModel().getSolver().setSearch(Search.randomSearch(bools, System.currentTimeMillis()));
+                    problem.getModel().getSolver().setSearch(Search.randomSearch(decisionVars, System.currentTimeMillis()));
                     break;
                 case "DOM_OVER_W_DEG":
-                    problem.getModel().getSolver().setSearch(Search.domOverWDegSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.domOverWDegSearch(decisionVars));
                     break;
                 case "DOM_OVER_W_DEG_REF":
-                    problem.getModel().getSolver().setSearch(Search.domOverWDegRefSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.domOverWDegRefSearch(decisionVars));
                     break;
                 case "MIN_DOM_LB":
-                    problem.getModel().getSolver().setSearch(Search.minDomLBSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.minDomLBSearch(decisionVars));
                     break;
                 case "MIN_DOM_UB":
-                    problem.getModel().getSolver().setSearch(Search.minDomUBSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.minDomUBSearch(decisionVars));
                     break;
                 case "ACTIVITY_BASED":
-                    problem.getModel().getSolver().setSearch(Search.activityBasedSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.activityBasedSearch(decisionVars));
                     break;
                 case "CONFLICT_HISTORY":
-                    problem.getModel().getSolver().setSearch(Search.conflictHistorySearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.conflictHistorySearch(decisionVars));
                     break;
                 case "FAILURE_RATE":
-                    problem.getModel().getSolver().setSearch(Search.failureRateBasedSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.failureRateBasedSearch(decisionVars));
                     break;
                 case "FAILURE_LENGTH":
-                    problem.getModel().getSolver().setSearch(Search.failureLengthBasedSearch(bools));
+                    problem.getModel().getSolver().setSearch(Search.failureLengthBasedSearch(decisionVars));
                     break;
             }
         } else {
@@ -112,6 +124,16 @@ public abstract class AbstractRestoptObjective {
                 System.out.println("Warning: the search strategy '" + this.search + "' does not exist. Setting default search");
             }
             problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
+        }
+    }
+
+    public void configureSearch() {
+        setSearch();
+        if (lns) {
+            if (decisionVars == null) {
+                initDecisionVars();
+            }
+            problem.getModel().getSolver().setLNS(INeighborFactory.random(decisionVars));
         }
     }
 
@@ -127,7 +149,7 @@ public abstract class AbstractRestoptObjective {
 
     public List<Solution> solve(int nbSolutions, int timeLimit, double optimalityGap) throws RestoptException {
         long t = System.currentTimeMillis();
-        setSearch();
+        configureSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();
@@ -149,7 +171,7 @@ public abstract class AbstractRestoptObjective {
 
     public List<Solution> solve(int nbSolutions, double optimalityGap) throws RestoptException {
         long t = System.currentTimeMillis();
-        setSearch();
+        configureSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();

@@ -27,12 +27,12 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
 
     public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
                                                 int precision) throws RestoptException {
-        this(problem, timeLimit, verbose, maximize, precision, 1, "");
+        this(problem, timeLimit, verbose, maximize, precision, 1, "", false);
     }
 
     public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
-                                                int precision, int distanceThreshold, String search) throws RestoptException {
-        super(problem, timeLimit, verbose, maximize, search);
+                                                int precision, int distanceThreshold, String search, boolean lns) throws RestoptException {
+        super(problem, timeLimit, verbose, maximize, search, lns);
         this.precision = precision;
         if (distanceThreshold < 1) {
             throw new RestoptException("The distance threshold for the integral index of connectivity must be at least" +
@@ -43,7 +43,7 @@ public class IntegralIndexOfConnectivityObjective extends AbstractRestoptObjecti
 
     public IntegralIndexOfConnectivityObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
                                                 int precision, int distanceThreshold) throws RestoptException {
-        this(problem, timeLimit, verbose, maximize, precision, distanceThreshold, "");
+        this(problem, timeLimit, verbose, maximize, precision, distanceThreshold, "", false);
     }
 
     private INeighborhood getNeighborhood() {

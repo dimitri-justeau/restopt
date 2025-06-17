@@ -11,12 +11,12 @@ import java.util.Map;
 
 public class NoOptimizationObjective extends AbstractRestoptObjective {
 
-    public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose, String search) {
-        super(problem, timeLimit, verbose, true, search);
+    public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose, String search, boolean lns) {
+        super(problem, timeLimit, verbose, true, search, lns);
     }
 
     public NoOptimizationObjective(RestoptProblem problem, int timeLimit, boolean verbose) {
-        this(problem, timeLimit, verbose, "");
+        this(problem, timeLimit, verbose, "", false);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
 
     @Override
     public List<Solution> solve(int nbSolutions, double optimalityGap) {
-        setSearch();
+        configureSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();
@@ -61,7 +61,7 @@ public class NoOptimizationObjective extends AbstractRestoptObjective {
 
     @Override
     public List<Solution> solve(int nbSolutions, int timeLimit, double optimalityGap) {
-        setSearch();
+        configureSearch();
         List<Solution> solutions;
         if (nbSolutions == 1) {
             solutions = new ArrayList<>();

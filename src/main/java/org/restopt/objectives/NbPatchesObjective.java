@@ -16,12 +16,13 @@ public class NbPatchesObjective extends AbstractRestoptObjective {
 
     int initialValue;
 
-    public NbPatchesObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) {
-        super(problem, timeLimit, verbose, maximize, search);
+    public NbPatchesObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
+                              String search, boolean lns) {
+        super(problem, timeLimit, verbose, maximize, search, lns);
     }
 
     public NbPatchesObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
-        this(problem, timeLimit, verbose, maximize, "");
+        this(problem, timeLimit, verbose, maximize, "", false);
     }
 
     @Override

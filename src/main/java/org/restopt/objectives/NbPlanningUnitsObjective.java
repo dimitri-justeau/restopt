@@ -13,12 +13,13 @@ public class NbPlanningUnitsObjective extends AbstractRestoptObjective {
 
     public static final String KEY_NB_PUS_BEST = "nb_planning_units_best";
 
-    public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize, String search) {
-        super(problem, timeLimit, verbose, maximize, search);
+    public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize,
+                                    String search, boolean lns) {
+        super(problem, timeLimit, verbose, maximize, search, lns);
     }
 
     public NbPlanningUnitsObjective(RestoptProblem problem, int timeLimit, boolean verbose, boolean maximize) {
-        this(problem, timeLimit, verbose, maximize, "");
+        this(problem, timeLimit, verbose, maximize, "", false);
     }
 
     @Override
