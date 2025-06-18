@@ -120,7 +120,7 @@ public abstract class AbstractRestoptObjective {
                     break;
             }
         } else {
-            if (!this.search.equals("")) {
+            if (!this.search.equals("") && !(this.search.equals("DEFAULT"))) {
                 System.out.println("Warning: the search strategy '" + this.search + "' does not exist. Setting default search");
             }
             problem.getModel().getSolver().setSearch(Search.setVarSearch(problem.getRestoreSetVar()));
@@ -130,10 +130,15 @@ public abstract class AbstractRestoptObjective {
     public void configureSearch() {
         setSearch();
         if (lns) {
-            if (decisionVars == null) {
-                initDecisionVars();
+            if (search.equals("ACTIVITY_BASED")) {
+                System.out.println("Warning: the search strategy '" + this.search + "' is not compatible with LNS. " +
+                        "LNS will not be activated.");
+            } else {
+                if (decisionVars == null) {
+                    initDecisionVars();
+                }
+                problem.getModel().getSolver().setLNS(INeighborFactory.random(decisionVars));
             }
-            problem.getModel().getSolver().setLNS(INeighborFactory.random(decisionVars));
         }
     }
 
