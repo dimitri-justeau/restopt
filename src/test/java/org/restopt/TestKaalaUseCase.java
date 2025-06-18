@@ -33,7 +33,7 @@ public class TestKaalaUseCase {
         restoptProblem.postCompactnessConstraint(11);
         restoptProblem.postMinMeshConstraint(275.2538, 3);
         RestoptSolution sol = restoptProblem.minimizeMinRestore(
-                0.75, 1, 10, 0, true, "", true
+                0.75, 1, 30, 0, true, "", true
         ).get(0);
         System.out.println(sol.getDiameter());
     }
