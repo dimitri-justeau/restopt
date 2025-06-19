@@ -36,4 +36,8 @@ public interface IRestoptConstraintFactory {
     default void postMinIICConstraint(double minIIC, int distanceThreshold, int precision) throws RestoptException {
         new IntegralIndexOfConnectivityConstraint(self(), minIIC, 1, distanceThreshold, precision).post();
     }
+
+    default void postNoNewPatchConstraint() {
+        new NoNewPatchConstraint(self()).post();
+    }
 }

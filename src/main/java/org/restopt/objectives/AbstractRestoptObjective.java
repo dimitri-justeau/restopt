@@ -228,7 +228,7 @@ public abstract class AbstractRestoptObjective {
         }
         List<Solution> solutions = new ArrayList<>();
         int i = 0;
-        while (solver.solve() && i < nbSolutions) {
+        while (solver.solve() && (i < nbSolutions || nbSolutions == -1)) {
             solutions.add(new Solution(solver.getModel()).record());
             i++;
         }
